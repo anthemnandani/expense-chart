@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
-import { Calendar, TrendingUp, Activity, Target, Zap } from "lucide-react"
+import { Calendar, TrendingUp, Activity, Target } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 export default function WeeklyTab() {
@@ -34,13 +34,6 @@ export default function WeeklyTab() {
   const bestWeek = weeklyData.reduce((prev, current) => (prev.net > current.net ? prev : current))
   const worstWeek = weeklyData.reduce((prev, current) => (prev.net < current.net ? prev : current))
   const avgWeeklyNet = weeklyData.reduce((sum, week) => sum + week.net, 0) / weeklyData.length
-
-  // Weekly patterns data
-  const weeklyPatterns = [
-    { pattern: "Income Weeks", count: 6, percentage: 50, color: "emerald" },
-    { pattern: "Expense Only", count: 4, percentage: 33, color: "red" },
-    { pattern: "Balanced Weeks", count: 2, percentage: 17, color: "blue" },
-  ]
 
   return (
     <div className="space-y-6">
@@ -95,99 +88,54 @@ export default function WeeklyTab() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Net Balance Trend */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-emerald-600" />
-              Weekly Net Balance Trend
-            </CardTitle>
-            <CardDescription>Track your weekly financial performance over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                net: {
-                  label: "Net Balance",
-                  color: "#10b981",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <AreaChart data={weeklyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <ChartTooltip
-                  content={({ active, payload, label }) => {
-                    if (active && payload && payload[0]) {
-                      const data = payload[0].payload
-                      return (
-                        <div className="bg-white p-3 border rounded-lg shadow-lg">
-                          <p className="font-semibold">{label}</p>
-                          <p className="text-sm">
-                            {data.weekStart} - {data.weekEnd}
-                          </p>
-                          <p className="text-sm">Net: ₹{data.net.toLocaleString()}</p>
-                          <p className="text-xs text-slate-600">
-                            Income: ₹{data.totalCredit.toLocaleString()} | Expenses: ₹{data.totalDebit.toLocaleString()}
-                          </p>
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Area type="monotone" dataKey="net" stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Patterns Analysis */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-orange-600" />
-              Weekly Patterns
-            </CardTitle>
-            <CardDescription>Analysis of your weekly financial patterns</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {weeklyPatterns.map((pattern, index) => (
-                <div key={pattern.pattern} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{pattern.pattern}</span>
-                    <span className="text-sm text-slate-600">{pattern.count} weeks</span>
-                  </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        pattern.color === "emerald"
-                          ? "bg-emerald-500"
-                          : pattern.color === "red"
-                            ? "bg-red-500"
-                            : "bg-blue-500"
-                      }`}
-                      style={{ width: `${pattern.percentage}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-slate-500">{pattern.percentage}% of total weeks</div>
-                </div>
-              ))}
-
-              <div className="mt-6 p-4 bg-slate-50 rounded-lg">
-                <h4 className="font-semibold text-slate-700 mb-2">Pattern Insights</h4>
-                <p className="text-sm text-slate-600">
-                  You have income in 50% of weeks. Consider establishing more consistent income streams.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Weekly Net Balance Trend */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-emerald-600" />
+            Weekly Net Balance Trend
+          </CardTitle>
+          <CardDescription>Track your weekly financial performance over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              net: {
+                label: "Net Balance",
+                color: "#10b981",
+              },
+            }}
+            className="h-[350px]"
+          >
+            <AreaChart data={weeklyData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis dataKey="week" />
+              <YAxis />
+              <ChartTooltip
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload[0]) {
+                    const data = payload[0].payload
+                    return (
+                      <div className="bg-white p-3 border rounded-lg shadow-lg">
+                        <p className="font-semibold">{label}</p>
+                        <p className="text-sm">
+                          {data.weekStart} - {data.weekEnd}
+                        </p>
+                        <p className="text-sm">Net: ₹{data.net.toLocaleString()}</p>
+                        <p className="text-xs text-slate-600">
+                          Income: ₹{data.totalCredit.toLocaleString()} | Expenses: ₹{data.totalDebit.toLocaleString()}
+                        </p>
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
+              <Area type="monotone" dataKey="net" stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} />
+            </AreaChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly Income vs Expenses */}

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
-import { Calendar, TrendingUp, ArrowUpRight, ArrowDownRight, Target, DollarSign } from "lucide-react"
+import { Calendar, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 interface MonthlyTabProps {
@@ -68,14 +68,6 @@ export default function MonthlyTab({ yearlyData }: MonthlyTabProps) {
     activeMonths[0],
   )
 
-  // Calculate quarterly data
-  const quarterlyData = [
-    { quarter: "Q1", months: "Jan-Mar", income: 13200, expenses: 11542, savings: 1658 },
-    { quarter: "Q2", months: "Apr-Jun", income: 17500, expenses: 18163, savings: -663 },
-    { quarter: "Q3", months: "Jul-Sep", income: 3000, expenses: 3480, savings: -480 },
-    { quarter: "Q4", months: "Oct-Dec", income: 0, expenses: 0, savings: 0 },
-  ]
-
   return (
     <div className="space-y-6">
       {/* Monthly Performance Cards */}
@@ -127,219 +119,105 @@ export default function MonthlyTab({ yearlyData }: MonthlyTabProps) {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Monthly Income vs Expenses */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
-              Monthly Income vs Expenses
-            </CardTitle>
-            <CardDescription>Detailed monthly financial performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                income: {
-                  label: "Income",
-                  color: "#10b981",
-                },
-                expenses: {
-                  label: "Expenses",
-                  color: "#ef4444",
-                },
-              }}
-              className="h-[400px]"
-            >
-              <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="shortMonth" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="income" fill="#10b981" radius={4} />
-                <Bar dataKey="expenses" fill="#ef4444" radius={4} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+      {/* Monthly Income vs Expenses */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-emerald-600" />
+            Monthly Income vs Expenses
+          </CardTitle>
+          <CardDescription>Detailed monthly financial performance</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              income: {
+                label: "Income",
+                color: "#10b981",
+              },
+              expenses: {
+                label: "Expenses",
+                color: "#ef4444",
+              },
+            }}
+            className="h-[400px]"
+          >
+            <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis dataKey="shortMonth" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="income" fill="#10b981" radius={4} />
+              <Bar dataKey="expenses" fill="#ef4444" radius={4} />
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
 
-        {/* Quarterly Summary */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-blue-600" />
-              Quarterly Summary
-            </CardTitle>
-            <CardDescription>Financial performance by quarters</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {quarterlyData.map((quarter, index) => (
-                <div key={quarter.quarter} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                  <div>
-                    <div className="font-semibold text-lg">{quarter.quarter}</div>
-                    <div className="text-sm text-slate-600">{quarter.months}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-lg font-bold ${quarter.savings >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                      {quarter.savings >= 0 ? "+" : ""}₹{quarter.savings.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-slate-500">
-                      ₹{quarter.income.toLocaleString()} - ₹{quarter.expenses.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Savings Rate Trend */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <CardTitle>Monthly Savings Rate</CardTitle>
+          <CardDescription>Percentage of income saved each month</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              savingsRate: {
+                label: "Savings Rate %",
+                color: "#8b5cf6",
+              },
+            }}
+            className="h-[300px]"
+          >
+            <LineChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis dataKey="shortMonth" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line
+                type="monotone"
+                dataKey="savingsRate"
+                stroke="#8b5cf6"
+                strokeWidth={3}
+                dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Savings Rate Trend */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle>Monthly Savings Rate</CardTitle>
-            <CardDescription>Percentage of income saved each month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                savingsRate: {
-                  label: "Savings Rate %",
-                  color: "#8b5cf6",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="shortMonth" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line
-                  type="monotone"
-                  dataKey="savingsRate"
-                  stroke="#8b5cf6"
-                  strokeWidth={3}
-                  dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Monthly Goals & Targets */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-              Monthly Goals & Targets
-            </CardTitle>
-            <CardDescription>Track your financial goals progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Monthly Savings Goal</span>
-                  <span className="text-sm text-slate-600">₹2,000</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div className="bg-emerald-500 h-2 rounded-full" style={{ width: "75%" }}></div>
-                </div>
-                <div className="text-xs text-slate-500 mt-1">₹1,500 achieved (75%)</div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Expense Limit</span>
-                  <span className="text-sm text-slate-600">₹5,000</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div className="bg-red-500 h-2 rounded-full" style={{ width: "85%" }}></div>
-                </div>
-                <div className="text-xs text-slate-500 mt-1">₹4,250 spent (85%)</div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Investment Target</span>
-                  <span className="text-sm text-slate-600">₹3,000</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: "60%" }}></div>
-                </div>
-                <div className="text-xs text-slate-500 mt-1">₹1,800 invested (60%)</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Current Month Daily Breakdown */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle>July 2025 - Daily Breakdown</CardTitle>
-            <CardDescription>Daily credit and debit transactions for the current month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                credit: {
-                  label: "Credit",
-                  color: "#10b981",
-                },
-                debit: {
-                  label: "Debit",
-                  color: "#ef4444",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <BarChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="credit" fill="#10b981" radius={2} />
-                <Bar dataKey="debit" fill="#ef4444" radius={2} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Monthly Insights */}
-        <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100">
-          <CardHeader>
-            <CardTitle>Monthly Insights</CardTitle>
-            <CardDescription>Smart recommendations based on your monthly patterns</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <h4 className="font-semibold text-emerald-700 mb-2">Best Performing Month</h4>
-                <p className="text-sm text-slate-600">
-                  <strong>January</strong> had the highest savings rate at <strong>39.7%</strong> with ₹2,397 saved
-                </p>
-              </div>
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <h4 className="font-semibold text-orange-700 mb-2">Improvement Opportunity</h4>
-                <p className="text-sm text-slate-600">
-                  Focus on <strong>May</strong> - despite high income (₹9,000), expenses were also highest (₹9,048)
-                </p>
-              </div>
-              <div className="p-4 bg-white rounded-lg shadow-sm">
-                <h4 className="font-semibold text-blue-700 mb-2">Trend Analysis</h4>
-                <p className="text-sm text-slate-600">
-                  Your savings rate has been <strong>declining</strong> since March. Consider budget adjustments.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Current Month Daily Breakdown */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <CardTitle>July 2025 - Daily Breakdown</CardTitle>
+          <CardDescription>Daily credit and debit transactions for the current month</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              credit: {
+                label: "Credit",
+                color: "#10b981",
+              },
+              debit: {
+                label: "Debit",
+                color: "#ef4444",
+              },
+            }}
+            className="h-[300px]"
+          >
+            <BarChart data={dailyData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="credit" fill="#10b981" radius={2} />
+              <Bar dataKey="debit" fill="#ef4444" radius={2} />
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
     </div>
   )
 }

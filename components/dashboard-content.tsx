@@ -1,14 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CreditCard, PieChart, Calendar, BarChart3, Activity } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import ModernOverviewTab from "@/components/modern-overview-tab"
-import MonthlyTab from "@/components/monthly-tab"
-import CategoriesTab from "@/components/categories-tab"
-import WeeklyTab from "@/components/weekly-tab"
-import DailyTab from "@/components/daily-tab"
+import ComprehensiveDashboard from "@/components/comprehensive-dashboard"
 
 // Static data based on your API responses
 const yearlyData = [
@@ -34,7 +28,6 @@ const categoryData = [
 ]
 
 export default function DashboardContent() {
-  const [activeTab, setActiveTab] = useState("overview")
   const [selectedYear, setSelectedYear] = useState("2025")
   const [selectedMonth, setSelectedMonth] = useState("July")
 
@@ -62,7 +55,7 @@ export default function DashboardContent() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
             Financial Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track your expenses with beautiful insights</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Complete overview of your financial data</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -93,68 +86,8 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* Modern Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl h-14">
-          <TabsTrigger
-            value="overview"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-emerald-400"
-          >
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger
-            value="monthly"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-blue-400"
-          >
-            <Calendar className="h-4 w-4" />
-            Monthly
-          </TabsTrigger>
-          <TabsTrigger
-            value="categories"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-purple-400"
-          >
-            <PieChart className="h-4 w-4" />
-            Categories
-          </TabsTrigger>
-          <TabsTrigger
-            value="weekly"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-orange-400"
-          >
-            <Activity className="h-4 w-4" />
-            Weekly
-          </TabsTrigger>
-          <TabsTrigger
-            value="daily"
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-indigo-400"
-          >
-            <CreditCard className="h-4 w-4" />
-            Daily
-          </TabsTrigger>
-        </TabsList>
-
-        <div className="min-h-[600px]">
-          <TabsContent value="overview" className="space-y-6 mt-0">
-            <ModernOverviewTab yearlyData={yearlyData} categoryData={categoryData} />
-          </TabsContent>
-
-          <TabsContent value="monthly" className="space-y-6 mt-0">
-            <MonthlyTab yearlyData={yearlyData} />
-          </TabsContent>
-
-          <TabsContent value="categories" className="space-y-6 mt-0">
-            <CategoriesTab categoryData={categoryData} />
-          </TabsContent>
-
-          <TabsContent value="weekly" className="space-y-6 mt-0">
-            <WeeklyTab />
-          </TabsContent>
-
-          <TabsContent value="daily" className="space-y-6 mt-0">
-            <DailyTab />
-          </TabsContent>
-        </div>
-      </Tabs>
+      {/* Comprehensive Dashboard */}
+      <ComprehensiveDashboard yearlyData={yearlyData} categoryData={categoryData} />
     </div>
   )
 }
