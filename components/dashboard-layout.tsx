@@ -3,161 +3,118 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { LayoutDashboard, CreditCard, Tags, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { BarChart3, CreditCard, Home, Menu, Settings, Tags, X } from "lucide-react"
+
+const navigation = [
+  { name: "Dashboard", href: "/", icon: Home },
+  { name: "Expenses", href: "/expenses", icon: CreditCard },
+  { name: "Categories", href: "/expense-types", icon: Tags },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Settings", href: "/settings", icon: Settings },
+]
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
-
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/",
-      active: pathname === "/",
-    },
-    {
-      title: "Expenses",
-      icon: CreditCard,
-      href: "/expenses",
-      active: pathname === "/expenses",
-    },
-    {
-      title: "Expense Types",
-      icon: Tags,
-      href: "/expense-types",
-      active: pathname === "/expense-types",
-    },
-    {
-      title: "Settings",
-      icon: Settings,
-      href: "/settings",
-      active: pathname === "/settings",
-    },
-  ]
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="bg-white dark:bg-gray-800"
-        >
-          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {/* Mobile Overlay */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setMobileMenuOpen(false)} />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed left-0 top-0 z-40 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out",
-          sidebarCollapsed ? "w-16" : "w-64",
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-        )}
-      >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          {!sidebarCollapsed && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">ET</span>
-              </div>
-              <span className="font-semibold text-gray-900 dark:text-white">Expense Tracker</span>
+      {/* Mobile sidebar */}
+      <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-xl">
+          <div className="flex h-16 items-center justify-between px-4">
+            <div className="flex items-center">
+              <BarChart3 className="h-8 w-8 text-emerald-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">ExpenseTracker</span>
             </div>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="hidden lg:flex"
-          >
-            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        {/* Navigation Menu */}
-        <nav className="p-4 space-y-2">
-          {menuItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={item.active ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start gap-3 transition-all duration-200",
-                  sidebarCollapsed && "justify-center px-2",
-                  item.active && "bg-blue-600 text-white hover:bg-blue-700",
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <item.icon className="h-4 w-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>{item.title}</span>}
-              </Button>
-            </Link>
-          ))}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <Button
-            variant="ghost"
-            className={cn(
-              "w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20",
-              sidebarCollapsed && "justify-center px-2",
-            )}
-          >
-            <LogOut className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Logout</span>}
-          </Button>
+            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          <nav className="flex-1 space-y-1 px-2 py-4">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive
+                      ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white",
+                  )}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  {item.name}
+                </Link>
+              )
+            })}
+          </nav>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className={cn("transition-all duration-300 ease-in-out", sidebarCollapsed ? "lg:ml-16" : "lg:ml-64")}>
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="lg:hidden w-8" /> {/* Spacer for mobile menu button */}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {menuItems.find((item) => item.active)?.title || "Dashboard"}
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Welcome back! Here's your financial overview.
-                </p>
-              </div>
-            </div>
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex h-16 items-center px-4">
+            <BarChart3 className="h-8 w-8 text-emerald-600" />
+            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">ExpenseTracker</span>
+          </div>
+          <nav className="flex-1 space-y-1 px-2 py-4">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive
+                      ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white",
+                  )}
+                >
+                  <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  {item.name}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      </div>
 
-            <div className="flex items-center gap-4">
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
+
+          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+            <div className="flex flex-1" />
+            <div className="flex items-center gap-x-4 lg:gap-x-6">
               <ThemeToggle />
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Page Content */}
-        <main className="p-6">{children}</main>
+        {/* Page content */}
+        <main className="py-10">
+          <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+        </main>
       </div>
     </div>
   )

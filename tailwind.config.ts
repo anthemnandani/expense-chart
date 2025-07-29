@@ -54,11 +54,11 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         chart: {
-          "1": "#10b981",
-          "2": "#ef4444",
-          "3": "#8b5cf6",
-          "4": "#f59e0b",
-          "5": "#06b6d4",
+          "1": "hsl(var(--chart-1))",
+          "2": "hsl(var(--chart-2))",
+          "3": "hsl(var(--chart-3))",
+          "4": "hsl(var(--chart-4))",
+          "5": "hsl(var(--chart-5))",
         },
       },
       borderRadius: {

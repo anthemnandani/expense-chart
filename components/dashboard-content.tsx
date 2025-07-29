@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import { CreditCard, PieChart, Calendar, BarChart3, Activity } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ModernOverviewTab from "@/components/modern-overview-tab"
 import MonthlyTab from "@/components/monthly-tab"
 import CategoriesTab from "@/components/categories-tab"
@@ -35,6 +35,24 @@ const categoryData = [
 
 export default function DashboardContent() {
   const [activeTab, setActiveTab] = useState("overview")
+  const [selectedYear, setSelectedYear] = useState("2025")
+  const [selectedMonth, setSelectedMonth] = useState("July")
+
+  const years = ["2023", "2024", "2025", "2026"]
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ]
 
   return (
     <div className="space-y-6 max-w-full overflow-hidden">
@@ -47,55 +65,68 @@ export default function DashboardContent() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">Track your expenses with beautiful insights</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge
-            variant="outline"
-            className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 px-3 py-1"
-          >
-            2025
-          </Badge>
-          <Badge
-            variant="outline"
-            className="bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800 px-3 py-1"
-          >
-            July
-          </Badge>
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <SelectTrigger className="w-[100px] bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((year) => (
+                <SelectItem key={year} value={year}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger className="w-[120px] bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Modern Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border-0 h-12 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl h-14">
           <TabsTrigger
             value="overview"
-            className="flex items-center gap-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200 text-sm"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-emerald-400"
           >
             <BarChart3 className="h-4 w-4" />
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="monthly"
-            className="flex items-center gap-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200 text-sm"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-blue-400"
           >
             <Calendar className="h-4 w-4" />
             Monthly
           </TabsTrigger>
           <TabsTrigger
             value="categories"
-            className="flex items-center gap-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200 text-sm"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-purple-400"
           >
             <PieChart className="h-4 w-4" />
             Categories
           </TabsTrigger>
           <TabsTrigger
             value="weekly"
-            className="flex items-center gap-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200 text-sm"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-orange-400"
           >
             <Activity className="h-4 w-4" />
             Weekly
           </TabsTrigger>
           <TabsTrigger
             value="daily"
-            className="flex items-center gap-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200 text-sm"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-indigo-400"
           >
             <CreditCard className="h-4 w-4" />
             Daily

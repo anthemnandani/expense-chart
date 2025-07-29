@@ -4,75 +4,50 @@ import DashboardLayout from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Plus, Edit, Trash2, Coffee, Droplets, PartyPopper, MoreHorizontal } from "lucide-react"
 
-const expenseTypes = [
-  {
-    id: 1,
-    name: "Tea",
-    icon: Coffee,
-    color: "emerald",
-    totalExpenses: 3100,
-    transactionCount: 15,
-    description: "Tea and beverage expenses",
-  },
-  {
-    id: 2,
-    name: "Water",
-    icon: Droplets,
-    color: "blue",
-    totalExpenses: 520,
-    transactionCount: 8,
-    description: "Water bills and related expenses",
-  },
-  {
-    id: 3,
-    name: "Party",
-    icon: PartyPopper,
-    color: "purple",
-    totalExpenses: 296,
-    transactionCount: 3,
-    description: "Party and entertainment expenses",
-  },
-  {
-    id: 4,
-    name: "Other",
-    icon: MoreHorizontal,
-    color: "gray",
-    totalExpenses: 300,
-    transactionCount: 5,
-    description: "Miscellaneous expenses",
-  },
-]
-
-const colorClasses = {
-  emerald: {
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
-    border: "border-emerald-200 dark:border-emerald-800",
-    text: "text-emerald-700 dark:text-emerald-400",
-    icon: "text-emerald-600",
-  },
-  blue: {
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    border: "border-blue-200 dark:border-blue-800",
-    text: "text-blue-700 dark:text-blue-400",
-    icon: "text-blue-600",
-  },
-  purple: {
-    bg: "bg-purple-50 dark:bg-purple-900/20",
-    border: "border-purple-200 dark:border-purple-800",
-    text: "text-purple-700 dark:text-purple-400",
-    icon: "text-purple-600",
-  },
-  gray: {
-    bg: "bg-gray-50 dark:bg-gray-800",
-    border: "border-gray-200 dark:border-gray-700",
-    text: "text-gray-700 dark:text-gray-400",
-    icon: "text-gray-600",
-  },
-}
-
 export default function ExpenseTypesPage() {
+  const expenseTypes = [
+    {
+      id: 1,
+      name: "Tea",
+      description: "Tea and beverages",
+      color: "#10b981",
+      icon: Coffee,
+      totalExpenses: 3100,
+      transactionCount: 25,
+    },
+    {
+      id: 2,
+      name: "Water",
+      description: "Bottled water and drinks",
+      color: "#f59e0b",
+      icon: Droplets,
+      totalExpenses: 520,
+      transactionCount: 8,
+    },
+    {
+      id: 3,
+      name: "Party",
+      description: "Celebrations and events",
+      color: "#ef4444",
+      icon: PartyPopper,
+      totalExpenses: 296,
+      transactionCount: 3,
+    },
+    {
+      id: 4,
+      name: "Other",
+      description: "Miscellaneous expenses",
+      color: "#8b5cf6",
+      icon: MoreHorizontal,
+      totalExpenses: 300,
+      transactionCount: 5,
+    },
+  ]
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -82,13 +57,106 @@ export default function ExpenseTypesPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expense Types</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and organize your expense categories</p>
           </div>
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
+          <Button size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Add Type
           </Button>
         </div>
 
-        {/* Summary Stats */}
+        {/* Expense Types Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {expenseTypes.map((type) => {
+            const IconComponent = type.icon
+            return (
+              <Card key={type.id} className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg" style={{ backgroundColor: `${type.color}20` }}>
+                        <IconComponent className="h-5 w-5" style={{ color: type.color }} />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{type.name}</CardTitle>
+                        <CardDescription className="text-sm">{type.description}</CardDescription>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Total Spent</span>
+                      <span className="font-bold" style={{ color: type.color }}>
+                        ₹{type.totalExpenses.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Transactions</span>
+                      <Badge variant="secondary">{type.transactionCount}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Avg per Transaction</span>
+                      <span className="text-sm font-medium">
+                        ₹{Math.round(type.totalExpenses / type.transactionCount).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Add New Type Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Add New Expense Type</CardTitle>
+            <CardDescription>Create a new category for organizing your expenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type-name">Type Name</Label>
+                  <Input id="type-name" placeholder="e.g., Food, Transport, Entertainment" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="type-description">Description</Label>
+                  <Input id="type-description" placeholder="Brief description of this expense type" />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type-color">Color</Label>
+                  <div className="flex items-center gap-2">
+                    <Input id="type-color" type="color" className="w-16 h-10" defaultValue="#10b981" />
+                    <Input placeholder="#10b981" className="flex-1" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="type-icon">Icon</Label>
+                  <Input id="type-icon" placeholder="Icon name (optional)" />
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Expense Type
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
@@ -96,92 +164,27 @@ export default function ExpenseTypesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-emerald-600">{expenseTypes.length}</div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active expense types</p>
+              <p className="text-sm text-gray-600 mt-1">Active expense types</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Total Expenses</CardTitle>
+              <CardTitle className="text-lg">Most Used</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600">
-                ₹{expenseTypes.reduce((sum, type) => sum + type.totalExpenses, 0).toLocaleString()}
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Across all categories</p>
+              <div className="text-3xl font-bold text-orange-600">Tea</div>
+              <p className="text-sm text-gray-600 mt-1">25 transactions</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Transactions</CardTitle>
+              <CardTitle className="text-lg">Highest Spending</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-600">
-                {expenseTypes.reduce((sum, type) => sum + type.transactionCount, 0)}
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total transactions</p>
+              <div className="text-3xl font-bold text-purple-600">₹3,100</div>
+              <p className="text-sm text-gray-600 mt-1">Tea category</p>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Expense Types Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {expenseTypes.map((type) => {
-            const Icon = type.icon
-            const colors = colorClasses[type.color as keyof typeof colorClasses]
-
-            return (
-              <Card
-                key={type.id}
-                className={`${colors.bg} ${colors.border} border-2 hover:shadow-lg transition-shadow`}
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg bg-white dark:bg-gray-800 ${colors.icon}`}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <CardTitle className={`text-xl ${colors.text}`}>{type.name}</CardTitle>
-                        <CardDescription className="text-sm">{type.description}</CardDescription>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Total Spent</span>
-                    <span className={`text-lg font-bold ${colors.text}`}>₹{type.totalExpenses.toLocaleString()}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Transactions</span>
-                    <Badge variant="outline" className={`${colors.bg} ${colors.text} ${colors.border}`}>
-                      {type.transactionCount}
-                    </Badge>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Avg per Transaction</span>
-                    <span className="text-sm font-semibold">
-                      ₹{Math.round(type.totalExpenses / type.transactionCount).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 bg-transparent">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
         </div>
       </div>
     </DashboardLayout>

@@ -159,10 +159,14 @@ export default function CategoriesTab({ categoryData }: CategoriesTabProps) {
               }}
               className="h-[300px]"
             >
-              <BarChart data={enhancedCategoryData} layout="horizontal">
+              <BarChart
+                data={enhancedCategoryData}
+                layout="horizontal"
+                margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis type="number" />
-                <YAxis dataKey="expenseDescType" type="category" width={80} />
+                <YAxis dataKey="expenseDescType" type="category" width={60} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="totalExpenses" radius={4}>
                   {enhancedCategoryData.map((entry, index) => (

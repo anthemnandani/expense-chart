@@ -157,9 +157,9 @@ export default function DailyTab() {
             }}
             className="h-[400px]"
           >
-            <BarChart data={dailyData}>
+            <BarChart data={dailyData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="date" />
+              <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} interval={0} fontSize={12} />
               <YAxis />
               <ChartTooltip
                 content={({ active, payload, label }) => {

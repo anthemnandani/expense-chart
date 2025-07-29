@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Filter, Download, Edit, Trash2 } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Plus, Search, Download, Upload } from "lucide-react"
 
 const expenseData = [
   { id: 1, date: "2025-07-31", description: "Miscellaneous income", category: "Other", type: "Credit", amount: 30 },
@@ -20,6 +22,14 @@ const expenseData = [
 ]
 
 export default function ExpensesPage() {
+  const expenses = [
+    { id: 1, date: "2025-01-15", category: "Tea", amount: 150, description: "Morning tea", type: "Debit" },
+    { id: 2, date: "2025-01-14", category: "Water", amount: 25, description: "Bottled water", type: "Debit" },
+    { id: 3, date: "2025-01-13", category: "Party", amount: 500, description: "Birthday celebration", type: "Debit" },
+    { id: 4, date: "2025-01-12", category: "Income", amount: 5000, description: "Salary", type: "Credit" },
+    { id: 5, date: "2025-01-11", category: "Tea", amount: 120, description: "Evening tea", type: "Debit" },
+  ]
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -29,32 +39,78 @@ export default function ExpensesPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track all your financial transactions</p>
           </div>
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Expense
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm">
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Expense
+            </Button>
+          </div>
         </div>
 
         {/* Filters and Search */}
         <Card>
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
-            <CardDescription>Search and filter your expenses</CardDescription>
+            <CardTitle className="text-lg">Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input placeholder="Search expenses..." className="pl-10" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="search">Search</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input id="search" placeholder="Search expenses..." className="pl-10" />
+                </div>
               </div>
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    <SelectItem value="tea">Tea</SelectItem>
+                    <SelectItem value="water">Water</SelectItem>
+                    <SelectItem value="party">Party</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">Type</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All types</SelectItem>
+                    <SelectItem value="credit">Credit</SelectItem>
+                    <SelectItem value="debit">Debit</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="date">Date Range</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Last 30 days" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 days</SelectItem>
+                    <SelectItem value="30">Last 30 days</SelectItem>
+                    <SelectItem value="90">Last 90 days</SelectItem>
+                    <SelectItem value="365">Last year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -66,56 +122,90 @@ export default function ExpensesPage() {
             <CardDescription>All your financial transactions in one place</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {expenseData.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell className="font-medium">{new Date(expense.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{expense.description}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{expense.category}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={expense.type === "Credit" ? "default" : "destructive"}
-                        className={
-                          expense.type === "Credit"
-                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                            : "bg-red-100 text-red-800 hover:bg-red-200"
-                        }
-                      >
-                        {expense.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      <span className={expense.type === "Credit" ? "text-emerald-600" : "text-red-600"}>
-                        {expense.type === "Credit" ? "+" : "-"}₹{expense.amount.toLocaleString()}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+            <div className="space-y-4">
+              {expenses.map((expense) => (
+                <div
+                  key={expense.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-3 h-3 rounded-full ${expense.type === "Credit" ? "bg-emerald-500" : "bg-red-500"}`}
+                    />
+                    <div>
+                      <div className="font-semibold">{expense.description}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {expense.date} • {expense.category}
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={expense.type === "Credit" ? "default" : "destructive"}>{expense.type}</Badge>
+                    <div className={`font-bold ${expense.type === "Credit" ? "text-emerald-600" : "text-red-600"}`}>
+                      {expense.type === "Credit" ? "+" : "-"}₹{expense.amount.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Add Expense Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Add New Expense</CardTitle>
+            <CardDescription>Record a new financial transaction</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input id="amount" type="number" placeholder="0.00" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="expense-category">Category</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tea">Tea</SelectItem>
+                      <SelectItem value="water">Water</SelectItem>
+                      <SelectItem value="party">Party</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="expense-type">Type</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="credit">Credit</SelectItem>
+                      <SelectItem value="debit">Debit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expense-date">Date</Label>
+                  <Input id="expense-date" type="date" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" placeholder="Enter description..." rows={3} />
+                </div>
+                <Button className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Expense
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
