@@ -1,10 +1,12 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
-import { TrendingUp, TrendingDown, PieChartIcon, Target, Calendar, Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import dynamic from "next/dynamic"
+
+// Dynamically import echarts to avoid SSR issues
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
 
 interface ModernOverviewTabProps {
   yearlyData: Array<{
@@ -34,388 +36,833 @@ export default function ModernOverviewTab({ yearlyData, categoryData }: ModernOv
   const netSavings = totalIncome - totalExpenses
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0
   const activeMonths = yearlyData.filter((item) => item.totalCredit > 0 || item.totalDebit > 0).length
-  const avgMonthlyExpense = totalExpenses / activeMonths || 0
 
-  // Performance by category (like team performance in reference)
-  const categoryPerformance = categoryData
-    .map((cat) => ({
-      name: cat.expenseDescType,
-      percentage: (cat.totalExpenses / totalExpenses) * 100,
-      amount: cat.totalExpenses,
-    }))
-    .sort((a, b) => b.percentage - a.percentage)
+  // Enhanced category data with colors
+  const categoryColors = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316"]
+  const enhancedCategoryData = categoryData.map((item, index) => ({
+    ...item,
+    color: categoryColors[index % categoryColors.length],
+    percentage: ((item.totalExpenses / totalExpenses) * 100).toFixed(1),
+  }))
+
+  // Financial Overview Area Chart Options
+  const financialChartOptions = {
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#e5e7eb",
+      borderWidth: 1,
+      textStyle: {
+        color: "#374151",
+      },
+      formatter: (params: any) => {
+        let result = `<div style="font-weight: 600; margin-bottom: 8px;">${params[0].axisValue} 2025</div>`
+        params.forEach((param: any) => {
+          result += `<div style="display: flex; align-items: center; margin-bottom: 4px;">
+            <span style="display: inline-block; width: 10px; height: 10px; background-color: ${param.color}; border-radius: 50%; margin-right: 8px;"></span>
+            <span style="margin-right: 12px;">${param.seriesName}:</span>
+            <span style="font-weight: 600;">₹${param.value.toLocaleString()}</span>
+          </div>`
+        })
+        return result
+      },
+    },
+    legend: {
+      data: ["Income", "Expenses"],
+      top: 10,
+      textStyle: {
+        color: "#6b7280",
+      },
+    },
+    grid: {
+      left: "5%",
+      right: "5%",
+      bottom: "20%",
+      top: "20%",
+      containLabel: true,
+    },
+    dataZoom: [
+      {
+        type: "inside",
+        start: 0,
+        end: 100,
+      },
+      {
+        start: 0,
+        end: 100,
+        height: 20,
+        bottom: 10,
+        borderColor: "#e5e7eb",
+        fillerColor: "rgba(59, 130, 246, 0.1)",
+        handleStyle: {
+          color: "#3b82f6",
+        },
+      },
+    ],
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: chartData.map((item) => item.month),
+      axisLine: {
+        lineStyle: {
+          color: "#e5e7eb",
+        },
+      },
+      axisLabel: {
+        color: "#6b7280",
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        color: "#6b7280",
+        formatter: (value: number) => `₹${(value / 1000).toFixed(0)}K`,
+      },
+      splitLine: {
+        lineStyle: {
+          color: "#f3f4f6",
+          type: "dashed",
+        },
+      },
+    },
+    series: [
+      {
+        name: "Income",
+        type: "line",
+        smooth: true,
+        symbol: "circle",
+        symbolSize: 6,
+        lineStyle: {
+          width: 3,
+          color: "#10b981",
+        },
+        itemStyle: {
+          color: "#10b981",
+        },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(16, 185, 129, 0.3)" },
+              { offset: 1, color: "rgba(16, 185, 129, 0.05)" },
+            ],
+          },
+        },
+        data: chartData.map((item) => item.income),
+      },
+      {
+        name: "Expenses",
+        type: "line",
+        smooth: true,
+        symbol: "circle",
+        symbolSize: 6,
+        lineStyle: {
+          width: 3,
+          color: "#ef4444",
+        },
+        itemStyle: {
+          color: "#ef4444",
+        },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(239, 68, 68, 0.3)" },
+              { offset: 1, color: "rgba(239, 68, 68, 0.05)" },
+            ],
+          },
+        },
+        data: chartData.map((item) => item.expenses),
+      },
+    ],
+  }
+
+  // Half Doughnut Chart Options
+  const categoryChartOptions = {
+    tooltip: {
+      trigger: "item",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#e5e7eb",
+      borderWidth: 1,
+      textStyle: {
+        color: "#374151",
+      },
+      formatter: (params: any) => `<div style="font-weight: 600; margin-bottom: 4px;">${params.name}</div>
+                <div>Amount: ₹${params.value.toLocaleString()}</div>
+                <div>Percentage: ${params.percent}%</div>`,
+    },
+    legend: {
+      orient: "horizontal",
+      bottom: 10,
+      textStyle: {
+        color: "#6b7280",
+        fontSize: 12,
+      },
+    },
+    series: [
+      {
+        name: "Expenses",
+        type: "pie",
+        radius: ["35%", "65%"],
+        center: ["50%", "40%"],
+        startAngle: 180,
+        endAngle: 360,
+        data: enhancedCategoryData.map((item) => ({
+          value: item.totalExpenses,
+          name: item.expenseDescType,
+          itemStyle: {
+            color: item.color,
+            borderRadius: 8,
+            borderColor: "#fff",
+            borderWidth: 2,
+          },
+        })),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+        label: {
+          show: true,
+          position: "outside",
+          formatter: "{b}: {d}%",
+          fontSize: 11,
+          color: "#6b7280",
+        },
+        labelLine: {
+          show: true,
+          length: 15,
+          length2: 10,
+        },
+      },
+    ],
+  }
+
+  // Savings Goal Gauge Chart Options
+  const savingsGaugeOptions = {
+    series: [
+      {
+        name: "Savings Rate",
+        type: "gauge",
+        startAngle: 180,
+        endAngle: 0,
+        center: ["50%", "70%"],
+        radius: "85%",
+        min: 0,
+        max: 100,
+        splitNumber: 8,
+        axisLine: {
+          lineStyle: {
+            width: 6,
+            color: [
+              [0.3, "#ef4444"],
+              [0.7, "#f59e0b"],
+              [1, "#10b981"],
+            ],
+          },
+        },
+        pointer: {
+          icon: "path://M12.8,0.7l12,40.1H0.7L12.8,0.7z",
+          length: "12%",
+          width: 20,
+          offsetCenter: [0, "-60%"],
+          itemStyle: {
+            color: "auto",
+          },
+        },
+        axisTick: {
+          length: 12,
+          lineStyle: {
+            color: "auto",
+            width: 2,
+          },
+        },
+        splitLine: {
+          length: 20,
+          lineStyle: {
+            color: "auto",
+            width: 5,
+          },
+        },
+        axisLabel: {
+          color: "#6b7280",
+          fontSize: 10,
+          distance: -60,
+          formatter: (value: number) => {
+            if (value === 100) return "100%"
+            if (value === 80) return "80%"
+            if (value === 60) return "60%"
+            if (value === 40) return "40%"
+            if (value === 20) return "20%"
+            if (value === 0) return "0%"
+            return ""
+          },
+        },
+        title: {
+          offsetCenter: [0, "-10%"],
+          fontSize: 14,
+          color: "#374151",
+        },
+        detail: {
+          fontSize: 24,
+          offsetCenter: [0, "-35%"],
+          valueAnimation: true,
+          formatter: (value: number) => Math.round(value) + "%",
+          color: "auto",
+        },
+        data: [
+          {
+            value: savingsRate,
+            name: "Savings Rate",
+          },
+        ],
+      },
+    ],
+  }
+
+  // Monthly Trend Bar Chart Options
+  const trendChartOptions = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#e5e7eb",
+      borderWidth: 1,
+      textStyle: {
+        color: "#374151",
+      },
+    },
+    legend: {
+      data: ["Income", "Expenses"],
+      top: 10,
+      textStyle: {
+        color: "#6b7280",
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: "15%",
+      containLabel: true,
+    },
+    xAxis: [
+      {
+        type: "category",
+        data: chartData.map((item) => item.month),
+        axisPointer: {
+          type: "shadow",
+        },
+        axisLine: {
+          lineStyle: {
+            color: "#e5e7eb",
+          },
+        },
+        axisLabel: {
+          color: "#6b7280",
+        },
+      },
+    ],
+    yAxis: [
+      {
+        type: "value",
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        axisLabel: {
+          color: "#6b7280",
+          formatter: (value: number) => `₹${(value / 1000).toFixed(0)}K`,
+        },
+        splitLine: {
+          lineStyle: {
+            color: "#f3f4f6",
+            type: "dashed",
+          },
+        },
+      },
+    ],
+    series: [
+      {
+        name: "Income",
+        type: "bar",
+        emphasis: {
+          focus: "series",
+        },
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "#10b981" },
+              { offset: 1, color: "#059669" },
+            ],
+          },
+          borderRadius: [4, 4, 0, 0],
+        },
+        data: chartData.map((item) => item.income),
+      },
+      {
+        name: "Expenses",
+        type: "bar",
+        emphasis: {
+          focus: "series",
+        },
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "#ef4444" },
+              { offset: 1, color: "#dc2626" },
+            ],
+          },
+          borderRadius: [4, 4, 0, 0],
+        },
+        data: chartData.map((item) => item.expenses),
+      },
+    ],
+  }
+
+  // Net Balance Chart Options
+  const balanceChartOptions = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#e5e7eb",
+      borderWidth: 1,
+      textStyle: {
+        color: "#374151",
+      },
+      formatter: (params: any) => {
+        const value = params[0].value
+        const color = value >= 0 ? "#10b981" : "#ef4444"
+        const status = value >= 0 ? "Profit" : "Loss"
+        return `<div style="font-weight: 600; margin-bottom: 4px;">${params[0].axisValue}</div>
+                <div style="display: flex; align-items: center;">
+                  <span style="display: inline-block; width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></span>
+                  <span>${status}: ₹${Math.abs(value).toLocaleString()}</span>
+                </div>`
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: "10%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: chartData.map((item) => item.month),
+      axisLine: {
+        lineStyle: {
+          color: "#e5e7eb",
+        },
+      },
+      axisLabel: {
+        color: "#6b7280",
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        color: "#6b7280",
+        formatter: (value: number) => `₹${(value / 1000).toFixed(0)}K`,
+      },
+      splitLine: {
+        lineStyle: {
+          color: "#f3f4f6",
+          type: "dashed",
+        },
+      },
+    },
+    series: [
+      {
+        name: "Net Balance",
+        type: "bar",
+        data: chartData.map((item) => ({
+          value: item.net,
+          itemStyle: {
+            color:
+              item.net >= 0
+                ? {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      { offset: 0, color: "#10b981" },
+                      { offset: 1, color: "#059669" },
+                    ],
+                  }
+                : {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      { offset: 0, color: "#ef4444" },
+                      { offset: 1, color: "#dc2626" },
+                    ],
+                  },
+            borderRadius: [4, 4, 4, 4],
+          },
+        })),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: "rgba(0, 0, 0, 0.3)",
+          },
+        },
+      },
+    ],
+  }
+
+  // Top Categories Horizontal Bar Chart Options
+  const performanceChartOptions = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#e5e7eb",
+      borderWidth: 1,
+      textStyle: {
+        color: "#374151",
+      },
+    },
+    grid: {
+      left: "20%",
+      right: "4%",
+      bottom: "3%",
+      top: "3%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "value",
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        color: "#6b7280",
+        formatter: "{value}%",
+      },
+      splitLine: {
+        lineStyle: {
+          color: "#f3f4f6",
+          type: "dashed",
+        },
+      },
+    },
+    yAxis: {
+      type: "category",
+      data: enhancedCategoryData.slice(0, 5).map((item) => item.expenseDescType),
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        color: "#6b7280",
+        fontSize: 11,
+      },
+    },
+    series: [
+      {
+        name: "Percentage",
+        type: "bar",
+        data: enhancedCategoryData.slice(0, 5).map((item, index) => ({
+          value: Number.parseFloat(item.percentage),
+          itemStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 1,
+              y2: 0,
+              colorStops: [
+                { offset: 0, color: item.color + "40" },
+                { offset: 1, color: item.color },
+              ],
+            },
+            borderRadius: [0, 4, 4, 0],
+          },
+        })),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: "rgba(0, 0, 0, 0.3)",
+          },
+        },
+        label: {
+          show: true,
+          position: "right",
+          formatter: "{c}%",
+          color: "#6b7280",
+          fontSize: 11,
+        },
+      },
+    ],
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Top Metrics Row - Circular Progress Style */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {/* Total Income */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl p-4">
-          <div className="flex items-center justify-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="2"
-                  strokeDasharray="75, 100"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-emerald-600" />
+    <div className="space-y-8">
+      {/* Top Row - Main Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Financial Metrics Chart */}
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Financial Overview
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-500 mt-1">
+                  Track your income and expenses over time
+                </CardDescription>
               </div>
-            </div>
-          </div>
-          <div className="text-center mt-2">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">₹{(totalIncome / 1000).toFixed(0)}K</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Income</div>
-          </div>
-        </Card>
-
-        {/* Total Expenses */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl p-4">
-          <div className="flex items-center justify-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="2"
-                  strokeDasharray="60, 100"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <TrendingDown className="h-6 w-6 text-red-600" />
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  DAY
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  WEEK
+                </Badge>
+                <Badge variant="default" className="text-xs bg-blue-500">
+                  MONTH
+                </Badge>
               </div>
-            </div>
-          </div>
-          <div className="text-center mt-2">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">₹{(totalExpenses / 1000).toFixed(0)}K</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Expenses</div>
-          </div>
-        </Card>
-
-        {/* Categories */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl p-4">
-          <div className="flex items-center justify-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f59e0b"
-                  strokeWidth="2"
-                  strokeDasharray="25, 100"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <PieChartIcon className="h-6 w-6 text-amber-600" />
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-2">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">{categoryData.length}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Categories</div>
-          </div>
-        </Card>
-
-        {/* Active Months */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl p-4">
-          <div className="flex items-center justify-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#06b6d4"
-                  strokeWidth="2"
-                  strokeDasharray={`${(activeMonths / 12) * 100}, 100`}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-cyan-600" />
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-2">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">{activeMonths}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Active Months</div>
-          </div>
-        </Card>
-
-        {/* Savings Rate */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl p-4">
-          <div className="flex items-center justify-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#8b5cf6"
-                  strokeWidth="2"
-                  strokeDasharray={`${savingsRate}, 100`}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-2">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">{savingsRate.toFixed(0)}%</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Savings Rate</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Second Row - Main Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Financial Trends - Takes 2 columns */}
-        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Financial Trends</CardTitle>
-              <CardDescription className="text-sm text-gray-500">
-                2025 • Income: ₹{(totalIncome / 1000).toFixed(0)}K • Expenses: ₹{(totalExpenses / 1000).toFixed(0)}K •
-                Others: ₹{((totalIncome - totalExpenses) / 1000).toFixed(0)}K
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <select className="text-sm border rounded-lg px-3 py-1 bg-white dark:bg-gray-700">
-                <option>Years</option>
-                <option>2025</option>
-                <option>2024</option>
-              </select>
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4" />
-              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="h-[280px]">
-              <ChartContainer
-                config={{
-                  income: { label: "Income", color: "#10b981" },
-                  expenses: { label: "Expenses", color: "#ef4444" },
-                  net: { label: "Net", color: "#8b5cf6" },
-                }}
-                className="h-full w-full"
-              >
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line
-                    type="monotone"
-                    dataKey="income"
-                    stroke="#10b981"
-                    strokeWidth={3}
-                    dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="expenses"
-                    stroke="#ef4444"
-                    strokeWidth={3}
-                    dot={{ fill: "#ef4444", strokeWidth: 2, r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="net"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 3 }}
-                  />
-                </LineChart>
-              </ChartContainer>
+            {/* Key Metrics */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">INCOME</div>
+                <div className="text-xl font-bold text-emerald-600">₹{(totalIncome / 1000).toFixed(0)}K</div>
+                <div className="text-xs text-emerald-500 flex items-center justify-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +12.5%
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">EXPENSES</div>
+                <div className="text-xl font-bold text-red-600">₹{(totalExpenses / 1000).toFixed(0)}K</div>
+                <div className="text-xs text-red-500 flex items-center justify-center gap-1">
+                  <ArrowDownRight className="h-3 w-3" />
+                  -8.2%
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">NET SAVINGS</div>
+                <div className="text-xl font-bold text-blue-600">₹{(netSavings / 1000).toFixed(0)}K</div>
+                <div className="text-xs text-blue-500 flex items-center justify-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +15.3%
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">SAVINGS RATE</div>
+                <div className="text-xl font-bold text-purple-600">{savingsRate.toFixed(1)}%</div>
+                <div className="text-xs text-purple-500">Target: 80%</div>
+              </div>
+            </div>
+
+            {/* ECharts Area Chart */}
+            <div className="h-[280px] w-full overflow-hidden">
+              <ReactECharts
+                option={financialChartOptions}
+                style={{ height: "280px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Savings Goal Progress */}
-        <Card className="bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Savings Goal</CardTitle>
-            <Button variant="ghost" size="sm">
-              <Download className="h-4 w-4" />
-            </Button>
+        {/* Category Distribution */}
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Categories</CardTitle>
+            <CardDescription className="text-sm text-gray-500 mt-1">
+              Distribution of your spending by category
+            </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <div className="relative w-32 h-32 mb-4">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f3f4f6"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f97316"
-                  strokeWidth="3"
-                  strokeDasharray={`${savingsRate}, 100`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <Target className="h-8 w-8 text-orange-500 mb-1" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{savingsRate.toFixed(0)}%</div>
-              </div>
+          <CardContent>
+            {/* ECharts Half Doughnut Chart */}
+            <div className="h-[280px] w-full overflow-hidden">
+              <ReactECharts
+                option={categoryChartOptions}
+                style={{ height: "280px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
             </div>
-            <div className="text-center space-y-2">
-              <div className="text-xs text-gray-500 dark:text-gray-400">0%</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">100%</div>
+
+            {/* Total in Center */}
+            <div className="text-center mt-4">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                ₹{(totalExpenses / 1000).toFixed(0)}K
+              </div>
+              <div className="text-sm text-gray-500">Total Expenses</div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Third Row - Performance & Analysis */}
+      {/* Second Row - Detailed Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Category Performance */}
-        <Card className="lg:col-span-1 bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl">
+        {/* Savings Goal */}
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Category Performance</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Savings Goal</CardTitle>
+            <CardDescription className="text-sm text-gray-500">Monthly savings target progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* ECharts Gauge Chart */}
+            <div className="h-[200px] w-full overflow-hidden">
+              <ReactECharts
+                option={savingsGaugeOptions}
+                style={{ height: "200px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
+            </div>
+            <div className="text-center mt-2">
+              <div className="text-sm text-gray-500 mb-1">Current: {savingsRate.toFixed(1)}%</div>
+              <div className="text-sm text-gray-500">Target: 80.0%</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Monthly Trend */}
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Monthly Trend</CardTitle>
+            <CardDescription className="text-sm text-gray-500">Income vs expenses comparison by month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* ECharts Bar Chart */}
+            <div className="h-[200px] w-full overflow-hidden">
+              <ReactECharts
+                option={trendChartOptions}
+                style={{ height: "200px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Quick Stats</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {categoryPerformance.map((category, index) => (
-              <div key={category.name} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{category.name}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">
-                    {category.percentage.toFixed(0)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full"
-                    style={{
-                      width: `${category.percentage}%`,
-                      backgroundColor:
-                        index === 0 ? "#ef4444" : index === 1 ? "#06b6d4" : index === 2 ? "#8b5cf6" : "#10b981",
-                    }}
-                  />
-                </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">{activeMonths}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wide">Active Months</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{categoryData.length}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wide">Categories</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                ₹{(totalExpenses / activeMonths / 1000).toFixed(1)}K
               </div>
-            ))}
+              <div className="text-xs text-gray-500 uppercase tracking-wide">Avg Monthly</div>
+            </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Monthly Expenses Trend */}
-        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Monthly Expenses</CardTitle>
-              <select className="text-sm border rounded-lg px-2 py-1 mt-1 bg-white dark:bg-gray-700">
-                <option>2025</option>
-                <option>2024</option>
-              </select>
-            </div>
+      {/* Bottom Row - Performance Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Categories Performance */}
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Top Categories</CardTitle>
+            <CardDescription className="text-sm text-gray-500">Highest spending categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
-              <ChartContainer
-                config={{
-                  expenses: { label: "Expenses", color: "#ef4444" },
-                  income: { label: "Income", color: "#10b981" },
-                }}
-                className="h-full w-full"
-              >
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} />
-                  <Line
-                    type="monotone"
-                    dataKey="net"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
-                    dot={{ fill: "#f59e0b", strokeWidth: 2, r: 3 }}
-                  />
-                </BarChart>
-              </ChartContainer>
+            {/* ECharts Horizontal Bar Chart */}
+            <div className="h-[200px] w-full overflow-hidden">
+              <ReactECharts
+                option={performanceChartOptions}
+                style={{ height: "200px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Expense Distribution */}
-        <Card className="lg:col-span-1 bg-white dark:bg-gray-800 shadow-sm border-0 rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">2025</CardTitle>
-              <div className="text-xs text-gray-500 mt-1">
-                <div>Tea: ₹{categoryData.find((c) => c.expenseDescType === "Tea")?.totalExpenses || 0}</div>
-                <div>Water: ₹{categoryData.find((c) => c.expenseDescType === "Water")?.totalExpenses || 0}</div>
-              </div>
-            </div>
-            <div className="relative w-16 h-16">
-              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#f97316"
-                  strokeWidth="3"
-                  strokeDasharray="58, 100"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-xs font-bold text-gray-900 dark:text-white">58%</div>
-              </div>
-            </div>
+        {/* Monthly Comparison */}
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 rounded-xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Net Balance Trend</CardTitle>
+            <CardDescription className="text-sm text-gray-500">Monthly profit/loss analysis</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">Sort by</span>
-              <select className="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-700">
-                <option>Years</option>
-              </select>
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4" />
-              </Button>
+            {/* ECharts Waterfall Chart */}
+            <div className="h-[200px] w-full overflow-hidden">
+              <ReactECharts
+                option={balanceChartOptions}
+                style={{ height: "200px", width: "100%" }}
+                opts={{ renderer: "canvas", width: "auto", height: "auto" }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
             </div>
           </CardContent>
         </Card>
