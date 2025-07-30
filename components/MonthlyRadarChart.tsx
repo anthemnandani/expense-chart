@@ -39,7 +39,7 @@ export default function MonthlyRadarChart() {
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-5">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-          <BarChart3 className="h-5 w-5 text-green-600" />
+          {/* <BarChart3 className="h-5 w-5 text-green-600" /> */}
           Monthly Income vs Expenses
         </CardTitle>
         <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
