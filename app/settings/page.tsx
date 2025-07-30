@@ -19,7 +19,7 @@ export default function SettingsPage() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and application preferences</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Profile Settings */}
             <Card>
@@ -112,70 +112,6 @@ export default function SettingsPage() {
                   <Input id="confirmPassword" type="password" />
                 </div>
                 <Button>Update Password</Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-            {/* Appearance Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Appearance
-                </CardTitle>
-                <CardDescription>Customize your interface</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="theme">Theme</Label>
-                  <Select defaultValue="system">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select defaultValue="inr">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="inr">₹ INR</SelectItem>
-                      <SelectItem value="usd">$ USD</SelectItem>
-                      <SelectItem value="eur">€ EUR</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Data Management */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5" />
-                  Data Management
-                </CardTitle>
-                <CardDescription>Manage your data</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full bg-transparent">
-                  Export Data
-                </Button>
-                <Button variant="outline" className="w-full bg-transparent">
-                  Import Data
-                </Button>
-                <Separator />
-                <Button variant="destructive" className="w-full">
-                  Delete Account
-                </Button>
               </CardContent>
             </Card>
           </div>

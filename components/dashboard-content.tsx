@@ -59,7 +59,7 @@ export default function DashboardContent() {
         </div>
         <div className="flex items-center gap-3">
           <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-[100px] bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
+            <SelectTrigger className="w-[100px] text-neutral-700 dark:text-neutral-100 border-neutral-200 dark:border-neutral-500">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -72,7 +72,7 @@ export default function DashboardContent() {
           </Select>
 
           <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-[120px] bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
+            <SelectTrigger className="w-[120px] text-neutral-700 dark:text-neutral-100 border-neutral-200 dark:border-neutral-500">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

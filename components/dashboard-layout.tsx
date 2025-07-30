@@ -137,12 +137,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center gap-4">
               <div className="lg:hidden w-8" /> {/* Spacer for mobile menu button */}
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {/* <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {menuItems.find((item) => item.active)?.title || "Dashboard"}
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Welcome back! Here's your financial overview.
-                </p>
+                </p> */}
               </div>
             </div>
 

@@ -10,6 +10,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   Line,
   LineChart,
   Pie,
@@ -35,6 +36,9 @@ import {
   MoreHorizontal,
   BarChart3,
 } from "lucide-react"
+import NetBalanceChart from "./NetBalanceChart"
+import MonthlyRadarChart from "./MonthlyRadarChart"
+import { TopCategoriesChart } from "./TopCategoriesChart"
 
 interface ComprehensiveDashboardProps {
   yearlyData: Array<{
@@ -48,7 +52,7 @@ interface ComprehensiveDashboardProps {
   }>
 }
 
-const COLORS = ["#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16"]
+const COLORS = ["#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#", "#f4a261"]
 
 const categoryIcons = {
   Tea: Coffee,
@@ -104,74 +108,71 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
   }))
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-emerald-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-emerald-700">
-              <DollarSign className="h-5 w-5" />
-              Total Income
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-800">₹{totalIncome.toLocaleString()}</div>
-            <div className="text-sm text-emerald-600 flex items-center gap-1 mt-1">
-              <ArrowUpRight className="h-3 w-3" />
-              +12.5% from last period
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg border-0 bg-gradient-to-br from-red-50 to-red-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-red-700">
-              <TrendingDown className="h-5 w-5" />
-              Total Expenses
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-800">₹{totalExpenses.toLocaleString()}</div>
-            <div className="text-sm text-red-600 flex items-center gap-1 mt-1">
-              <ArrowDownRight className="h-3 w-3" />
-              -8.2% from last period
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-purple-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-purple-700">
-              <Target className="h-5 w-5" />
-              Net Savings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${netSavings >= 0 ? "text-purple-800" : "text-red-800"}`}>
-              ₹{netSavings.toLocaleString()}
-            </div>
-            <div className="text-sm text-purple-600 mt-1">{savingsRate.toFixed(1)}% savings rate</div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-orange-100">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-orange-700">
-              <Calendar className="h-5 w-5" />
-              Active Months
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-800">{activeMonths}/12</div>
-            <div className="text-sm text-orange-600 mt-1">{((activeMonths / 12) * 100).toFixed(0)}% year coverage</div>
-          </CardContent>
-        </Card>
+        {/* Metric Card Template */}
+        {[
+          {
+            title: "Total Income",
+            icon: DollarSign,
+            value: `₹${totalIncome.toLocaleString()}`,
+            change: "+12.5% from last period",
+            changeIcon: ArrowUpRight,
+          },
+          {
+            title: "Total Expenses",
+            icon: TrendingDown,
+            value: `₹${totalExpenses.toLocaleString()}`,
+            change: "-8.2% from last period",
+            changeIcon: ArrowDownRight,
+          },
+          {
+            title: "Net Savings",
+            icon: Target,
+            value: `₹${netSavings.toLocaleString()}`,
+            subtitle: `${savingsRate.toFixed(1)}% savings rate`,
+          },
+          {
+            title: "Active Months",
+            icon: Calendar,
+            value: `${activeMonths}/12`,
+            subtitle: `${((activeMonths / 12) * 100).toFixed(0)}% year coverage`,
+          },
+        ].map(({ title, icon: Icon, value, change, subtitle, changeIcon: ChangeIcon }, idx) => (
+          <Card
+            key={idx}
+            className="shadow-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-lg transition-shadow"
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-sm font-medium">
+                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                {title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+              {change && (
+                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
+                  <ChangeIcon className="h-3 w-3" />
+                  {change}
+                </div>
+              )}
+              {subtitle && (
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {subtitle}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
+
       {/* Financial Overview and Expense Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Financial Overview */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
+        <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-emerald-600" />
@@ -184,11 +185,11 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
               config={{
                 income: {
                   label: "Income",
-                  color: "#10b981",
+                  color: "#22c55e",
                 },
                 expenses: {
                   label: "Expenses",
-                  color: "#ef4444",
+                  color: "#3b82f6",
                 },
               }}
               className="h-[350px]"
@@ -198,13 +199,13 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                 <XAxis dataKey="month" />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Area type="monotone" dataKey="income" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
+                <Area type="monotone" dataKey="income" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
                 <Area
                   type="monotone"
                   dataKey="expenses"
                   stackId="2"
-                  stroke="#ef4444"
-                  fill="#ef4444"
+                  stroke="#3b82f6"
+                  fill="#3b82f6"
                   fillOpacity={0.6}
                 />
               </AreaChart>
@@ -213,14 +214,15 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         </Card>
 
         {/* Expense Distribution */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
+        <Card className="shadow-lg col-span-2 border-0 bg-white dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChartIcon className="h-5 w-5 text-purple-600" />
               Expense Distribution
             </CardTitle>
-            <CardDescription>Visual breakdown of spending by category</CardDescription>
+            <CardDescription>Track category-wise expenses and their relative proportions.</CardDescription>
           </CardHeader>
+
           <CardContent>
             <ChartContainer
               config={{
@@ -229,7 +231,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="h-[300px]"
+              className="h-[250px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -239,82 +241,83 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                     cy="50%"
                     innerRadius={60}
                     outerRadius={120}
-                    paddingAngle={5}
+                    paddingAngle={2}
                     dataKey="totalExpenses"
+                    cornerRadius={5}
+                    label={({ percentage, expenseDescType }) =>
+                      `${expenseDescType} (${percentage.toFixed(1)}%)`
+                    }
+                    labelLine={false}
                   >
                     {enhancedCategoryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
+
                   <ChartTooltip
+                    wrapperStyle={{ zIndex: 9999 }}
                     content={({ active, payload }) => {
                       if (active && payload && payload[0]) {
-                        const data = payload[0].payload
+                        const data = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 border rounded-lg shadow-lg">
-                            <p className="font-semibold">{data.expenseDescType}</p>
-                            <p className="text-sm">₹{data.totalExpenses.toLocaleString()}</p>
-                            <p className="text-xs text-slate-600">{data.percentage.toFixed(1)}%</p>
+                          <div className="bg-white px-3 py-2 border rounded shadow-xl max-w-[200px]">
+                            <div className="flex justify-between gap-2 pb-1">
+                              <p className="font-semibold text-purple-700">
+                                {data.expenseDescType}
+                              </p>
+                              <p className="text-xs text-slate-600">
+                                <p className="text-xs">₹{data.totalExpenses.toLocaleString()}</p>
+                              </p>
+                            </div>
+                            {data.percentage.toFixed(1)}% of total
                           </div>
-                        )
+                        );
                       }
-                      return null
+                      return null;
                     }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              {enhancedCategoryData.map((entry, index) => (
-                <div key={entry.expenseDescType} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{entry.expenseDescType}</span>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+              {enhancedCategoryData.map((entry) => (
+                <div
+                  key={entry.expenseDescType}
+                  className="flex items-center gap-2 bg-muted/20 dark:bg-muted/10 px-2 py-1 rounded-md"
+                >
+                  <div
+                    className="w-6 h-full rounded"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      {entry.expenseDescType}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      ₹{entry.totalExpenses.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
+
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Other cards */}
+        <NetBalanceChart />
       </div>
 
       {/* Monthly Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Monthly Income vs Expenses */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              Monthly Income vs Expenses
-            </CardTitle>
-            <CardDescription>Detailed monthly financial performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                income: {
-                  label: "Income",
-                  color: "#10b981",
-                },
-                expenses: {
-                  label: "Expenses",
-                  color: "#ef4444",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="shortMonth" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="income" fill="#10b981" radius={4} />
-                <Bar dataKey="expenses" fill="#ef4444" radius={4} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <MonthlyRadarChart />
+
 
         {/* Monthly Savings Rate */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
+        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-7">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-purple-600" />
@@ -327,7 +330,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
               config={{
                 savingsRate: {
                   label: "Savings Rate %",
-                  color: "#8b5cf6",
+                  color: "#3b82f6",
                 },
               }}
               className="h-[350px]"
@@ -340,9 +343,9 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                 <Line
                   type="monotone"
                   dataKey="savingsRate"
-                  stroke="#8b5cf6"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                 />
               </LineChart>
             </ChartContainer>
@@ -351,46 +354,15 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
       </div>
 
       {/* Net Balance and Weekly Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
         {/* Net Balance Trend */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-emerald-600" />
-              Net Balance Trend
-            </CardTitle>
-            <CardDescription>Monthly profit/loss analysis</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                net: {
-                  label: "Net Balance",
-                  color: "hsl(var(--chart-3))",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="net" radius={4}>
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.net >= 0 ? "#10b981" : "#ef4444"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+          <TopCategoriesChart />
 
         {/* Weekly Net Balance Trend */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
+        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-orange-600" />
+              {/* <Activity className="h-5 w-5 text-orange-600" /> */}
               Weekly Net Balance Trend
             </CardTitle>
             <CardDescription>Track your weekly financial performance over time</CardDescription>
@@ -400,7 +372,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
               config={{
                 net: {
                   label: "Net Balance",
-                  color: "#10b981",
+                  color: "#3b82f6",
                 },
               }}
               className="h-[350px]"
@@ -429,7 +401,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                     return null
                   }}
                 />
-                <Area type="monotone" dataKey="net" stroke="#10b981" fill="#10b981" fillOpacity={0.3} strokeWidth={2} />
+                <Area type="monotone" dataKey="net" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
               </AreaChart>
             </ChartContainer>
           </CardContent>
