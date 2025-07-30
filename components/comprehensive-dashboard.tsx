@@ -408,54 +408,6 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         </Card>
       </div>
 
-      {/* Top Categories */}
-      <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-orange-600" />
-            Top Categories - Highest Spending Categories
-          </CardTitle>
-          <CardDescription>Detailed breakdown of your spending by category</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {enhancedCategoryData.map((category, index) => {
-              const IconComponent = category.icon
-              return (
-                <div
-                  key={category.expenseDescType}
-                  className="bg-slate-50 dark:bg-slate-800 p-6 rounded-xl hover:shadow-lg transition-shadow"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-3 rounded-lg" style={{ backgroundColor: `${category.color}20` }}>
-                      <IconComponent className="h-6 w-6" style={{ color: category.color }} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">{category.expenseDescType}</h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        {category.percentage.toFixed(1)}% of total
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="text-2xl font-bold" style={{ color: category.color }}>
-                      ₹{category.totalExpenses.toLocaleString()}
-                    </div>
-                    <Progress
-                      value={category.percentage}
-                      className="h-2"
-                      style={{
-                        backgroundColor: `${category.color}20`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Financial Insights */}
       <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-700">
         <CardHeader>

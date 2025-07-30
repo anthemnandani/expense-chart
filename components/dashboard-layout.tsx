@@ -78,10 +78,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           {!sidebarCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">ET</span>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
               </div>
               <span className="font-semibold text-gray-900 dark:text-white">Expense Tracker</span>
+            </div>
+          )}
+          {sidebarCollapsed && (
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
+              </div>
             </div>
           )}
           <Button
