@@ -175,7 +175,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
+              {/* <TrendingUp className="h-5 w-5 text-emerald-600" /> */}
               Financial Overview
             </CardTitle>
             <CardDescription>Track your income and expenses over time</CardDescription>
@@ -217,7 +217,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         <Card className="shadow-lg col-span-2 border-0 bg-white dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PieChartIcon className="h-5 w-5 text-purple-600" />
+              {/* <PieChartIcon className="h-5 w-5 text-purple-600" /> */}
               Expense Distribution
             </CardTitle>
             <CardDescription>Track category-wise expenses and their relative proportions.</CardDescription>
@@ -320,7 +320,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-7">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-purple-600" />
+              {/* <Target className="h-5 w-5 text-purple-600" /> */}
               Monthly Savings Rate
             </CardTitle>
             <CardDescription>Percentage of income saved each month</CardDescription>
