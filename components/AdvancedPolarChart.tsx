@@ -1,17 +1,18 @@
 "use client"
 
-import Highcharts from "highcharts"
-import HighchartsReact from "highcharts-react-official"
-import HighchartsMore from "highcharts/highcharts-more"
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 
-// Initialize Highcharts modules
-if (typeof Highcharts === 'function') {
-    HighchartsMore(Highcharts)
-}
-
 const AdvancedPolarChart = () => {
+    useEffect(() => {
+        import('highcharts/highcharts-more').then((mod: any) => {
+            mod(Highcharts);
+        });
+    }, []);
+
     const [isDarkMode, setIsDarkMode] = useState(false);
     const darkBg = "#1f1836"
     const lightBg = "#ffffff"
@@ -138,12 +139,13 @@ const AdvancedPolarChart = () => {
                 backgroundColor: 'transparent',
                 events: {
                     load: function () {
-                        const midPane = this.pane[1]
-                            ; (this as any).setMidPaneBg = function (background: any) {
-                                midPane.update({ background })
-                            }
+                        const midPane = (this as any).pane[1];
+                        (this as any).setMidPaneBg = function (background: any) {
+                            midPane.update({ background });
+                        };
                     }
                 }
+
             },
             title: {
                 text: undefined,
@@ -169,47 +171,54 @@ const AdvancedPolarChart = () => {
                     innerSize: '75%',
                     startAngle: 0,
                     endAngle: 360,
-                    background: {
-                        borderColor: isDarkMode ? '#444' : '#ccc',
-                        backgroundColor: {
-                            radialGradient: [1, 0.25, 0.1],
-                            stops: [
-                                [0, isDarkMode ? '#1e1e1e' : '#fff'],
-                                [1, isDarkMode ? '#2a2a2a' : '#f4f4f4']
-                            ]
-                        },
-                        innerRadius: '40%'
-                    }
+                    background: [
+                        {
+                            borderColor: isDarkMode ? '#444' : '#ccc',
+                            backgroundColor: {
+                                radialGradient: { cx: 0.5, cy: 0.5, r: 0.5 },
+                                stops: [
+                                    [0, isDarkMode ? '#1e1e1e' : '#fff'],
+                                    [1, isDarkMode ? '#2a2a2a' : '#f4f4f4']
+                                ]
+                            },
+                            innerRadius: '40%'
+                        }
+                    ]
                 },
                 {
                     size: '55%',
                     innerSize: '45%',
                     startAngle: 40.5,
                     endAngle: 319.5,
-                    background: {
-                        borderWidth: 0,
-                        backgroundColor: {
-                            radialGradient: [1, 0.25, 0.1],
-                            stops: [
-                                [0, chartBg],
-                                [1, borderColor]
-                            ]
-                        },
-                        outerRadius: '75%'
-                    }
+                    background: [
+                        {
+                            borderWidth: 0,
+                            backgroundColor: {
+                                radialGradient: { cx: 0.5, cy: 0.5, r: 0.5 },
+                                stops: [
+                                    [0, chartBg],
+                                    [1, borderColor]
+                                ]
+                            },
+                            outerRadius: '75%'
+                        }
+                    ]
                 },
                 {
                     size: '100%',
                     innerSize: '88%',
                     startAngle: 0,
                     endAngle: 360,
-                    background: {
-                        borderWidth: 1,
-                        borderColor: borderColor,
-                        backgroundColor: secondaryNewBg,
-                        innerRadius: '55%',
-                        outerRadius: '100%'
-                    }
+                    background: [
+                        {
+                            borderWidth: 1,
+                            borderColor: borderColor,
+                            backgroundColor: secondaryNewBg,
+                            innerRadius: '55%',
+                            outerRadius: '100%'
+                        }
+                    ]
+
                 }
             ],
             xAxis: [
@@ -251,10 +260,10 @@ const AdvancedPolarChart = () => {
                 {
                     pane: 0,
                     gridLineWidth: 0.5,
-                    gridLineDashStyle: 'longdash',
+                    gridLineDashStyle: 'LongDash',
                     gridLineColor: isDarkMode ? '#BBBAC5' : '#7a7a7a',
                     tickInterval: 1,
-                    title: null,
+                    title: undefined,
                     labels: { enabled: false },
                     min: 1,
                     max: 3
@@ -266,7 +275,7 @@ const AdvancedPolarChart = () => {
                     tickInterval: 100,
                     min: 0,
                     max: 400,
-                    title: null,
+                    title: undefined,
                     labels: { enabled: false }
                 },
                 {
@@ -276,7 +285,7 @@ const AdvancedPolarChart = () => {
                     gridLineColor: colors[1].brighten(0.05).toString(),
                     min: -3,
                     max: 1,
-                    title: null,
+                    title: undefined,
                     labels: { enabled: false }
                 }
             ],
@@ -284,7 +293,7 @@ const AdvancedPolarChart = () => {
                 enabled: true,
                 floating: true,
                 layout: 'vertical',
-                verticalAlign: 'center',
+                verticalAlign: 'middle',
                 align: 'center',
                 backgroundColor: 'transparent',
                 borderRadius: 14,
@@ -311,7 +320,6 @@ const AdvancedPolarChart = () => {
                         lineColor: colors[9 % colors.length].tweenTo(colors[0], 0.25).toString(),
                         lineWidth: 2
                     },
-                    shadow: true,
                     maxSize: '4%',
                     minSize: '1%',
                     clip: false,
@@ -327,7 +335,7 @@ const AdvancedPolarChart = () => {
                             '<span class="team-salescount">{point.z}</span>',
                         footerFormat: '</div>',
                         useHTML: true
-                    }
+                    } as any
                 },
                 {
                     type: 'bubble',
@@ -339,7 +347,6 @@ const AdvancedPolarChart = () => {
                         lineColor: colors[9 % colors.length].tweenTo(colors[8 % colors.length], 0.65).toString(),
                         lineWidth: 2
                     },
-                    shadow: true,
                     maxSize: '4%',
                     minSize: '1%',
                     clip: false,
@@ -355,7 +362,7 @@ const AdvancedPolarChart = () => {
                             '<span class="team-salescount">{point.z}</span>',
                         footerFormat: '</div>',
                         useHTML: true
-                    }
+                    } as any
                 },
                 {
                     type: 'column',
@@ -419,7 +426,7 @@ const AdvancedPolarChart = () => {
                             '<b>Net Avg: </b><span>{point.avg}</span></span>' +
                             '<span class="col-display-fieldwrap">',
                         useHTML: true
-                    },
+                    } as any,
                     animation: false,
                     color: isDarkMode ? '#2CAFFE' : '#3A86FF',
                 }
