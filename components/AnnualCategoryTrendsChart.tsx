@@ -110,6 +110,8 @@ const AnnualCategoryTrendsChart = () => {
     credits: { enabled: false }
   }
 
+  if (typeof window === 'undefined') return null
+
   return (
     <Card className="col-span-full shadow-md border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between lg:flex-row flex-col'>
