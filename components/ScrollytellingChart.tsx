@@ -11,7 +11,7 @@ if (typeof Highcharts === 'function') {
 }
 
 const ScrollytellingChart = () => {
-  const [isDark, setIsDark] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   const data = [
     ['Jan', 15000],
@@ -28,15 +28,13 @@ const ScrollytellingChart = () => {
     ['Dec', 120000],
   ]
 
-  useEffect(() => {
-    const checkDark = () =>
-      document.documentElement.classList.contains('dark')
-    setIsDark(checkDark())
+    useEffect(() => {
+    if (typeof window === 'undefined') return
 
-    const observer = new MutationObserver(() => {
-      setIsDark(checkDark())
-    })
+    const check = () => document.documentElement.classList.contains('dark')
+    setIsDarkMode(check())
 
+    const observer = new MutationObserver(() => setIsDarkMode(check()))
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
@@ -45,7 +43,8 @@ const ScrollytellingChart = () => {
     return () => observer.disconnect()
   }, [])
 
-  const baseColor = isDark ? '#60a5fa' : '#3b82f6'
+
+  const baseColor = isDarkMode ? '#60a5fa' : '#3b82f6'
 
   const options: Highcharts.Options = {
     chart: {
@@ -60,7 +59,7 @@ const ScrollytellingChart = () => {
     title: {
       text: 'Monthly Expense Funnel (Debit Trend)',
       style: {
-        color: isDark ? '#ffffff' : '#111827',
+        color: isDarkMode ? '#ffffff' : '#111827',
         fontSize: '20px',
         fontWeight: '600'
       }
@@ -70,7 +69,7 @@ const ScrollytellingChart = () => {
         dataLabels: {
           enabled: true,
           format: '<b>{point.name}</b>: ₹{point.y}',
-          color: isDark ? '#e0e7ff' : '#1e293b',
+          color: isDarkMode ? '#e0e7ff' : '#1e293b',
           softConnector: true,
           style: {
             textOutline: 'none',
@@ -91,10 +90,10 @@ const ScrollytellingChart = () => {
       }
     },
     tooltip: {
-      backgroundColor: isDark ? '#1f2937' : '#ffffff',
+      backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
       borderColor: baseColor,
       style: {
-        color: isDark ? '#f9fafb' : '#1f2937',
+        color: isDarkMode ? '#f9fafb' : '#1f2937',
         fontSize: '13px'
       },
       formatter: function () {

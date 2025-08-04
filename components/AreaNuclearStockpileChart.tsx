@@ -3,6 +3,7 @@
 import Highcharts from "highcharts/highstock"
 import HighchartsReact from "highcharts-react-official"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEffect, useState } from "react"
 
 const monthlyExpenseData = [
   { month: "Jan", totalDebit: 3803, totalCredit: 6200 },
@@ -170,6 +171,14 @@ const chartOptions: Highcharts.Options = {
 }
 
 export default function AreaYearlyExpenseChart() {
+  const [isClient, setIsClient] = useState(false)
+
+useEffect(() => {
+  setIsClient(true)
+}, [])
+
+if (!isClient) return null
+
   return (
     <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
       <CardHeader className="flex justify-between lg:flex-row lex-col">
