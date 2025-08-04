@@ -38,8 +38,9 @@ const AnnualCategoryTrendsChart = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    const check = () =>
-      document.documentElement.classList.contains('dark')
+    if (typeof window === 'undefined') return
+
+    const check = () => document.documentElement.classList.contains('dark')
     setIsDarkMode(check())
 
     const observer = new MutationObserver(() => setIsDarkMode(check()))
