@@ -39,6 +39,16 @@ import {
 import NetBalanceChart from "./NetBalanceChart"
 import MonthlyRadarChart from "./MonthlyRadarChart"
 import { TopCategoriesChart } from "./TopCategoriesChart"
+import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
+import { DailyExpenseChart } from "./DailyExpenseChart"
+import { CategoryWiseExpenseChart } from "./CategoryWiseExpenseChart"
+import GaugeMultipleKPIChart from "./GaugeMultipleKPIChart"
+import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
+import WeeklyExpenseChart from "./WeeklyExpenseChart"
+import HighLevelPieChart from "./HighLevelPieChart"
+import AdvancedPolarChart from "./AdvancedPolarChart"
+import ScrollytellingChart from "./ScrollytellingChart"
+import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
 
 interface ComprehensiveDashboardProps {
   yearlyData: Array<{
@@ -171,241 +181,35 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
 
       {/* Financial Overview and Expense Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Financial Overview */}
-        <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {/* <TrendingUp className="h-5 w-5 text-emerald-600" /> */}
-              Financial Overview
-            </CardTitle>
-            <CardDescription>Track your income and expenses over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                income: {
-                  label: "Income",
-                  color: "#22c55e",
-                },
-                expenses: {
-                  label: "Expenses",
-                  color: "#3b82f6",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area type="monotone" dataKey="income" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-                <Area
-                  type="monotone"
-                  dataKey="expenses"
-                  stackId="2"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.6}
-                />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Expense Distribution */}
-        <Card className="shadow-lg col-span-2 border-0 bg-white dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {/* <PieChartIcon className="h-5 w-5 text-purple-600" /> */}
-              Expense Distribution
-            </CardTitle>
-            <CardDescription>Track category-wise expenses and their relative proportions.</CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <ChartContainer
-              config={{
-                expenses: {
-                  label: "Expenses",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[250px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={enhancedCategoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={120}
-                    paddingAngle={2}
-                    dataKey="totalExpenses"
-                    cornerRadius={5}
-                    label={({ percentage, expenseDescType }) =>
-                      `${expenseDescType} (${percentage.toFixed(1)}%)`
-                    }
-                    labelLine={false}
-                  >
-                    {enhancedCategoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-
-                  <ChartTooltip
-                    wrapperStyle={{ zIndex: 9999 }}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload[0]) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="bg-white px-3 py-2 border rounded shadow-xl max-w-[200px]">
-                            <div className="flex justify-between gap-2 pb-1">
-                              <p className="font-semibold text-purple-700">
-                                {data.expenseDescType}
-                              </p>
-                              <p className="text-xs text-slate-600">
-                                <p className="text-xs">₹{data.totalExpenses.toLocaleString()}</p>
-                              </p>
-                            </div>
-                            {data.percentage.toFixed(1)}% of total
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-              {enhancedCategoryData.map((entry) => (
-                <div
-                  key={entry.expenseDescType}
-                  className="flex items-center gap-2 bg-muted/20 dark:bg-muted/10 px-2 py-1 rounded-md"
-                >
-                  <div
-                    className="w-6 h-full rounded"
-                    style={{ backgroundColor: entry.color }}
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      {entry.expenseDescType}
-                    </span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      ₹{entry.totalExpenses.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
+        <AreaNuclearStockpileChart />
+        <HighLevelPieChart categoryData={categoryData} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Other cards */}
         <NetBalanceChart />
       </div>
 
       {/* Monthly Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Monthly Income vs Expenses */}
         <MonthlyRadarChart />
-
-
-        {/* Monthly Savings Rate */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-7">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {/* <Target className="h-5 w-5 text-purple-600" /> */}
-              Monthly Savings Rate
-            </CardTitle>
-            <CardDescription>Percentage of income saved each month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                savingsRate: {
-                  label: "Savings Rate %",
-                  color: "#3b82f6",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="shortMonth" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line
-                  type="monotone"
-                  dataKey="savingsRate"
-                  stroke="#3b82f6"
-                  strokeWidth={3}
-                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <CategoryWiseExpenseChart />
       </div>
 
       {/* Net Balance and Weekly Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-        {/* Net Balance Trend */}
-          <TopCategoriesChart />
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        <DailyExpenseChart />
+      </div>
 
-        {/* Weekly Net Balance Trend */}
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {/* <Activity className="h-5 w-5 text-orange-600" /> */}
-              Weekly Net Balance Trend
-            </CardTitle>
-            <CardDescription>Track your weekly financial performance over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                net: {
-                  label: "Net Balance",
-                  color: "#3b82f6",
-                },
-              }}
-              className="h-[350px]"
-            >
-              <AreaChart data={weeklyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <ChartTooltip
-                  content={({ active, payload, label }) => {
-                    if (active && payload && payload[0]) {
-                      const data = payload[0].payload
-                      return (
-                        <div className="bg-white p-3 border rounded-lg shadow-lg">
-                          <p className="font-semibold">{label}</p>
-                          <p className="text-sm">
-                            {data.weekStart} - {data.weekEnd}
-                          </p>
-                          <p className="text-sm">Net: ₹{data.net.toLocaleString()}</p>
-                          <p className="text-xs text-slate-600">
-                            Income: ₹{data.totalCredit.toLocaleString()} | Expenses: ₹{data.totalDebit.toLocaleString()}
-                          </p>
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Area type="monotone" dataKey="net" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+        {/* <TopCategoriesChart /> */}
+        {/* <GaugeMultipleKPIChart /> */}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <AdvancedPolarChart />
+        <GaugeMultipleKPIChart />
+        <AnnualCategoryTrendsChart/>
+        {/* <ScrollytellingChart /> */}
       </div>
 
       {/* Financial Insights */}
@@ -445,3 +249,4 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
     </div>
   )
 }
+

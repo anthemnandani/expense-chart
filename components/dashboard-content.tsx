@@ -57,33 +57,6 @@ export default function DashboardContent() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Complete overview of your financial data</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-[100px] text-neutral-700 dark:text-neutral-100 border-neutral-200 dark:border-neutral-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={year}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-[120px] text-neutral-700 dark:text-neutral-100 border-neutral-200 dark:border-neutral-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       {/* Comprehensive Dashboard */}

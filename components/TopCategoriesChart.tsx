@@ -38,13 +38,36 @@ export function TopCategoriesChart() {
   const maxAmount = Math.max(...categoryData.map(d => d.amount))
 
   return (
-    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-3">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
+      <CardHeader className="flex justify-between flex-col lg:flex-row">
+       <div>
+         <CardTitle className="flex items-center gap-2">
           {/* <Activity className="h-5 w-5 text-orange-600" /> */}
           Top Spending Categories
         </CardTitle>
         <CardDescription>Based on spending amount with heat scale</CardDescription>
+       </div>
+         {/* Month and Year Selectors */}
+                <div className="flex gap-2 items-center">
+                    <select
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-1 py-1"
+                        defaultValue="August"
+                    >
+                        {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+                            'September', 'October', 'November', 'December'].map((month) => (
+                                <option key={month} value={month}>{month}</option>
+                            ))}
+                    </select>
+
+                    <select
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+                        defaultValue={2025}
+                    >
+                        {[2023, 2024, 2025].map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+                </div>
       </CardHeader>
 
       <div className="h-[350px]">

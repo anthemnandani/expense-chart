@@ -36,18 +36,30 @@ const radarChartData = [
 
 export default function MonthlyRadarChart() {
   return (
-    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-5">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-          {/* <BarChart3 className="h-5 w-5 text-green-600" /> */}
-          Monthly Income vs Expenses
-        </CardTitle>
-        <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-          Analyze trends across the year in a clean radial format
-        </CardDescription>
+    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
+      <CardHeader className="pb-2 flex justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+            {/* <BarChart3 className="h-5 w-5 text-green-600" /> */}
+            Monthly Income vs Expenses
+          </CardTitle>
+          <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+            Analyze trends across the year in a clean radial format
+          </CardDescription>
+        </div>
+        <div className="flex gap-2 items-center">
+          <select
+            className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+            defaultValue={2025}
+          >
+            {[2025, 2024, 2023].map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
       </CardHeader>
 
-      <CardContent className="h-[480px] p-6">
+      <CardContent className="h-[450px] p-6">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
