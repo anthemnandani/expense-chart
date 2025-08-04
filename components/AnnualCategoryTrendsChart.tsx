@@ -36,12 +36,6 @@ const generateMockData = () => {
 
 const AnnualCategoryTrendsChart = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-  if (!isClient) return null
 
   useEffect(() => {
     const check = () =>
@@ -122,15 +116,15 @@ const AnnualCategoryTrendsChart = () => {
         <CardTitle className="text-lg">Expense Heatmap</CardTitle>
         <div>
 
-          <select
-            className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            defaultValue={2025}
-          >
-            {[2023, 2024, 2025].map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
+                    <select
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+                        defaultValue={2025}
+                    >
+                        {[2023, 2024, 2025].map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+                </div>
       </CardHeader>
       <CardContent>
         <HighchartsReact

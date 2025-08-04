@@ -18,7 +18,6 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { BarChart3 } from "lucide-react"
-import { useEffect, useState } from "react"
 
 const radarChartData = [
   { month: "Jan", income: 8000, expenses: 6500 },
@@ -36,12 +35,6 @@ const radarChartData = [
 ]
 
 export default function MonthlyRadarChart() {
-    const [isClient, setIsClient] = useState(false)
-  
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
-    if (!isClient) return null
   return (
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
       <CardHeader className="pb-2 flex justify-between">

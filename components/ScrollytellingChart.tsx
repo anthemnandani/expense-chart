@@ -11,13 +11,7 @@ if (typeof Highcharts === 'function') {
 }
 
 const ScrollytellingChart = () => {
-  const [isDark, setIsDark] = useState(false);
-    const [isClient, setIsClient] = useState(false)
-  
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
-    if (!isClient) return null
+  const [isDark, setIsDark] = useState(false)
 
   const data = [
     ['Jan', 15000],
@@ -31,7 +25,7 @@ const ScrollytellingChart = () => {
     ['Sep', 8500],
     ['Oct', 8000],
     ['Nov', 7500],
-    ['Dec', 12000],
+    ['Dec', 120000],
   ]
 
   useEffect(() => {

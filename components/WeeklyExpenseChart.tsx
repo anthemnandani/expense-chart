@@ -3,7 +3,7 @@
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import HighchartsMore from "highcharts/highcharts-more"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 // Initialize Highcharts modules
 if (typeof Highcharts === 'function') {
@@ -11,12 +11,6 @@ if (typeof Highcharts === 'function') {
 }
 
 const AdvancedPolarChart = () => {
-      const [isClient, setIsClient] = useState(false)
-    
-      useEffect(() => {
-        setIsClient(true)
-      }, [])
-      if (!isClient) return null
   useEffect(() => {
     // Custom data for our chart
     const teamData = [

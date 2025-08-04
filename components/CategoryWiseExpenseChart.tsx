@@ -122,24 +122,18 @@ function useChartOptions(): Highcharts.Options {
 
 export function CategoryWiseExpenseChart() {
     const options = useChartOptions();
-    const [isClient, setIsClient] = useState(false)
-
-    useEffect(() => {
-        setIsClient(true)
-    }, [])
-    if (!isClient) return null
 
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-8">
             <CardHeader className='flex justify-between flex-col lg:flex-row'>
-                <div>
-                    <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
-                        Monthly Category Line Chart
-                    </CardTitle>
-                    <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
-                        Dotted & dashed lines show expense category trends across months.
-                    </CardDescription>
-                </div>
+               <div>
+                 <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
+                    Monthly Category Line Chart
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
+                    Dotted & dashed lines show expense category trends across months.
+                </CardDescription>
+               </div>
                 <div className="flex gap-2 items-center">
                     <select
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"

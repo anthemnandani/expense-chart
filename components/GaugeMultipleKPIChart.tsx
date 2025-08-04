@@ -10,7 +10,6 @@ if (typeof HighchartsMore === 'function') HighchartsMore(Highcharts)
 if (typeof SolidGauge === 'function') SolidGauge(Highcharts)
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { useEffect, useState } from 'react'
 
 // Static Data
 const categoryData = [
@@ -21,12 +20,6 @@ const categoryData = [
 ]
 
 export default function GaugeMultipleKPIChart() {
-      const [isClient, setIsClient] = useState(false)
-    
-      useEffect(() => {
-        setIsClient(true)
-      }, [])
-      if (!isClient) return null
     const colors = ['#0088fe', '#00c49f', '#a259ff', '#ff7300']
     const maxValue = Math.max(...categoryData.map(item => item.totalExpenses), 3500)
     const trackColors = colors.map(color => Highcharts.color(color).setOpacity(0.15).get())
