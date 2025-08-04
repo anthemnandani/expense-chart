@@ -11,7 +11,13 @@ if (typeof Highcharts === 'function') {
 }
 
 const ScrollytellingChart = () => {
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(false);
+    const [isClient, setIsClient] = useState(false)
+  
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+    if (!isClient) return null
 
   const data = [
     ['Jan', 15000],

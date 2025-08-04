@@ -12,7 +12,13 @@ if (typeof Highcharts === 'function') {
 }
 
 const AdvancedPolarChart = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false)
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
+    if (!isClient) return null
     const darkBg = "#1f1836"
     const lightBg = "#ffffff"
 
