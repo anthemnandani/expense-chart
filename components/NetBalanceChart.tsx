@@ -5,42 +5,38 @@ import HighchartsReact from 'highcharts-react-official'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-// Generate sample data for 2025
-const generateStockLikeData = () => {
-  const startDate = new Date('2025-01-01')
-  const data: [number, number][] = []
-
-  for (let i = 0; i < 365; i++) {
-    const date = new Date(startDate)
-    date.setDate(startDate.getDate() + i)
-
-    const timestamp = date.getTime()
-    const value = Math.round(Math.random() * 20000 - 10000)
-    data.push([timestamp, value])
-  }
-
-  return data
-}
-
 const NetBalanceChart = () => {
-  const data = useMemo(() => generateStockLikeData(), [])
+  const [chartData, setChartData] = useState<[number, number][]>([])
+  const [selectedYear, setSelectedYear] = useState(2025)
+  const groupId = 4
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/net-balance?groupId=${groupId}&year=${selectedYear}`);
+        if (!res.ok) throw new Error("Failed to fetch day-wise net balance");
+        const data: [number, number][] = await res.json();
+        setChartData(data);
+      } catch (err) {
+        console.error("Error fetching net balance:", err);
+      }
+    };
+    fetchData();
+  }, [selectedYear, groupId]);
+
 
   useEffect(() => {
     const checkDarkMode = () =>
       document.documentElement.classList.contains('dark')
-
     setIsDarkMode(checkDarkMode())
-
     const observer = new MutationObserver(() => {
       setIsDarkMode(checkDarkMode())
     })
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     })
-
     return () => observer.disconnect()
   }, [])
 
@@ -147,7 +143,7 @@ const NetBalanceChart = () => {
       {
         type: 'areaspline',
         name: 'Net Balance',
-        data,
+        data: chartData,
         color: '#3b82f6',
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -170,11 +166,14 @@ const NetBalanceChart = () => {
   return (
     <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between flex-col lg:flex-row'>
-        <CardTitle className="text-lg text-gray-800 dark:text-white">Net Balance (₹) - Day-wise (2025)</CardTitle>
+        <CardTitle className="text-lg text-gray-800 dark:text-white">
+          Net Balance (₹) - Week-wise ({selectedYear})
+        </CardTitle>
         <div className="flex gap-2 items-center">
           <select
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            defaultValue={2025}
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
           >
             {[2025, 2024, 2023].map((year) => (
               <option key={year} value={year}>{year}</option>
