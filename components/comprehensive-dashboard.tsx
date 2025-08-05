@@ -44,7 +44,6 @@ import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
 import { DailyExpenseChart } from "./DailyExpenseChart"
 import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
 import WeeklyExpenseChart from "./WeeklyExpenseChart"
-// import AdvancedPolarChart from "./AdvancedPolarChart"
 // import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
 
 // ✅ Dynamically import Highcharts-based charts to disable SSR
@@ -54,7 +53,8 @@ const GaugeMultipleKPIChart = dynamic(() => import("./GaugeMultipleKPIChart"), {
 const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: false });
 const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
 const ScrollytellingChart = dynamic(() => import("./ScrollytellingChart"), { ssr: false });
-// const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
+// const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
+const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
 
 
 interface ComprehensiveDashboardProps {
@@ -213,7 +213,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         {/* <GaugeMultipleKPIChart /> */}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* <AdvancedPolarChart /> */}
+        <AdvancedPolarChart />
         <GaugeMultipleKPIChart />
         {/* <AnnualCategoryTrendsChart/> */}
         {/* <ScrollytellingChart /> */}
