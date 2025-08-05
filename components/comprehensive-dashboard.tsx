@@ -1,5 +1,7 @@
 "use client"
 
+import dynamic from "next/dynamic";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
@@ -36,19 +38,24 @@ import {
   MoreHorizontal,
   BarChart3,
 } from "lucide-react"
-import NetBalanceChart from "./NetBalanceChart"
 import MonthlyRadarChart from "./MonthlyRadarChart"
 import { TopCategoriesChart } from "./TopCategoriesChart"
 import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
 import { DailyExpenseChart } from "./DailyExpenseChart"
-import { CategoryWiseExpenseChart } from "./CategoryWiseExpenseChart"
-import GaugeMultipleKPIChart from "./GaugeMultipleKPIChart"
 import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
 import WeeklyExpenseChart from "./WeeklyExpenseChart"
-import HighLevelPieChart from "./HighLevelPieChart"
 // import AdvancedPolarChart from "./AdvancedPolarChart"
-import ScrollytellingChart from "./ScrollytellingChart"
 // import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
+
+// ✅ Dynamically import Highcharts-based charts to disable SSR
+const AreaYearlyExpenseChart = dynamic(() => import("./AreaNuclearStockpileChart"), { ssr: false });
+const CategoryWiseExpenseChart = dynamic(() => import("./CategoryWiseExpenseChart"), { ssr: false });
+const GaugeMultipleKPIChart = dynamic(() => import("./GaugeMultipleKPIChart"), { ssr: false });
+const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: false });
+const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
+const ScrollytellingChart = dynamic(() => import("./ScrollytellingChart"), { ssr: false });
+// const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
+
 
 interface ComprehensiveDashboardProps {
   yearlyData: Array<{

@@ -120,7 +120,7 @@ function useChartOptions(): Highcharts.Options {
     }
 }
 
-export function CategoryWiseExpenseChart() {
+export default function CategoryWiseExpenseChart() {
     const options = useChartOptions()
 
     return (
