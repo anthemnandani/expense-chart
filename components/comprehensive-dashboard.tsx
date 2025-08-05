@@ -53,7 +53,7 @@ const GaugeMultipleKPIChart = dynamic(() => import("./GaugeMultipleKPIChart"), {
 const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: false });
 const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
 const ScrollytellingChart = dynamic(() => import("./ScrollytellingChart"), { ssr: false });
-// const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
+const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
 const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
 
 
@@ -215,7 +215,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <AdvancedPolarChart />
         <GaugeMultipleKPIChart />
-        {/* <AnnualCategoryTrendsChart/> */}
+        <AnnualCategoryTrendsChart/>
         {/* <ScrollytellingChart /> */}
       </div>
 
