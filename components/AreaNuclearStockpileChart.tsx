@@ -3,7 +3,6 @@
 import Highcharts from "highcharts/highstock"
 import HighchartsReact from "highcharts-react-official"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
 
 const monthlyExpenseData = [
   { month: "Jan", totalDebit: 3803, totalCredit: 6200 },
@@ -100,7 +99,7 @@ const chartOptions: Highcharts.Options = {
       },
       states: {
         inactive: {
-          opacity: 0.5,
+          opacity: 0.2,
         },
         hover: {
           halo: {
@@ -145,9 +144,8 @@ const chartOptions: Highcharts.Options = {
       color: {
         linearGradient: [0, 0, 0, 300],
         stops: [
-          [0, "#3b82f6"],
-          [0.5, "#58bdfcb1"],
-          [1, "#2CAFFE"],
+          [0, "#f97316"],
+          [1, "rgba(249, 115, 22, 0.1)"],
         ],
       },
     },
@@ -158,9 +156,8 @@ const chartOptions: Highcharts.Options = {
       color: {
         linearGradient: [0, 0, 0, 300],
         stops: [
-          [0, "#37ffa8"],
-          [0.5, "#3efba9a5"],
-          [1, "#57cc99"],
+          [0, "#10b981"],
+          [1, "rgba(16, 185, 129, 0.1)"],
         ],
       },
     },
@@ -171,14 +168,6 @@ const chartOptions: Highcharts.Options = {
 }
 
 export default function AreaYearlyExpenseChart() {
-  const [isClient, setIsClient] = useState(false)
-
-useEffect(() => {
-  setIsClient(true)
-}, [])
-
-if (!isClient) return null
-
   return (
     <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
       <CardHeader className="flex justify-between lg:flex-row lex-col">

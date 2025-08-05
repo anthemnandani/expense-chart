@@ -19,23 +19,14 @@ const COLORS = [
 
 export default function HighLevelPieChart({ categoryData }: HighLevelPieChartProps) {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [isClient, setIsClient] = useState(false)
-
     useEffect(() => {
-        if (typeof window === 'undefined') return
-
-        const check = () => document.documentElement.classList.contains('dark')
-        setIsDarkMode(check())
-
-        const observer = new MutationObserver(() => setIsDarkMode(check()))
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
+        const observer = new MutationObserver(() => {
+            setIsDarkMode(document.documentElement.classList.contains('dark'))
         })
-
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+        setIsDarkMode(document.documentElement.classList.contains('dark'))
         return () => observer.disconnect()
     }, [])
-
     useEffect(() => {
         const initializeHighcharts = async () => {
             const HighchartsMore = (await import('highcharts/highcharts-more')).default
@@ -101,26 +92,26 @@ export default function HighLevelPieChart({ categoryData }: HighLevelPieChartPro
             },
         },
         legend: {
-            layout: "horizontal",
-            align: "center",
-            verticalAlign: "bottom",
-            itemDistance: 20,
-            symbolRadius: 15,
-            symbolHeight: 15,
-            symbolWidth: 15,
-            itemMarginTop: 6,
-            itemMarginBottom: 6,
+            layout: "horizontal",        
+            align: "center",             
+            verticalAlign: "bottom",      
+            itemDistance: 20,             
+            symbolRadius: 15,               
+            symbolHeight: 15,             
+            symbolWidth: 15,            
+            itemMarginTop: 6,             
+            itemMarginBottom: 6,         
 
             itemStyle: {
-                color: "#444",
-                fontWeight: "500",
-                fontSize: "14px",
+                color: "#444",             
+                fontWeight: "500",         
+                fontSize: "14px",     
             },
             itemHoverStyle: {
-                color: "#1f2937",
+                color: "#1f2937",         
             },
             itemHiddenStyle: {
-                color: "#ccc",
+                color: "#ccc",            
             },
         },
         series: [
@@ -138,13 +129,13 @@ export default function HighLevelPieChart({ categoryData }: HighLevelPieChartPro
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
                     <CardTitle className="flex items-center gap-2">
-                        Expense Distribution
-                    </CardTitle>
-                    <CardDescription>
-                        Animated pie chart showing category-wise expense shares
-                    </CardDescription>
+                    Expense Distribution
+                </CardTitle>
+                <CardDescription>
+                    Animated pie chart showing category-wise expense shares
+                </CardDescription>
                 </div>
-                <div className="flex gap-2 flex-col-reverse">
+                 <div className="flex gap-2 flex-col-reverse">
                     <select
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-1 py-1"
                         defaultValue="August"

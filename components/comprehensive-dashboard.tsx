@@ -46,9 +46,9 @@ import GaugeMultipleKPIChart from "./GaugeMultipleKPIChart"
 import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
 import WeeklyExpenseChart from "./WeeklyExpenseChart"
 import HighLevelPieChart from "./HighLevelPieChart"
-import AdvancedPolarChart from "./AdvancedPolarChart"
+// import AdvancedPolarChart from "./AdvancedPolarChart"
 import ScrollytellingChart from "./ScrollytellingChart"
-import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
+// import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
 
 interface ComprehensiveDashboardProps {
   yearlyData: Array<{
@@ -206,9 +206,9 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         {/* <GaugeMultipleKPIChart /> */}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <AdvancedPolarChart />
+        {/* <AdvancedPolarChart /> */}
         <GaugeMultipleKPIChart />
-        <AnnualCategoryTrendsChart/>
+        {/* <AnnualCategoryTrendsChart/> */}
         {/* <ScrollytellingChart /> */}
       </div>
 

@@ -27,12 +27,15 @@ const NetBalanceChart = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    const checkDarkMode = () =>
+      document.documentElement.classList.contains('dark')
 
-    const check = () => document.documentElement.classList.contains('dark')
-    setIsDarkMode(check())
+    setIsDarkMode(checkDarkMode())
 
-    const observer = new MutationObserver(() => setIsDarkMode(check()))
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(checkDarkMode())
+    })
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
@@ -40,7 +43,6 @@ const NetBalanceChart = () => {
 
     return () => observer.disconnect()
   }, [])
-
 
   const textColor = isDarkMode ? '#ffffff' : '#1f2937'
   const borderColor = isDarkMode ? '#4B5563' : '#E5E7EB'

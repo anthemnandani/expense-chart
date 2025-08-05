@@ -23,7 +23,7 @@
     "dayjs": "^1.11.13",
     "echarts": "latest",
     "echarts-for-react": "latest",
-    "highcharts": "^12.3.0",
+    "highcharts": "^11.4.3",
     "highcharts-3d": "^0.1.7",
     "highcharts-react-official": "^3.2.2",
     "lucide-react": "^0.454.0",
