@@ -19,28 +19,29 @@ export default function AreaYearlyExpenseChart() {
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([])
 
   // Fetch API data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/api/Analytics/GetYearlyExpenseChart?groupId=${groupId}&year=${year}`)
-        if (!res.ok) throw new Error("Failed to fetch yearly expense data")
-        const data = await res.json()
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const res = await fetch(`/api/yearly-expense?groupId=${groupId}&year=${year}`);
+      if (!res.ok) throw new Error("Failed to fetch yearly expense data");
+      const data = await res.json();
 
-        // Transform API months into Jan/Feb labels
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        const transformed = data.map((item: any) => ({
-          month: months[parseInt(item.month) - 1],
-          totalDebit: item.totalDebit,
-          totalCredit: item.totalCredit
-        }))
-        setMonthlyExpenseData(transformed)
-      } catch (err) {
-        console.error("Error fetching yearly expense data:", err)
-      }
+      // Transform API months into readable labels
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const transformed = data.map((item: any) => ({
+        month: months[parseInt(item.month) - 1],
+        totalDebit: item.totalDebit,
+        totalCredit: item.totalCredit,
+      }));
+
+      setMonthlyExpenseData(transformed);
+    } catch (err) {
+      console.error("Error fetching yearly expense data:", err);
     }
-    fetchData()
-  }, [year]);
+  };
 
+  fetchData();
+}, [year, groupId]);
 
   const chartOptions: Highcharts.Options = {
     chart: {
