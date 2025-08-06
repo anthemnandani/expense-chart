@@ -140,46 +140,48 @@ export default function ExpenseTreeChart() {
             }
         ]
     }
-
     const onChartReady = (chart: any) => {
-        chartRef.current = chart
+        chartRef.current = chart;
+
         chart.on("mouseover", function (params: any) {
-            const level = params.data.id.split("-").length - 1
+            const level = params.data.id.split("-").length - 1;
             if (level === 1) {
                 chart.dispatchAction({
                     type: "expandTreeNode",
                     seriesIndex: 0,
                     dataIndex: params.dataIndex
-                })
+                });
             }
-        })
+        });
+
         chart.on("mouseout", function (params: any) {
-            const level = params.data.id.split("-").length - 1
+            const level = params.data.id.split("-").length - 1;
             if (level === 1) {
                 chart.dispatchAction({
                     type: "collapseTreeNode",
                     seriesIndex: 0,
                     dataIndex: params.dataIndex
-                })
+                });
             }
-        })
-    }
+        });
+    };
 
-  if (loading) {
-  return (
-    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-3">
-      <CardHeader className="flex justify-between lg:flex-row flex-col items-center gap-3">
-        <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Yearly Credit & Debit Overview
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Skeleton placeholder for chart */}
-        <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md w-full h-[650px]" />
-      </CardContent>
-    </Card>
-  )
-}
+
+    if (loading) {
+        return (
+            <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-3">
+                <CardHeader className="flex justify-between lg:flex-row flex-col items-center gap-3">
+                    <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Yearly Credit & Debit Overview
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {/* Skeleton placeholder for chart */}
+                    <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md w-full h-[650px]" />
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-3">
@@ -188,21 +190,31 @@ export default function ExpenseTreeChart() {
                     Yearly Credit & Debit Overview
                 </CardTitle>
 
-                {/* Toggle with Label */}
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Move chart
-                    </span>
-                    <div
-                        onClick={() => setRoamEnabled(!roamEnabled)}
-                        className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 
-        ${roamEnabled ? "bg-blue-500" : "bg-gray-400"}`}
-                    >
+                <div className="flex items-center gap-4">
+                    {/* Move chart toggle */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                            Move chart
+                        </span>
                         <div
-                            className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 
-          ${roamEnabled ? "translate-x-7" : "translate-x-0"}`}
-                        />
+                            onClick={() => setRoamEnabled(!roamEnabled)}
+                            className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 
+                    ${roamEnabled ? "bg-blue-500" : "bg-gray-400"}`}
+                        >
+                            <div
+                                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 
+                        ${roamEnabled ? "translate-x-7" : "translate-x-0"}`}
+                            />
+                        </div>
                     </div>
+
+                    {/* View Detailed Map button */}
+                    <button
+                        onClick={() => window.open("/detailed-map", "_blank")}
+                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                    >
+                        View Detailed Map
+                    </button>
                 </div>
             </CardHeader>
 
