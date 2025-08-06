@@ -12,34 +12,23 @@ const months = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-const generateMockData = () => {
-  const data: [number, number, number][] = [];
-  for (let y = 0; y < categories.length; y++) {
-    for (let x = 0; x < 12; x++) {
-      let value = Math.floor(Math.random() * 1000);
-      if (categories[y] === "Tea" && (x === 0 || x === 1)) value += 500;
-      data.push([x, y, value]);
-    }
-  }
-  return data;
-};
-
 export default function AnnualCategoryTrendsChart() {
   const [Highcharts, setHighcharts] = useState<any>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [year, setYear] = useState(2025);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [heatmapData, setHeatmapData] = useState<[number, number, number][]>([]);
 
-  // Load Highcharts & required modules in the browser
+  // Load Highcharts modules
   useEffect(() => {
     (async () => {
       const HC = (await import("highcharts")).default;
       const HCHeatmap = (await import("highcharts/modules/heatmap")).default;
       const HCAccessibility = (await import("highcharts/modules/accessibility")).default;
       const HCExporting = (await import("highcharts/modules/exporting")).default;
-
       HCHeatmap(HC);
       HCAccessibility(HC);
       HCExporting(HC);
-
       setHighcharts(HC);
     })();
   }, []);
@@ -52,6 +41,21 @@ export default function AnnualCategoryTrendsChart() {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(`/api/annual-category-trends?groupId=4&year=${year}`);
+        if (!res.ok) throw new Error("Failed to fetch chart data");
+        const json = await res.json();
+        setCategories(json.categories);
+        setHeatmapData(json.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchData();
+  }, [year]);
 
   if (!Highcharts) return <div>Loading chart...</div>;
 
@@ -103,7 +107,7 @@ export default function AnnualCategoryTrendsChart() {
         name: "Expenses",
         borderWidth: 1,
         borderColor: isDarkMode ? "#444" : "#fff",
-        data: generateMockData(),
+        data: heatmapData,
         dataLabels: { enabled: true, color: isDarkMode ? "#fff" : "#000" },
         type: "heatmap",
       },
@@ -117,11 +121,12 @@ export default function AnnualCategoryTrendsChart() {
         <CardTitle className="text-lg">Expense Heatmap</CardTitle>
         <div>
           <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            defaultValue={2025}
           >
-            {[2023, 2024, 2025].map((year) => (
-              <option key={year} value={year}>{year}</option>
+            {[2023, 2024, 2025].map((y) => (
+              <option key={y} value={y}>{y}</option>
             ))}
           </select>
         </div>

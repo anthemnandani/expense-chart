@@ -46,6 +46,9 @@ const NetBalanceChart = () => {
   const gridLineColor = isDarkMode ? '#374151' : '#D1D5DB'
   const fillTop = isDarkMode ? '#2CAFFE' : '#3a86ff'
   const fillBottom = isDarkMode ? '#3a86ff' : '#2CAFFE'
+  const now = new Date();
+  const firstDayOfYear = new Date(selectedYear, 0, 1).getTime();
+  const lastDayOfCurrentMonth = new Date(selectedYear, now.getMonth() + 1, 0).getTime();
 
   const options: Highcharts.Options = {
     chart: {
@@ -66,6 +69,8 @@ const NetBalanceChart = () => {
     },
     xAxis: {
       type: 'datetime',
+      min: firstDayOfYear,
+      max: lastDayOfCurrentMonth,
       lineColor: borderColor,
       tickColor: borderColor,
       labels: {
@@ -109,7 +114,7 @@ const NetBalanceChart = () => {
       }
     },
     rangeSelector: {
-      selected: 1,
+      selected: 2,
       buttons: [
         { type: 'month', count: 1, text: '1m' },
         { type: 'month', count: 3, text: '3m' },
@@ -182,12 +187,17 @@ const NetBalanceChart = () => {
         </div>
       </CardHeader>
       <CardContent className="h-[500px]">
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType="stockChart"
-          options={options}
-        />
+        {chartData.length > 0 ? (
+          <HighchartsReact
+            highcharts={Highcharts}
+            constructorType="stockChart"
+            options={options}
+          />
+        ) : (
+          <div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md" />
+        )}
       </CardContent>
+
     </Card>
   )
 }

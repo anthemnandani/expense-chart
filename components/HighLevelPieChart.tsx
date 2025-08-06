@@ -20,8 +20,9 @@ const groupId = 4
 export default function HighLevelPieChart() {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [selectedYear, setSelectedYear] = useState(2025)
-    const [selectedMonth, setSelectedMonth] = useState(8) // August as default
+    const [selectedMonth, setSelectedMonth] = useState(8)
     const [categoryData, setCategoryData] = useState<ExpenseCategory[]>([])
+    const [loading, setLoading] = useState(true)
 
     // Detect dark mode
     useEffect(() => {
@@ -48,19 +49,22 @@ export default function HighLevelPieChart() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                setLoading(true)
                 const res = await fetch(
                     `/api/expense-monthswise?groupId=${groupId}&year=${selectedYear}&months=${selectedMonth}`
-                );
-                if (!res.ok) throw new Error("Failed to fetch category data");
-                const data = await res.json();
-                setCategoryData(data);
+                )
+                if (!res.ok) throw new Error("Failed to fetch category data")
+                const data = await res.json()
+                setCategoryData(data)
             } catch (err) {
-                console.error("Error fetching category data:", err);
-                setCategoryData([]);
+                console.error("Error fetching category data:", err)
+                setCategoryData([])
+            } finally {
+                setLoading(false)
             }
-        };
-        fetchData();
-    }, [selectedYear, selectedMonth, groupId]);
+        }
+        fetchData()
+    }, [selectedYear, selectedMonth])
 
 
     const total = categoryData.reduce((sum, cat) => sum + (cat.totalExpenses || 0), 0)
@@ -183,8 +187,12 @@ export default function HighLevelPieChart() {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] min-h-fit">
-                    <HighchartsReact highcharts={Highcharts} options={options} />
+                 <div className="h-[300px] min-h-fit flex items-center justify-center">
+                    {loading ? (
+                        <div className="animate-pulse w-50 h-50 rounded-full bg-gray-200 dark:bg-gray-700" />
+                    ) : (
+                        <HighchartsReact highcharts={Highcharts} options={options} />
+                    )}
                 </div>
             </CardContent>
         </Card>
