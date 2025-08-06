@@ -1,18 +1,27 @@
 "use client"
 
-import Highcharts from "highcharts"
-import HighchartsReact from "highcharts-react-official"
-import HighchartsMore from "highcharts/highcharts-more"
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+import HighchartsMore from "highcharts/highcharts-more";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
-// Initialize Highcharts modules
-if (typeof Highcharts === 'function') {
-    HighchartsMore(Highcharts)
+if (typeof Highcharts === "function") {
+    HighchartsMore(Highcharts);
 }
+
+type MonthlyRecord = {
+    date: string;
+    credit: number;
+    debit: number;
+};
 
 const AdvancedPolarChart = () => {
     const [isDarkMode, setIsDarkMode] = useState(false)
+    const [monthlyData, setMonthlyData] = useState<MonthlyRecord[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState("8");
+    const [selectedYear, setSelectedYear] = useState(2025);
+    const groupId = 4;
     const darkBg = "#1f1836"
     const lightBg = "#ffffff"
 
@@ -48,54 +57,32 @@ const AdvancedPolarChart = () => {
         return () => observer.disconnect()
     }, [])
 
+    // 1️⃣ Effect for fetching data
     useEffect(() => {
-        const monthlyData = [
-            { date: "01/07/2025", credit: 0, debit: 100 },
-            { date: "02/07/2025", credit: 0, debit: 0 },
-            { date: "03/07/2025", credit: 5000, debit: 300 },
-            { date: "04/07/2025", credit: 4000, debit: 150 },
-            { date: "05/07/2025", credit: 0, debit: 1800 },
-            { date: "06/07/2025", credit: 2000, debit: 200 },
-            { date: "07/07/2025", credit: 0, debit: 0 },
-            { date: "08/07/2025", credit: 1000, debit: 300 },
-            { date: "09/07/2025", credit: 0, debit: 120 },
-            { date: "10/07/2025", credit: 300, debit: 100 },
-            { date: "11/07/2025", credit: 200, debit: 600 },
-            { date: "12/07/2025", credit: 0, debit: 0 },
-            { date: "13/07/2025", credit: 4000, debit: 900 },
-            { date: "14/07/2025", credit: 0, debit: 100 },
-            { date: "15/07/2025", credit: 500, debit: 1100 },
-            { date: "16/07/2025", credit: 0, debit: 0 },
-            { date: "17/07/2025", credit: 1000, debit: 500 },
-            { date: "18/07/2025", credit: 700, debit: 200 },
-            { date: "19/07/2025", credit: 0, debit: 300 },
-            { date: "20/07/2025", credit: 100, debit: 150 },
-            { date: "21/07/2025", credit: 300, debit: 100 },
-            { date: "22/07/2025", credit: 200, debit: 150 },
-            { date: "23/07/2025", credit: 100, debit: 90 },
-            { date: "24/07/2025", credit: 0, debit: 120 },
-            { date: "25/07/2025", credit: 150, debit: 100 },
-            { date: "26/07/2025", credit: 0, debit: 0 },
-            { date: "27/07/2025", credit: 250, debit: 300 },
-            { date: "28/07/2025", credit: 0, debit: 0 },
-            { date: "29/07/2025", credit: 100, debit: 90 },
-            { date: "30/07/2025", credit: 0, debit: 700 },
-            { date: "31/07/2025", credit: 1500, debit: 500 },
-        ]
+        const fetchMonthlyData = async () => {
+            try {
+                const res = await fetch(
+                    `/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch monthly data");
+                const data = await res.json();
+                setMonthlyData(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
 
-        const creditSeries = monthlyData.map((entry, i) => [i + 1, 1, entry.credit])
-        const debitSeries = monthlyData.map((entry, i) => [i + 1, 2, entry.debit])
+        fetchMonthlyData();
+    }, [groupId, selectedMonth, selectedYear]);
 
-        // Convert monthlyData to bubble format: [day, yAxisTeamIndex, value]
-        const teamData = monthlyData.map((entry, index) => {
-            const day = index + 1
-            const credit = entry.credit
-            const debit = entry.debit
-            return [
-                day, 1, credit
-            ]
-        })
-        const scoreData = [
+    useEffect(() => {
+        if (monthlyData.length === 0) return;
+
+        const creditSeries = monthlyData.map((entry, i) => [i + 1, 1, entry.credit]);
+        const debitSeries = monthlyData.map((entry, i) => [i + 1, 2, entry.debit]);
+        const totalDays = monthlyData.length;
+
+                const scoreData = [
             {
                 x: 1,
                 low: 0,
@@ -135,6 +122,7 @@ const AdvancedPolarChart = () => {
         ]
 
         const chartOptions: Highcharts.Options = {
+            accessibility: { enabled: false },
             chart: {
                 polar: true,
                 height: '100%',
@@ -224,7 +212,7 @@ const AdvancedPolarChart = () => {
                     lineWidth: 0,
                     gridLineWidth: 0,
                     min: 1,
-                    max: 26,
+                    max: totalDays,
                     labels: { enabled: false },
                 },
                 {
@@ -238,7 +226,7 @@ const AdvancedPolarChart = () => {
                         return { from, to, color: '#BBBAC5' }
                     }),
                     min: 0,
-                    max: 26,
+                    max: totalDays,
                     labels: { enabled: false }
                 },
                 {
@@ -429,9 +417,8 @@ const AdvancedPolarChart = () => {
             ]
         }
 
-        // Apply the options to a new chart instance
-        Highcharts.chart('polar-container', chartOptions)
-    }, [isDarkMode])
+        Highcharts.chart('polar-container', chartOptions);
+    }, [isDarkMode, monthlyData, selectedMonth, selectedYear]);
 
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-6">
@@ -447,21 +434,25 @@ const AdvancedPolarChart = () => {
                 </div>
                 <div className="flex gap-2">
                     <select
-                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-1 py-1"
-                        defaultValue="August"
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-1 py-1"
                     >
-                        {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-                            'September', 'October', 'November', 'December'].map((month) => (
-                                <option key={month} value={month}>{month}</option>
-                            ))}
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                            <option key={m} value={m}>
+                                {new Date(0, m - 1).toLocaleString("default", { month: "long" })}
+                            </option>
+                        ))}
                     </select>
-
                     <select
-                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-                        defaultValue={2025}
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(Number(e.target.value))}
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
                     >
-                        {[2023, 2024, 2025].map((year) => (
-                            <option key={year} value={year}>{year}</option>
+                        {[2023, 2024, 2025].map((y) => (
+                            <option key={y} value={y}>
+                                {y}
+                            </option>
                         ))}
                     </select>
                 </div>
