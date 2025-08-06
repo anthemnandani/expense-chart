@@ -43,7 +43,8 @@ import { TopCategoriesChart } from "./TopCategoriesChart"
 import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
 import { DailyExpenseChart } from "./DailyExpenseChart"
 import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
-import WeeklyExpenseChart from "./WeeklyExpenseChart"
+// import WeeklyExpenseChart from "./WeeklyExpenseChart"
+// import TreeGraphChart from "./ExpenseTreeChart";
 // import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
 
 // ✅ Dynamically import Highcharts-based charts to disable SSR
@@ -54,7 +55,8 @@ const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: fa
 const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
 const ScrollytellingChart = dynamic(() => import("./ScrollytellingChart"), { ssr: false });
 const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
-const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
+const TreeGraphChart = dynamic(() => import("./ExpenseTreeChart"), { ssr: false });
+// const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
 
 
 interface ComprehensiveDashboardProps {
@@ -197,6 +199,11 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         <NetBalanceChart />
       </div>
 
+      {/* Financial Overview and Expense Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        <TreeGraphChart />
+      </div>
+      
       {/* Monthly Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <MonthlyRadarChart />
@@ -208,12 +215,12 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         <DailyExpenseChart />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* <TopCategoriesChart /> */}
         {/* <GaugeMultipleKPIChart /> */}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <AdvancedPolarChart />
+        {/* <AdvancedPolarChart /> */}
         <GaugeMultipleKPIChart />
         <AnnualCategoryTrendsChart/>
         {/* <ScrollytellingChart /> */}
