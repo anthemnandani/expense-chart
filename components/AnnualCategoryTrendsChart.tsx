@@ -67,7 +67,7 @@ export default function AnnualCategoryTrendsChart() {
       height: 400,
     },
     title: {
-      text: "Annual Category Trends (Heatmap)",
+      text: undefined,
       style: {
         color: isDarkMode ? "#fff" : "#000",
         fontSize: "16px",
@@ -118,7 +118,7 @@ export default function AnnualCategoryTrendsChart() {
   return (
     <Card className="col-span-full shadow-md border-0 bg-white dark:bg-gray-800">
       <CardHeader className="flex justify-between lg:flex-row flex-col">
-        <CardTitle className="text-lg">Expense Heatmap</CardTitle>
+        <CardTitle className="text-lg">Annual Category Trends (Heatmap)</CardTitle>
         <div>
           <select
             value={year}

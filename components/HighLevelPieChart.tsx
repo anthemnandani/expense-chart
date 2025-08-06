@@ -157,11 +157,11 @@ export default function HighLevelPieChart() {
                     <CardTitle className="flex items-center gap-2">
                         Expense Distribution
                     </CardTitle>
-                    <CardDescription>
+                    {/* <CardDescription>
                         Animated pie chart showing category-wise expense shares
-                    </CardDescription>
+                    </CardDescription> */}
                 </div>
-                <div className="flex gap-2 flex-col-reverse">
+                <div className="flex gap-2 flex-col lg:flex-row">
                     <select
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-1 py-1"
                         value={selectedMonth}

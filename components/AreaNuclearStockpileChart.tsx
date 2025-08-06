@@ -196,11 +196,11 @@ useEffect(() => {
       <CardHeader className="flex justify-between lg:flex-row lex-col">
         <div>
           <CardTitle className="text-lg font-semibold">
-            Yearly Expense & Income Overview
+            Yearly Credit & Debit Overview
           </CardTitle>
-          <CardDescription>
+          {/* <CardDescription>
             Smooth area chart with rounded connections between points
-          </CardDescription>
+          </CardDescription> */}
         </div>
         <div className="flex gap-2 items-center">
           <select

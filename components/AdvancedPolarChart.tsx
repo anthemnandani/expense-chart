@@ -428,9 +428,9 @@ const AdvancedPolarChart = () => {
                         {/* <BarChart3 className="h-5 w-5 text-green-600" /> */}
                         Weekly Credit vs Debit
                     </CardTitle>
-                    <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                    {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
                         Analyze trends across the month
-                    </CardDescription>
+                    </CardDescription> */}
                 </div>
                 <div className="flex gap-2">
                     <select

@@ -78,7 +78,7 @@ export default function CategoryWiseExpenseChart() {
         accessibility: { enabled: false },
         chart: { type: "spline", backgroundColor: "transparent" },
         title: {
-            text: "Category-wise Monthly Expenses",
+            text: undefined,
             style: { color: isDarkMode ? "#f9fafb" : "#1f2937" },
         },
         xAxis: {
@@ -130,11 +130,11 @@ export default function CategoryWiseExpenseChart() {
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
                     <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
-                        Monthly Category Line Chart
+                       Category-wise Monthly Expenses
                     </CardTitle>
-                    <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
+                    {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
                         Dotted & dashed lines show expense category trends across months.
-                    </CardDescription>
+                    </CardDescription> */}
                 </div>
                 <div className="flex gap-2 items-center">
                     <select

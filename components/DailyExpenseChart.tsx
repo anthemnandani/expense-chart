@@ -42,8 +42,8 @@ export function DailyExpenseChart() {
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-12">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
-                    <CardTitle className="flex items-center gap-2">Daily Expenses (July 2025)</CardTitle>
-                    <CardDescription>Track your daily expenses and credits</CardDescription>
+                    <CardTitle className="flex items-center gap-2">Daily Expenses ({monthsList[selectedMonth-1]} {selectedYear})</CardTitle>
+                    {/* <CardDescription>Track your daily expenses and credits</CardDescription> */}
                 </div>
                 <div className="flex gap-2">
                     <select
