@@ -11,7 +11,6 @@ interface ExpenseData {
   totalCredit: number
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 const groupId = 4
 
 export default function AreaYearlyExpenseChart() {
@@ -168,8 +167,8 @@ useEffect(() => {
         color: {
           linearGradient: [0, 0, 0, 300],
           stops: [
-            [0, "#f97316"],
-            [1, "rgba(249, 115, 22, 0.1)"],
+            [0, "#1D4ED8"],
+            [1, "#1d4fd8a1"],
           ],
         },
       },
@@ -178,10 +177,11 @@ useEffect(() => {
         type: "areaspline", // Changed from "area" to "areaspline"
         data: monthlyExpenseData.map((d) => d.totalCredit),
         color: {
-          linearGradient: [0, 0, 0, 300],
+          linearGradient: [0, 0, 0, 600],
           stops: [
-            [0, "#10b981"],
-            [1, "rgba(16, 185, 129, 0.1)"],
+            [0, "#14532D"],
+            [0.5, "#4ade80"],
+            [1, "#64ff9da3"],
           ],
         },
       },

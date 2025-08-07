@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LayoutDashboard, CreditCard, Tags, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
   DropdownMenu,
@@ -18,15 +18,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/context/auth-context"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+    const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+    const { signOut, user, loading, checkAuth } = useAuth();
+      useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!user) {
+      console.warn("No user found, redirecting...");
+      router.push("/signin");
+    } 
+  }, [loading, checkAuth, pathname]);
 
   const menuItems = [
     {
@@ -137,6 +152,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               "w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20",
               sidebarCollapsed && "justify-center px-2",
             )}
+            onClick={signOut}
           >
             <LogOut className="h-4 w-4 flex-shrink-0" />
             {!sidebarCollapsed && <span>Logout</span>}
@@ -181,7 +197,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600 cursor-pointer">
+                  <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={signOut}>
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>

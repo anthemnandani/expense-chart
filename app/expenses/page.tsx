@@ -1,21 +1,147 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
 import DashboardLayout from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Filter, Download } from "lucide-react"
+import { Expense } from "@/lib/types"
+import CustomPagination from "@/components/CustomPagination"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function ExpensesPage() {
-  const expenses = [
-    { id: 1, date: "2025-01-29", description: "Tea", amount: 150, category: "Food", type: "Debit" },
-    { id: 2, date: "2025-01-28", description: "Salary", amount: 5000, category: "Income", type: "Credit" },
-    { id: 3, date: "2025-01-27", description: "Water", amount: 50, category: "Utilities", type: "Debit" },
-    { id: 4, date: "2025-01-26", description: "Party", amount: 500, category: "Entertainment", type: "Debit" },
-  ]
+  const [expenses, setExpenses] = useState<Expense[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [expenseTypes, setExpenseTypes] = useState<{ ExpenseTypeId: number; Type: string }[]>([])
+  const [selectedType, setSelectedType] = useState<string>("all")
+  const [categories, setCategories] = useState<string[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch("/api/expenses")
+        if (!res.ok) throw new Error("Failed to fetch expenses")
+        const data = await res.json()
+        setExpenses(data)
+
+        // Extract unique categories
+        const uniqueCategories = [...new Set(data.map((exp: Expense) => exp.ExpenseDescType))]
+        setCategories(uniqueCategories.filter(Boolean))
+      } catch (error) {
+        console.error("Error fetching expenses:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchExpenses()
+  }, [])
+
+  useEffect(() => {
+    const fetchExpenseTypes = async () => {
+      try {
+        const res = await fetch("/api/expense-types")
+        if (!res.ok) throw new Error("Failed to fetch expense types")
+        const data = await res.json()
+        setExpenseTypes(data)
+      } catch (error) {
+        console.error("Error fetching expense types:", error)
+      }
+    }
+
+    fetchExpenseTypes()
+  }, [])
+
+  const enrichedExpenses = useMemo(() => {
+    const typeMap = Object.fromEntries(
+      expenseTypes.map((t) => [t.ExpenseTypeId, t.Type])
+    )
+    return expenses.map((exp) => ({
+      ...exp,
+      Type: typeMap[exp.ExpenseTypeId] || "",
+    }))
+  }, [expenses, expenseTypes])
+
+  const filteredExpenses = useMemo(() => {
+    return enrichedExpenses.filter((exp) => {
+      const typeMatch = selectedType === "all" || exp.Type === selectedType;
+      const categoryMatch =
+        selectedCategory === "all" || exp.ExpenseDescType === selectedCategory;
+      return typeMatch && categoryMatch;
+    });
+  }, [enrichedExpenses, selectedType, selectedCategory])
+
+  const paginatedExpenses = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage
+    const end = start + rowsPerPage
+    return filteredExpenses.slice(start, end)
+  }, [filteredExpenses, currentPage, rowsPerPage])
+
+  const handleExportToPDF = () => {
+    const doc = new jsPDF()
+
+    doc.setFontSize(16)
+    doc.text("Expenses Report", 14, 22)
+
+    const tableColumn = ["Date", "Description", "Category", "Type", "Amount"]
+    const tableRows: any[] = []
+
+    filteredExpenses.forEach((exp) => {
+      const date = new Date(exp.Date).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+
+      tableRows.push([
+        date,
+        exp.Description,
+        exp.ExpenseDescType,
+        exp.Type === "Cr." ? "Credit" : "Debit",
+        `${exp.Expenses.toLocaleString()}`,
+      ])
+    })
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      styles: {
+        fontSize: 9, // Global font size for the table
+      },
+      columnStyles: {
+        0: { cellWidth: 28 }, // Date
+        1: { cellWidth: 88 }, // Description (wider)
+        2: { cellWidth: 28 }, // Category
+        3: { cellWidth: 25 }, // Type
+        4: { cellWidth: 35 }, // Amount
+      },
+    })
+
+    doc.save("expenses-report.pdf")
+  }
+
 
   return (
     <DashboardLayout>
@@ -23,7 +149,9 @@ export default function ExpensesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your income and expenses</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Manage your income and expenses
+            </p>
           </div>
           <Button className="bg-blue-600 hover:bg-blue-700">
             <Plus className="h-4 w-4 mr-2" />
@@ -38,46 +166,48 @@ export default function ExpensesPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
+              {/* <div>
                 <Label htmlFor="search">Search</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input id="search" placeholder="Search expenses..." className="pl-10" />
                 </div>
-              </div>
+              </div> */}
               <div>
                 <Label htmlFor="category">Category</Label>
-                <Select>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All categories</SelectItem>
-                    <SelectItem value="food">Food</SelectItem>
-                    <SelectItem value="utilities">Utilities</SelectItem>
-                    <SelectItem value="entertainment">Entertainment</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="type">Type</Label>
-                <Select>
+                <Select value={selectedType} onValueChange={setSelectedType}>
                   <SelectTrigger>
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All types</SelectItem>
-                    <SelectItem value="credit">Credit</SelectItem>
-                    <SelectItem value="debit">Debit</SelectItem>
+                    <SelectItem value="Cr.">Credit</SelectItem>
+                    <SelectItem value="Dr.">Debit</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end gap-2">
-                <Button variant="outline">
+                {/* <Button variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                   Apply
-                </Button>
-                <Button variant="outline">
+                </Button> */}
+                <Button variant="outline" onClick={handleExportToPDF}>
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
@@ -90,40 +220,79 @@ export default function ExpensesPage() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>Your latest income and expense transactions</CardDescription>
+            <CardDescription>
+              Your latest income and expense transactions
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4">Date</th>
-                    <th className="text-left py-3 px-4">Description</th>
-                    <th className="text-left py-3 px-4">Category</th>
-                    <th className="text-left py-3 px-4">Type</th>
-                    <th className="text-right py-3 px-4">Amount</th>
+                    <th className="text-left py-3 px-4 text-sm">Date</th>
+                    <th className="text-left py-3 px-4 text-sm">Description</th>
+                    <th className="text-left py-3 px-4 text-sm">Category</th>
+                    <th className="text-left py-3 px-4 text-sm">Type</th>
+                    <th className="text-right py-3 px-4 text-sm">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {expenses.map((expense) => (
-                    <tr key={expense.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
-                      <td className="py-3 px-4">{expense.date}</td>
-                      <td className="py-3 px-4 font-medium">{expense.description}</td>
-                      <td className="py-3 px-4">{expense.category}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant={expense.type === "Credit" ? "default" : "destructive"}>{expense.type}</Badge>
-                      </td>
-                      <td
-                        className={`py-3 px-4 text-right font-medium ${
-                          expense.type === "Credit" ? "text-green-600" : "text-red-600"
-                        }`}
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, i) => (
+                      <tr key={i} className="animate-pulse border-b">
+                        <td className="py-3 px-4"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" /></td>
+                        <td className="py-3 px-4"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32" /></td>
+                        <td className="py-3 px-4"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" /></td>
+                        <td className="py-3 px-4"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20" /></td>
+                        <td className="py-3 px-4 text-right"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 ml-auto" /></td>
+                      </tr>
+                    ))
+                  ) : (
+                    paginatedExpenses.map((expense) => (
+                      <tr
+                        key={expense.ExpenseId}
+                        className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
-                        {expense.type === "Credit" ? "+" : "-"}₹{expense.amount.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(expense.Date).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }).replace(" ", " ")}
+                        </td>
+
+                        <td className="py-3 px-4 text-sm">
+                          {expense.Description}
+                        </td>
+                        <td className="py-3 px-4 text-sm">{expense.ExpenseDescType}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant={expense.Type === "Cr." ? "default" : "destructive"}>
+                            {expense.Type === "Cr." ? "Credit" : "Debit"}
+                          </Badge>
+                        </td>
+
+                        <td
+                          className={`py-3 px-4 text-right text-sm ${expense.Type === "Cr." ? "text-green-600" : "text-red-600"
+                            }`}
+                        >
+                          {expense.Type === "Cr." ? "+" : "-"}₹
+                          {expense.Expenses.toLocaleString()}
+                        </td>
+
+
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
+
+              <CustomPagination
+                totalItems={filteredExpenses.length}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
             </div>
           </CardContent>
         </Card>

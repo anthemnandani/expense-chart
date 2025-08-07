@@ -43,6 +43,7 @@ import { TopCategoriesChart } from "./TopCategoriesChart"
 import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
 import { DailyExpenseChart } from "./DailyExpenseChart"
 import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
+import UniqueStatCards from "./UniqueStatCards";
 // import WeeklyExpenseChart from "./WeeklyExpenseChart"
 // import TreeGraphChart from "./ExpenseTreeChart";
 // import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
@@ -128,73 +129,14 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Metric Card Template */}
-        {[
-          {
-            title: "Total Income",
-            icon: DollarSign,
-            value: `₹${totalIncome.toLocaleString()}`,
-            change: "+12.5% from last period",
-            changeIcon: ArrowUpRight,
-          },
-          {
-            title: "Total Expenses",
-            icon: TrendingDown,
-            value: `₹${totalExpenses.toLocaleString()}`,
-            change: "-8.2% from last period",
-            changeIcon: ArrowDownRight,
-          },
-          {
-            title: "Net Savings",
-            icon: Target,
-            value: `₹${netSavings.toLocaleString()}`,
-            subtitle: `${savingsRate.toFixed(1)}% savings rate`,
-          },
-          {
-            title: "Active Months",
-            icon: Calendar,
-            value: `${activeMonths}/12`,
-            subtitle: `${((activeMonths / 12) * 100).toFixed(0)}% year coverage`,
-          },
-        ].map(({ title, icon: Icon, value, change, subtitle, changeIcon: ChangeIcon }, idx) => (
-          <Card
-            key={idx}
-            className="shadow-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-lg transition-shadow"
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-sm font-medium">
-                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                {title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
-              {change && (
-                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
-                  <ChangeIcon className="h-3 w-3" />
-                  {change}
-                </div>
-              )}
-              {subtitle && (
-                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {subtitle}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-
+      <UniqueStatCards />
       {/* Financial Overview and Expense Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <AreaNuclearStockpileChart />
         <HighLevelPieChart />
       </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Other cards */}
         <NetBalanceChart />
       </div>
@@ -222,7 +164,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <AdvancedPolarChart />
         <GaugeMultipleKPIChart />
-        <AnnualCategoryTrendsChart/>
+        <AnnualCategoryTrendsChart />
         {/* <ScrollytellingChart /> */}
       </div>
 

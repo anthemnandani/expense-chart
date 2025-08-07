@@ -6,17 +6,31 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { User, Bell, Shield, Database, Palette } from "lucide-react"
+import { User, Bell, Shield } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function SettingsPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  // Redirect to signin if user is not found after loading
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/signin")
+    }
+  }, [loading, user, router])
+
+  // if (loading || !user) return <div className="p-6">Loading...</div>
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and application preferences</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
@@ -33,21 +47,17 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="John" />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Doe" />
+                    <Label htmlFor="firstName">Name</Label>
+                    <Input id="firstName" defaultValue={user?.fullName || ""} />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                  <Input id="email" type="email" defaultValue={user?.email || ""} disabled />
                 </div>
                 <div>
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" defaultValue="+1 (555) 123-4567" />
+                  <Input id="phone" defaultValue={user?.contactNumber || ""} />
                 </div>
                 <Button>Save Changes</Button>
               </CardContent>

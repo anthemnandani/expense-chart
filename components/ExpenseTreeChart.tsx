@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useRef } from "react"
 import ReactECharts from "echarts-for-react"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Button } from "./ui/button" // Tailwind + shadcn button
 
 type TreeNode = {
     id: string
@@ -17,7 +16,7 @@ export default function ExpenseTreeChart() {
     const [loading, setLoading] = useState(true)
     const chartRef = useRef<any>(null)
     const [isDark, setIsDark] = useState(false)
-    const [roamEnabled, setRoamEnabled] = useState(false) // ✅ Roam toggle
+    const [roamEnabled, setRoamEnabled] = useState(false)
 
     // Watch Tailwind's dark mode
     useEffect(() => {
@@ -132,10 +131,13 @@ export default function ExpenseTreeChart() {
                 },
                 lineStyle: { color: isDark ? "#6b7280" : "#d1d5db" },
                 expandAndCollapse: true,
+                emphasis: {
+                    focus: 'descendant'
+                },
                 initialTreeDepth: 2,
                 animationDuration: 350,
                 animationDurationUpdate: 350,
-                roam: roamEnabled, // ✅ Controlled by button
+                roam: roamEnabled,
                 nodePadding: 25
             }
         ]
@@ -210,7 +212,7 @@ export default function ExpenseTreeChart() {
 
                     {/* View Detailed Map button */}
                     <button
-                        onClick={() => window.open("/detailed-map", "_blank")}
+                        onClick={() => window.open("/detailed-map", "")}
                         className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                     >
                         View Detailed Map
