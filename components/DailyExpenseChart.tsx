@@ -3,12 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { ChartContainer } from "@/components/ui/chart"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/auth-context"
-
-type ExpenseRecord = {
-    date: string
-    credit: number
-    debit: number
-}
+import { ExpenseRecord } from "@/lib/types"
 
 export function DailyExpenseChart() {
     const [data, setData] = useState<ExpenseRecord[]>([])

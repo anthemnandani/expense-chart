@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { useAuth } from "@/context/auth-context"
+import { ExpenseCategory } from "@/lib/types"
 
-interface ExpenseCategory {
-    expenseDescType: string
-    totalExpenses: number
-}
+// interface ExpenseCategory {
+//     expenseDescType: string
+//     totalExpenses: number
+// }
 
 const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
@@ -21,8 +22,8 @@ export default function HighLevelPieChart() {
     const [selectedMonth, setSelectedMonth] = useState(8)
     const [categoryData, setCategoryData] = useState<ExpenseCategory[]>([])
     const [loading, setLoading] = useState(true)
- const { user } = useAuth()
-     const groupId = user?.groupId
+    const { user } = useAuth()
+    const groupId = user?.groupId
     // Detect dark mode
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -46,7 +47,7 @@ export default function HighLevelPieChart() {
 
     // Fetch API data
     useEffect(() => {
-         if (!groupId) return
+        if (!groupId) return
         const fetchData = async () => {
             try {
                 setLoading(true)
@@ -187,7 +188,7 @@ export default function HighLevelPieChart() {
                 </div>
             </CardHeader>
             <CardContent>
-                 <div className="h-[300px] min-h-fit flex items-center justify-center">
+                <div className="h-[300px] min-h-fit flex items-center justify-center">
                     {loading ? (
                         <div className="animate-pulse w-50 h-50 rounded-full bg-gray-200 dark:bg-gray-700" />
                     ) : (

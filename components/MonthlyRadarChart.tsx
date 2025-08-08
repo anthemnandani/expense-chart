@@ -74,7 +74,7 @@ export default function MonthlyRadarChart() {
     };
 
     fetchData();
-  }, [selectedYear]);
+  }, [selectedYear, groupId]);
 
   return (
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-4 col-span-1">

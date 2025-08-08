@@ -5,12 +5,13 @@ import HighchartsReact from "highcharts-react-official";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
+import { ExpenseEntry } from "@/lib/types";
 
-type ExpenseEntry = {
-    month: string;
-    expenseDescType: string;
-    totalExpenses: number;
-};
+// type ExpenseEntry = {
+//     month: string;
+//     expenseDescType: string;
+//     totalExpenses: number;
+// };
 
 const dashStyles = [
     "Solid", "Dash", "Dot", "DashDot", "LongDash", "ShortDash", "ShortDot", "ShortDashDot"

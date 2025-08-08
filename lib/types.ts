@@ -39,9 +39,37 @@ export interface Expense {
   GroupId?: number | null;
 }
 
-type ExpenseType = {
+export interface ExpenseType {
   ExpenseTypeId: number
   Type: string
   IsDeleted: number
   CreatedOn: string
+}
+
+export interface ExpenseRecord {
+    date: string
+    credit: number
+    debit: number
+}
+
+export interface ExpenseCategory {
+    expenseDescType: string
+    totalExpenses: number
+}
+
+export interface ExpenseEntry {
+    month: string;
+    expenseDescType: string;
+    totalExpenses: number;
+};
+
+export interface CategoryData {
+  expenseDescType: string;
+  totalExpenses: number;
+};
+
+export interface ExpenseData {
+  month: string
+  totalDebit: number
+  totalCredit: number
 }

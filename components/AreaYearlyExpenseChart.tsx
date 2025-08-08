@@ -5,12 +5,13 @@ import HighchartsReact from "highcharts-react-official"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/auth-context"
+import { ExpenseData } from "@/lib/types"
 
-interface ExpenseData {
-  month: string
-  totalDebit: number
-  totalCredit: number
-}
+// interface ExpenseData {
+//   month: string
+//   totalDebit: number
+//   totalCredit: number
+// }
 
 export default function AreaYearlyExpenseChart() {
   const [year, setYear] = useState(2025)

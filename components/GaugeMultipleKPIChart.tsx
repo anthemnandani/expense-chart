@@ -7,27 +7,23 @@ import SolidGauge from "highcharts/modules/solid-gauge";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
+import { CategoryData } from "@/lib/types";
 
 if (typeof HighchartsMore === "function") HighchartsMore(Highcharts);
 if (typeof SolidGauge === "function") SolidGauge(Highcharts);
-
-type CategoryData = {
-  expenseDescType: string;
-  totalExpenses: number;
-};
 
 export default function GaugeMultipleKPIChart() {
   const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState("8"); // August
   const [selectedYear, setSelectedYear] = useState(2025);
-   const { user } = useAuth()
-       const groupId = user?.groupId
+  const { user } = useAuth()
+  const groupId = user?.groupId
 
   const colors = ["#0088fe", "#00c49f", "#a259ff", "#ff7300"];
 
   useEffect(() => {
     const fetchData = async () => {
-       if (!groupId) return
+      if (!groupId) return
       try {
         const res = await fetch(
           `/api/expense-monthswise?groupId=${groupId}&year=${selectedYear}&months=${selectedMonth}`
@@ -41,13 +37,13 @@ export default function GaugeMultipleKPIChart() {
       }
     };
     fetchData();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, groupId]);
 
   const maxValue = Math.max(...categoryData.map((item) => item.totalExpenses), 1);
   const trackColors = colors.map((color) => Highcharts.color(color).setOpacity(0.15).get());
 
   const chartOptions: Highcharts.Options = {
-     accessibility: { enabled: false },
+    accessibility: { enabled: false },
     chart: {
       type: "solidgauge",
       height: "110%",

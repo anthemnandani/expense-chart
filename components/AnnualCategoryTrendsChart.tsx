@@ -58,7 +58,7 @@ export default function AnnualCategoryTrendsChart() {
       }
     }
     fetchData();
-  }, [year]);
+  }, [year, groupId]);
 
   if (!Highcharts) return <div>Loading chart...</div>;
 
