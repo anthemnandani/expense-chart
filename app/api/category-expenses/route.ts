@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     }
 
     const data = await res.json();
+    console.log("data: ", data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Backend API error:", error);

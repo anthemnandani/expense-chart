@@ -22,7 +22,7 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
 
     const handleRowsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
-        setCurrentPage(1); // Reset to first page when rows change
+        setCurrentPage(1);
     };
 
     const from = (currentPage - 1) * rowsPerPage + 1;
@@ -30,7 +30,6 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
 
     return (
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 mt-4">
-            {/* Rows Per Page */}
             <div className="flex items-center gap-2">
                 <span className="text-sm">Rows per page:</span>
                 <select
@@ -57,8 +56,8 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
                     onClick={handlePrev}
                     disabled={currentPage === 1}
                     className={`p-2 rounded border ${currentPage === 1
-                            ? "text-gray-400 border-gray-200"
-                            : "hover:bg-blue-600 hover:text-white border-gray-300"
+                        ? "text-gray-400 border-gray-200"
+                        : "hover:bg-blue-600 hover:text-white border-gray-300"
                         }`}
                 >
                     <ChevronLeft />
@@ -67,8 +66,8 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
                     onClick={handleNext}
                     disabled={currentPage === totalPages}
                     className={`p-2 rounded border ${currentPage === totalPages
-                            ? "text-gray-400 border-gray-200"
-                            : "hover:bg-blue-600 hover:text-white border-gray-300"
+                        ? "text-gray-400 border-gray-200"
+                        : "hover:bg-blue-600 hover:text-white border-gray-300"
                         }`}
                 >
                     <ChevronRight />

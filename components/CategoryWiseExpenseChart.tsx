@@ -3,7 +3,8 @@
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useAuth } from "@/context/auth-context";
 
 type ExpenseEntry = {
     month: string;
@@ -24,7 +25,8 @@ export default function CategoryWiseExpenseChart() {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedYear, setSelectedYear] = useState(2025);
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
-    const groupId = 4;
+    const { user } = useAuth()
+    const groupId = user?.groupId
 
     // Dark mode listener
     useEffect(() => {
@@ -39,6 +41,7 @@ export default function CategoryWiseExpenseChart() {
     // Fetch API Data
     useEffect(() => {
         const fetchData = async () => {
+            if (!groupId) return
             try {
                 const res = await fetch(`/api/category-expenses?groupId=${groupId}&year=${selectedYear}`);
                 if (!res.ok) throw new Error("Failed to fetch expenses data");
@@ -130,11 +133,8 @@ export default function CategoryWiseExpenseChart() {
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
                     <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
-                       Category-wise Monthly Expenses
+                        Category-wise Monthly Expenses
                     </CardTitle>
-                    {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
-                        Dotted & dashed lines show expense category trends across months.
-                    </CardDescription> */}
                 </div>
                 <div className="flex gap-2 items-center">
                     <select

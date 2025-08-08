@@ -4,14 +4,17 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/context/auth-context'
 
 const NetBalanceChart = () => {
   const [chartData, setChartData] = useState<[number, number][]>([])
   const [selectedYear, setSelectedYear] = useState(2025)
-  const groupId = 4
+  const { user } = useAuth()
+  const groupId = user?.groupId
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
+    if (!groupId) return
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/net-balance?groupId=${groupId}&year=${selectedYear}`);
@@ -161,7 +164,32 @@ const NetBalanceChart = () => {
         tooltip: {
           valueDecimals: 0,
         },
-      }
+        zones: [
+          {
+            value: 0, // values <= 0 (debit area)
+            color: '#cc3a3a', // red
+            fillColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+              stops: [
+                [0, '#cc3a3a'],
+                [0.5, 'rgba(239, 68, 68, 0.25)'],
+                [1, '#ef4444']
+              ]
+            }
+          },
+          {
+            color: '#2bac5e', // positive/credit area (default blue)
+            fillColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+              stops: [
+                [0, "#2bac5e"],
+                [0.5, "#4ade80"],
+                [1, "#64ff9da3"],
+              ]
+            }
+          }
+        ],
+      },
     ],
     credits: {
       enabled: false,

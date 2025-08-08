@@ -4,8 +4,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const groupId = searchParams.get("groupId") || "4";
-  const year = searchParams.get("year") || "2025";
+  const groupId = searchParams.get("groupId");
+  const year = searchParams.get("year");
 
   try {
     const res = await fetch(

@@ -6,6 +6,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import SolidGauge from "highcharts/modules/solid-gauge";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { useAuth } from "@/context/auth-context";
 
 if (typeof HighchartsMore === "function") HighchartsMore(Highcharts);
 if (typeof SolidGauge === "function") SolidGauge(Highcharts);
@@ -19,12 +20,14 @@ export default function GaugeMultipleKPIChart() {
   const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState("8"); // August
   const [selectedYear, setSelectedYear] = useState(2025);
-  const groupId = 4;
+   const { user } = useAuth()
+       const groupId = user?.groupId
 
   const colors = ["#0088fe", "#00c49f", "#a259ff", "#ff7300"];
 
   useEffect(() => {
     const fetchData = async () => {
+       if (!groupId) return
       try {
         const res = await fetch(
           `/api/expense-monthswise?groupId=${groupId}&year=${selectedYear}&months=${selectedMonth}`

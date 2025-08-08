@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
+import { useAuth } from "@/context/auth-context"
 
 interface ExpenseCategory {
     expenseDescType: string
@@ -14,16 +15,14 @@ const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
 ]
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-const groupId = 4
-
 export default function HighLevelPieChart() {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [selectedYear, setSelectedYear] = useState(2025)
     const [selectedMonth, setSelectedMonth] = useState(8)
     const [categoryData, setCategoryData] = useState<ExpenseCategory[]>([])
     const [loading, setLoading] = useState(true)
-
+ const { user } = useAuth()
+     const groupId = user?.groupId
     // Detect dark mode
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -47,6 +46,7 @@ export default function HighLevelPieChart() {
 
     // Fetch API data
     useEffect(() => {
+         if (!groupId) return
         const fetchData = async () => {
             try {
                 setLoading(true)

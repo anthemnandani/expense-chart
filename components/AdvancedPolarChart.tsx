@@ -5,6 +5,7 @@ import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { useAuth } from "@/context/auth-context";
 
 if (typeof Highcharts === "function") {
     HighchartsMore(Highcharts);
@@ -21,7 +22,8 @@ const AdvancedPolarChart = () => {
     const [monthlyData, setMonthlyData] = useState<MonthlyRecord[]>([]);
     const [selectedMonth, setSelectedMonth] = useState("8");
     const [selectedYear, setSelectedYear] = useState(2025);
-    const groupId = 4;
+     const { user } = useAuth()
+     const groupId = user?.groupId
     const darkBg = "#1f1836"
     const lightBg = "#ffffff"
 
@@ -60,6 +62,7 @@ const AdvancedPolarChart = () => {
     // 1️⃣ Effect for fetching data
     useEffect(() => {
         const fetchMonthlyData = async () => {
+             if (!groupId) return
             try {
                 const res = await fetch(
                     `/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`

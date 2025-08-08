@@ -18,24 +18,27 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/auth-context";
 
 interface ExpenseRecord {
   month: string;
-  expenseDescType: string;
-  totalExpenses: number;
+  totalDebit: number;
+  totalCredit: number;
 }
 
 export default function MonthlyRadarChart() {
 
   const [selectedYear, setSelectedYear] = useState(2025);
   const [chartData, setChartData] = useState<any[]>([]);
-  const groupId = 4;
+  const { user } = useAuth()
+  const groupId = user?.groupId
 
   useEffect(() => {
+    if (!groupId) return
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `/api/category-expenses?groupId=${groupId}&year=${selectedYear}`
+          `/api/yearly-expense?groupId=${groupId}&year=${selectedYear}`
         );
         if (!res.ok) throw new Error("Failed to fetch category expenses");
         const data: ExpenseRecord[] = await res.json();
@@ -53,10 +56,10 @@ export default function MonthlyRadarChart() {
 
         data.forEach((item) => {
           const monthName = months[parseInt(item.month) - 1];
-          // Assumption: "income" means positive values for some categories
-          // Here we put all into expenses (since API is category-wise expense)
-          monthlyMap[monthName].expenses += item.totalExpenses;
+          monthlyMap[monthName].income += Number(item.totalCredit || 0);
+          monthlyMap[monthName].expenses += Number(item.totalDebit || 0);
         });
+
 
         const transformedData = months.map((month) => ({
           month,
@@ -78,7 +81,7 @@ export default function MonthlyRadarChart() {
       <CardHeader className="pb-2 flex flex-col lg:flex-row justify-between gap-2">
         <div>
           <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-            Monthly Credit vs Debit 
+            Monthly Credit vs Debit
           </CardTitle>
           {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
             Analyze trends across the year in a clean radial format
@@ -116,17 +119,17 @@ export default function MonthlyRadarChart() {
             />
             <Legend verticalAlign="bottom" iconType="circle" height={36} />
             <Radar
-              name="Income"
+              name="Credit"
               dataKey="income"
-              stroke="#3b82f6"
-              fill="#3b82f6"
+              stroke="#60d394"
+              fill="#60d394"
               fillOpacity={0.4}
             />
             <Radar
-              name="Expenses"
+              name="Debit"
               dataKey="expenses"
-              stroke="#60d394"
-              fill="#60d394"
+              stroke="#3b82f6"
+              fill="#3b82f6"
               fillOpacity={0.4}
             />
           </RadarChart>

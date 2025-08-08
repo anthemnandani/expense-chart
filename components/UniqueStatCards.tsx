@@ -14,8 +14,8 @@ const iconMap = {
 // Animate number from current to target over duration
 function animateValue(start: number, end: number, duration: number, onUpdate: (val: number) => void) {
   const range = end - start
-  const stepTime = Math.max(Math.floor(duration / 30), 20)
-  let current = start
+  // const stepTime = Math.max(Math.floor(duration / 30), 20)
+  // let current = start
   let startTime = performance.now()
 
   function step(timestamp: number) {

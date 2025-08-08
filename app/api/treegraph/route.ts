@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-const groupId = 4
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const availableYears = [2023, 2024, 2025]
-
+  const { searchParams } = new URL(req.url);
+    const groupId = searchParams.get("groupId");
     // Root Node
     const rootNode = [{ id: "root", name: "Expense Data" }]
     let nodes: any[] = []

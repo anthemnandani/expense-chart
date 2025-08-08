@@ -4,6 +4,7 @@ import Highcharts from "highcharts/highstock"
 import HighchartsReact from "highcharts-react-official"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import { useAuth } from "@/context/auth-context"
 
 interface ExpenseData {
   month: string
@@ -11,40 +12,39 @@ interface ExpenseData {
   totalCredit: number
 }
 
-const groupId = 4
-
 export default function AreaYearlyExpenseChart() {
   const [year, setYear] = useState(2025)
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([])
+  const { user } = useAuth()
+  const groupId = user?.groupId
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!groupId) return
+      try {
+        const res = await fetch(`/api/yearly-expense?groupId=${groupId}&year=${year}`);
+        if (!res.ok) throw new Error("Failed to fetch yearly expense data");
+        const data = await res.json();
 
-  // Fetch API data
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const res = await fetch(`/api/yearly-expense?groupId=${groupId}&year=${year}`);
-      if (!res.ok) throw new Error("Failed to fetch yearly expense data");
-      const data = await res.json();
+        // Transform API months into readable labels
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const transformed = data.map((item: any) => ({
+          month: months[parseInt(item.month) - 1],
+          totalDebit: item.totalDebit,
+          totalCredit: item.totalCredit,
+        }));
 
-      // Transform API months into readable labels
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const transformed = data.map((item: any) => ({
-        month: months[parseInt(item.month) - 1],
-        totalDebit: item.totalDebit,
-        totalCredit: item.totalCredit,
-      }));
+        setMonthlyExpenseData(transformed);
+      } catch (err) {
+        console.error("Error fetching yearly expense data:", err);
+      }
+    };
 
-      setMonthlyExpenseData(transformed);
-    } catch (err) {
-      console.error("Error fetching yearly expense data:", err);
-    }
-  };
-
-  fetchData();
-}, [year, groupId]);
+    fetchData();
+  }, [year, groupId]);
 
   const chartOptions: Highcharts.Options = {
     chart: {
-      type: "areaspline", // Changed from "area" to "areaspline" for rounded connections
+      type: "areaspline",
       backgroundColor: "transparent",
       style: {
         fontFamily: "'Inter', sans-serif",
@@ -106,7 +106,7 @@ useEffect(() => {
       },
     },
     plotOptions: {
-      areaspline: { // Changed from "area" to "areaspline"
+      areaspline: {
         stacking: "normal",
         lineWidth: 2,
         marker: {
@@ -162,7 +162,7 @@ useEffect(() => {
     series: [
       {
         name: "Expenses",
-        type: "areaspline", // Changed from "area" to "areaspline"
+        type: "areaspline",
         data: monthlyExpenseData.map((d) => d.totalDebit),
         color: {
           linearGradient: [0, 0, 0, 300],
@@ -174,7 +174,7 @@ useEffect(() => {
       },
       {
         name: "Credits",
-        type: "areaspline", // Changed from "area" to "areaspline"
+        type: "areaspline",
         data: monthlyExpenseData.map((d) => d.totalCredit),
         color: {
           linearGradient: [0, 0, 0, 600],
@@ -198,9 +198,6 @@ useEffect(() => {
           <CardTitle className="text-lg font-semibold">
             Yearly Credit & Debit Overview
           </CardTitle>
-          {/* <CardDescription>
-            Smooth area chart with rounded connections between points
-          </CardDescription> */}
         </div>
         <div className="flex gap-2 items-center">
           <select

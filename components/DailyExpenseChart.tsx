@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
 import { useEffect, useState } from "react"
+import { useAuth } from "@/context/auth-context"
 
 type ExpenseRecord = {
     date: string
@@ -14,13 +15,15 @@ export function DailyExpenseChart() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1) // current month
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
     const [loading, setLoading] = useState(false)
-    const groupId = 4
+    const { user } = useAuth()
+    const groupId = user?.groupId
 
     const monthsList = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
     useEffect(() => {
+        if (!groupId) return
         const fetchData = async () => {
             setLoading(true)
             try {
@@ -42,8 +45,7 @@ export function DailyExpenseChart() {
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-12">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
-                    <CardTitle className="flex items-center gap-2">Daily Expenses ({monthsList[selectedMonth-1]} {selectedYear})</CardTitle>
-                    {/* <CardDescription>Track your daily expenses and credits</CardDescription> */}
+                    <CardTitle className="flex items-center gap-2">Daily Expenses ({monthsList[selectedMonth - 1]} {selectedYear})</CardTitle>
                 </div>
                 <div className="flex gap-2">
                     <select

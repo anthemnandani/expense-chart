@@ -17,6 +17,7 @@ export default function ExpenseTreeChartDetailed() {
 
     useEffect(() => {
         async function fetchData() {
+            
             try {
                 const res = await fetch("/api/treegraph")
                 const flatData: TreeNode[] = await res.json()

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/context/auth-context";
 
 const HighchartsReact = dynamic(() => import("highcharts-react-official"), { ssr: false });
 
@@ -18,7 +19,8 @@ export default function AnnualCategoryTrendsChart() {
   const [year, setYear] = useState(2025);
   const [categories, setCategories] = useState<string[]>([]);
   const [heatmapData, setHeatmapData] = useState<[number, number, number][]>([]);
-
+ const { user } = useAuth()
+     const groupId = user?.groupId
   // Load Highcharts modules
   useEffect(() => {
     (async () => {
@@ -44,8 +46,9 @@ export default function AnnualCategoryTrendsChart() {
 
   useEffect(() => {
     async function fetchData() {
+       if (!groupId) return
       try {
-        const res = await fetch(`/api/annual-category-trends?groupId=4&year=${year}`);
+        const res = await fetch(`/api/annual-category-trends?groupId=${groupId}&year=${year}`);
         if (!res.ok) throw new Error("Failed to fetch chart data");
         const json = await res.json();
         setCategories(json.categories);

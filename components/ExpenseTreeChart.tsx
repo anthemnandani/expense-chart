@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import ReactECharts from "echarts-for-react"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
+import { useAuth } from "@/context/auth-context"
 
 type TreeNode = {
     id: string
@@ -17,6 +18,8 @@ export default function ExpenseTreeChart() {
     const chartRef = useRef<any>(null)
     const [isDark, setIsDark] = useState(false)
     const [roamEnabled, setRoamEnabled] = useState(false)
+    const { user } = useAuth()
+    const groupId = user?.groupId
 
     // Watch Tailwind's dark mode
     useEffect(() => {
@@ -33,8 +36,9 @@ export default function ExpenseTreeChart() {
 
     useEffect(() => {
         async function fetchData() {
+             if (!groupId) return
             try {
-                const res = await fetch("/api/treegraph")
+                const res = await fetch(`/api/treegraph?groupId=${groupId}`)
                 const flatData: TreeNode[] = await res.json()
                 const nested = buildTree(flatData)
                 setTreeData(nested)
@@ -56,7 +60,7 @@ export default function ExpenseTreeChart() {
             const level = parts.length - 1
 
             let symbol = "circle"
-            let customColor = "#9ca3af" // default gray
+            let customColor = "#9ca3af"
 
             if (node.id === "root") {
                 symbol = "diamond"

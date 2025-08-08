@@ -3,169 +3,44 @@
 import dynamic from "next/dynamic";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Progress } from "@/components/ui/progress"
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts"
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  PieChartIcon,
-  Calendar,
-  Target,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  Zap,
-  Coffee,
-  Droplets,
-  PartyPopper,
-  MoreHorizontal,
-  BarChart3,
-} from "lucide-react"
 import MonthlyRadarChart from "./MonthlyRadarChart"
-import { TopCategoriesChart } from "./TopCategoriesChart"
-import YearlyCategoryExpenseChart from "./YearlyCategoryExpenseChart"
 import { DailyExpenseChart } from "./DailyExpenseChart"
-import AreaNuclearStockpileChart from "./AreaNuclearStockpileChart"
 import UniqueStatCards from "./UniqueStatCards";
-// import WeeklyExpenseChart from "./WeeklyExpenseChart"
-// import TreeGraphChart from "./ExpenseTreeChart";
-// import AnnualCategoryTrendsChart from "./AnnualCategoryTrendsChart"
-
-// ✅ Dynamically import Highcharts-based charts to disable SSR
-const AreaYearlyExpenseChart = dynamic(() => import("./AreaNuclearStockpileChart"), { ssr: false });
+const AreaYearlyExpenseChart = dynamic(() => import("./AreaYearlyExpenseChart"), { ssr: false });
 const CategoryWiseExpenseChart = dynamic(() => import("./CategoryWiseExpenseChart"), { ssr: false });
 const GaugeMultipleKPIChart = dynamic(() => import("./GaugeMultipleKPIChart"), { ssr: false });
 const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: false });
 const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
-const ScrollytellingChart = dynamic(() => import("./ScrollytellingChart"), { ssr: false });
 const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
 const TreeGraphChart = dynamic(() => import("./ExpenseTreeChart"), { ssr: false });
 const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: false });
 
-
-interface ComprehensiveDashboardProps {
-  yearlyData: Array<{
-    month: string
-    totalDebit: number
-    totalCredit: number
-  }>
-  categoryData: Array<{
-    expenseDescType: string
-    totalExpenses: number
-  }>
-}
-
-const COLORS = ["#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#", "#f4a261"]
-
-const categoryIcons = {
-  Tea: Coffee,
-  Water: Droplets,
-  Party: PartyPopper,
-  Other: MoreHorizontal,
-}
-
-export default function ComprehensiveDashboard({ yearlyData, categoryData }: ComprehensiveDashboardProps) {
-  // Calculate totals and metrics
-  const totalIncome = yearlyData.reduce((sum, item) => sum + item.totalCredit, 0)
-  const totalExpenses = yearlyData.reduce((sum, item) => sum + item.totalDebit, 0)
-  const netSavings = totalIncome - totalExpenses
-  const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0
-  const activeMonths = yearlyData.filter((item) => item.totalCredit > 0 || item.totalDebit > 0).length
-
-  // Prepare chart data
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  const chartData = yearlyData.map((item) => ({
-    month: monthNames[Number.parseInt(item.month) - 1],
-    shortMonth: monthNames[Number.parseInt(item.month) - 1].slice(0, 3),
-    income: item.totalCredit,
-    expenses: item.totalDebit,
-    net: item.totalCredit - item.totalDebit,
-    savingsRate: item.totalCredit > 0 ? ((item.totalCredit - item.totalDebit) / item.totalCredit) * 100 : 0,
-  }))
-
-  // Enhanced category data
-  const enhancedCategoryData = categoryData
-    .map((item, index) => ({
-      ...item,
-      percentage: (item.totalExpenses / totalExpenses) * 100,
-      color: COLORS[index % COLORS.length],
-      icon: categoryIcons[item.expenseDescType as keyof typeof categoryIcons] || MoreHorizontal,
-    }))
-    .sort((a, b) => b.totalExpenses - a.totalExpenses)
-
-  // Weekly data (sample)
-  const weeklyData = [
-    { week: "W1", weekStart: "01/01", weekEnd: "07/01", totalCredit: 3000, totalDebit: 1153, net: 1847 },
-    { week: "W2", weekStart: "08/01", weekEnd: "14/01", totalCredit: 0, totalDebit: 0, net: 0 },
-    { week: "W3", weekStart: "15/01", weekEnd: "21/01", totalCredit: 0, totalDebit: 580, net: -580 },
-    { week: "W4", weekStart: "22/01", weekEnd: "28/01", totalCredit: 2000, totalDebit: 1200, net: 800 },
-    { week: "W5", weekStart: "29/01", weekEnd: "04/02", totalCredit: 1500, totalDebit: 800, net: 700 },
-    { week: "W6", weekStart: "05/02", weekEnd: "11/02", totalCredit: 0, totalDebit: 900, net: -900 },
-    { week: "W7", weekStart: "12/02", weekEnd: "18/02", totalCredit: 0, totalDebit: 1200, net: -1200 },
-    { week: "W8", weekStart: "19/02", weekEnd: "25/02", totalCredit: 2000, totalDebit: 423, net: 1577 },
-  ]
-
-  const pieData = categoryData.map((item) => ({
-    name: item.expenseDescType,
-    value: item.totalExpenses,
-  }))
-
+export default function ComprehensiveDashboard() {
   return (
     <div className="space-y-6">
       <UniqueStatCards />
       {/* Financial Overview and Expense Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <AreaNuclearStockpileChart />
+        <AreaYearlyExpenseChart />
         <HighLevelPieChart />
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Other cards */}
         <NetBalanceChart />
       </div>
-
-      {/* Financial Overview and Expense Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <TreeGraphChart />
       </div>
-
-      {/* Monthly Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <MonthlyRadarChart />
         <CategoryWiseExpenseChart />
       </div>
-
-      {/* Net Balance and Weekly Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <DailyExpenseChart />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-        {/* <TopCategoriesChart /> */}
-        {/* <GaugeMultipleKPIChart /> */}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <AdvancedPolarChart />
         <GaugeMultipleKPIChart />
         <AnnualCategoryTrendsChart />
-        {/* <ScrollytellingChart /> */}
       </div>
 
       {/* Financial Insights */}
@@ -178,6 +53,7 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Best Performing Month */}
             <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
               <h4 className="font-semibold text-emerald-700 mb-3">Best Performing Month</h4>
               <div className="text-2xl font-bold text-emerald-800 mb-2">January</div>
@@ -185,6 +61,17 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                 Highest savings rate at <strong>39.7%</strong> with ₹2,397 saved
               </p>
             </div>
+
+            {/* Lowest Income Month */}
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <h4 className="font-semibold text-sky-600 mb-3">Lowest Income Month</h4>
+              <div className="text-2xl font-bold text-sky-700 mb-2">July</div>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Only ₹3,000 earned. Consider boosting income.
+              </p>
+            </div>
+
+            {/* Top Spending Category */}
             <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
               <h4 className="font-semibold text-orange-700 mb-3">Top Spending Category</h4>
               <div className="text-2xl font-bold text-orange-800 mb-2">Tea</div>
@@ -192,11 +79,31 @@ export default function ComprehensiveDashboard({ yearlyData, categoryData }: Com
                 Accounts for <strong>74.5%</strong> of your total expenses
               </p>
             </div>
+
+            {/* Monthly Trend Indicator */}
             <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <h4 className="font-semibold text-purple-700 mb-3">Savings Goal</h4>
-              <div className="text-2xl font-bold text-purple-800 mb-2">{savingsRate.toFixed(1)}%</div>
+              <h4 className="font-semibold text-lime-600 mb-3">This Month’s Trend</h4>
+              <div className="text-2xl font-bold text-lime-700 mb-2">📉 Downward</div>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Current savings rate. Target: <strong>80%</strong>
+                Spending is <strong>18% lower</strong> than last month.
+              </p>
+            </div>
+
+            {/* Average Transaction Size */}
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <h4 className="font-semibold text-red-600 mb-3">Avg. Transaction Size</h4>
+              <div className="text-2xl font-bold text-red-700 mb-2">₹212</div>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Across <strong>145</strong> transactions this month.
+              </p>
+            </div>
+
+            {/* Income-to-Expense Ratio */}
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <h4 className="font-semibold text-green-600 mb-3">Income vs Expense</h4>
+              <div className="text-2xl font-bold text-green-700 mb-2">1.3 : 1</div>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Income is <strong>30% higher</strong> than total expenses.
               </p>
             </div>
           </div>
