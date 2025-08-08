@@ -108,9 +108,9 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-7 h-7 text-white" />
-            </div>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
+              </div>
             <h1 className="text-3xl font-bold text-gray-900">Expense Tracker</h1>
           </div>
           <p className="text-gray-600">Track your expenses with ease</p>
@@ -193,9 +193,9 @@ export default function SignInPage() {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <Button variant="link" className="text-sm text-blue-600 hover:text-blue-700">
+              {/* <Button variant="link" className="text-sm text-blue-600 hover:text-blue-700">
                 Forgot Password?
-              </Button>
+              </Button> */}
               <p className="text-sm text-gray-600">
                 {"Don't have an account? "}
                 <Button

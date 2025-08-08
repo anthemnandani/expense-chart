@@ -49,7 +49,7 @@ export default function ExpenseTreeChart() {
             }
         }
         fetchData()
-    }, [])
+    }, [groupId])
 
     function buildTree(flat: TreeNode[], isDark: boolean): any[] {
         const idMap: Record<string, any> = {}
