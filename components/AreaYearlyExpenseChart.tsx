@@ -192,7 +192,7 @@ export default function AreaYearlyExpenseChart() {
   }
 
   return (
-    <Card className="shadow-lg border-0 bg-white col-span-3 dark:bg-gray-800">
+    <Card className="shadow-lg border-0 bg-white col-span-1 lg:col-span-3 dark:bg-gray-800">
       <CardHeader className="flex justify-between lg:flex-row lex-col">
         <div>
           <CardTitle className="text-lg font-semibold">

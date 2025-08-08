@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
 export async function GET(req: Request) {
   try {
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const apiUrl = `http://essentialsapi.antheminfotech.com/api/Analytics/GetExpenseMonthswise?groupId=${groupId}&year=${year}&months=${months}`;
+    const apiUrl = `${BASE_URL}/api/Analytics/GetExpenseMonthswise?groupId=${groupId}&year=${year}&months=${months}`;
 
     const res = await fetch(apiUrl);
     if (!res.ok) {

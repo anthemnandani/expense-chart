@@ -77,15 +77,12 @@ export default function MonthlyRadarChart() {
   }, [selectedYear]);
 
   return (
-    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-4">
+    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-4 col-span-1">
       <CardHeader className="pb-2 flex flex-col lg:flex-row justify-between gap-2">
         <div>
           <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
             Monthly Credit vs Debit
           </CardTitle>
-          {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-            Analyze trends across the year in a clean radial format
-          </CardDescription> */}
         </div>
         <div className="flex gap-2 items-center">
           <select

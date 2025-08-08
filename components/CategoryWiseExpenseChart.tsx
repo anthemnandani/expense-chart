@@ -129,7 +129,7 @@ export default function CategoryWiseExpenseChart() {
     };
 
     return (
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-8">
+        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-8 col-span-1">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
                     <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">

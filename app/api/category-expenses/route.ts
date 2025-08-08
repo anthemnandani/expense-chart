@@ -1,5 +1,6 @@
 // app/api/category-expenses/route.ts
 import { NextResponse } from "next/server";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -11,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const apiUrl = `http://essentialsapi.antheminfotech.com/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`;
+    const apiUrl = `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`;
     const res = await fetch(apiUrl);
 
     if (!res.ok) {

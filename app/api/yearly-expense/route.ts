@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
 export async function GET(req: Request) {
   try {
@@ -10,7 +11,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing groupId or year" }, { status: 400 });
     }
 
-    const apiUrl = `http://essentialsapi.antheminfotech.com/api/Analytics/GetYearlyExpenseChart?groupId=${groupId}&year=${year}`;
+    const apiUrl = `${BASE_URL}/api/Analytics/GetYearlyExpenseChart?groupId=${groupId}&year=${year}`;
 
     const res = await fetch(apiUrl);
     if (!res.ok) {

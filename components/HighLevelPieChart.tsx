@@ -64,7 +64,7 @@ export default function HighLevelPieChart() {
             }
         }
         fetchData()
-    }, [selectedYear, selectedMonth])
+    }, [selectedYear, selectedMonth, groupId])
 
 
     const total = categoryData.reduce((sum, cat) => sum + (cat.totalExpenses || 0), 0)
@@ -151,7 +151,7 @@ export default function HighLevelPieChart() {
     ]
 
     return (
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-2">
+        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-2 col-span-1">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
                     <CardTitle className="flex items-center gap-2">

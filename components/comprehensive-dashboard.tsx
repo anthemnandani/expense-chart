@@ -40,6 +40,8 @@ export default function ComprehensiveDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <AdvancedPolarChart />
         <GaugeMultipleKPIChart />
+      </div>
+      <div className="grid grid-cols-1 gap-6">
         <AnnualCategoryTrendsChart />
       </div>
 

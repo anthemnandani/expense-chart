@@ -1,7 +1,7 @@
 // app/api/net-balance-daywise/route.ts
 import { NextResponse } from "next/server";
 
-const BASE_API = "http://essentialsapi.antheminfotech.com/api/Analytics";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
 export async function GET(req: Request) {
   try {
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 
     const responses = await Promise.all(
       months.map((m) =>
-        fetch(`${BASE_API}/GetMonthlyExpenseDrandCr?groupId=${groupId}&year=${year}&months=${m}`)
+        fetch(`${BASE_URL}/api/Analytics/GetMonthlyExpenseDrandCr?groupId=${groupId}&year=${year}&months=${m}`)
           .then((res) => res.json())
           .catch(() => [])
       )
