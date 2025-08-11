@@ -77,10 +77,10 @@ export async function GET(req: NextRequest) {
     // 2. Lowest Income Month
     const lowestIncomeMonth = yearlyData.recordset.reduce(
       (lowest: any, curr: any) =>
-        curr.totalCredit > 0 && curr.totalCredit < (lowest.income || Infinity)
-          ? { month: monthName(curr.month.toString()), income: curr.totalCredit }
+        curr.totalDebit > 0 && curr.totalDebit < (lowest.debit || Infinity)
+          ? { month: monthName(curr.month.toString()), debit: curr.totalDebit }
           : lowest,
-      { month: "N/A", income: Infinity }
+      { month: "N/A", debit: Infinity }
     );
 
     // 3. Top Spending Category
@@ -112,9 +112,9 @@ export async function GET(req: NextRequest) {
       (top: any, curr: any) =>
         curr.totalExpenses > (top.totalExpenses || 0)
           ? {
-              category: curr.expenseDescType,
-              percentage: totalExpenses > 0 ? (curr.totalExpenses / totalExpenses) * 100 : 0,
-            }
+            category: curr.expenseDescType,
+            percentage: totalExpenses > 0 ? (curr.totalExpenses / totalExpenses) * 100 : 0,
+          }
           : top,
       { category: "N/A", percentage: 0, totalExpenses: 0 }
     );
@@ -158,8 +158,8 @@ export async function GET(req: NextRequest) {
       prevMonthTotal > 0
         ? ((currentMonthTotal - prevMonthTotal) / prevMonthTotal) * 100
         : currentMonthTotal > 0
-        ? 100
-        : 0;
+          ? 100
+          : 0;
 
     // 5. Average Transaction Size
     const avgTransaction = await pool
@@ -210,8 +210,8 @@ export async function GET(req: NextRequest) {
         amountSaved: Math.round(bestPerformingMonth.amountSaved) || 0,
       },
       lowestIncomeMonth: {
-        month: lowestIncomeMonth.month === "N/A" && lowestIncomeMonth.income === Infinity ? "N/A" : lowestIncomeMonth.month,
-        income: lowestIncomeMonth.income === Infinity ? 0 : lowestIncomeMonth.income,
+        month: lowestIncomeMonth.month === "N/A" && lowestIncomeMonth.debit === Infinity ? "N/A" : lowestIncomeMonth.month,
+        income: lowestIncomeMonth.debit === Infinity ? 0 : lowestIncomeMonth.debit,
       },
       topSpendingCategory: {
         category: topSpendingCategory.category,

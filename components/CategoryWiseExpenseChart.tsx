@@ -8,7 +8,7 @@ import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
 
 const dashStyles = [
-    "Solid", "Dash", "Dot", "DashDot", "LongDash", "ShortDash", "ShortDot", "ShortDashDot"
+    "Solid"
 ];
 
 const monthLabels = [
@@ -71,7 +71,7 @@ export default function CategoryWiseExpenseChart() {
     // Chart Options
     const options: Highcharts.Options = {
         accessibility: { enabled: false },
-        chart: { type: "spline", backgroundColor: "transparent" },
+        chart: { type: "line", backgroundColor: "transparent" },
         title: {
             text: undefined,
             style: { color: isDarkMode ? "#f9fafb" : "#1f2937" },

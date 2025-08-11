@@ -9,6 +9,7 @@ import MonthlyRadarChart from "./MonthlyRadarChart";
 import { DailyExpenseChart } from "./DailyExpenseChart";
 import UniqueStatCards from "./UniqueStatCards";
 import { FinancialInsight } from "@/lib/types";
+import { StackedBarCategoryChart } from "./StackedBarCategoryChart";
 
 const AreaYearlyExpenseChart = dynamic(() => import("./AreaYearlyExpenseChart"), { ssr: false });
 const CategoryWiseExpenseChart = dynamic(() => import("./CategoryWiseExpenseChart"), { ssr: false });
@@ -50,6 +51,8 @@ export default function DashboardContent() {
 
     fetchData();
   }, [groupId, selectedYear, selectedMonth]);
+
+  const years = [2023, 2024, 2025];
 
   return (
     <div className="space-y-6 max-w-full overflow-hidden">
@@ -99,14 +102,14 @@ export default function DashboardContent() {
           <DailyExpenseChart />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <StackedBarCategoryChart years={years} />
           <AdvancedPolarChart />
-          <GaugeMultipleKPIChart />
         </div>
         <div className="grid grid-cols-1 gap-6">
           <AnnualCategoryTrendsChart />
         </div>
 
-      {/* Financial Insights */}
+        {/* Financial Insights */}
         <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Financial Insights & Recommendations</CardTitle>
@@ -118,24 +121,45 @@ export default function DashboardContent() {
             {financialInsights ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-emerald-700 mb-3">Best Performing Month</h4>
+                  <h4 className="font-semibold text-emerald-700 mb-3">Highest Debit Month</h4>
                   <div className="text-2xl font-bold text-emerald-800 mb-2">{financialInsights.bestPerformingMonth.month}</div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Highest savings rate at <strong>{financialInsights.bestPerformingMonth.savingsRate}%</strong> with ₹{financialInsights.bestPerformingMonth.amountSaved.toLocaleString()} saved
+                    Highest expenses of ₹9048
                   </p>
                 </div>
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-sky-600 mb-3">Lowest Income Month</h4>
-                  <div className="text-2xl font-bold text-sky-700 mb-2">{financialInsights.lowestIncomeMonth.month}</div>
+                  <h4 className="font-semibold text-sky-600 mb-3">Lowest Debit Month</h4>
+                  <div className="text-2xl font-bold text-sky-700 mb-2">{financialInsights.lowestIncomeMonth?.month ?? "N/A"}</div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Only ₹{financialInsights.lowestIncomeMonth.income.toLocaleString()} earned. Consider boosting income.
+                    Lowest expenses of ₹{financialInsights.lowestIncomeMonth?.income ?? 0}
                   </p>
                 </div>
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-orange-700 mb-3">Top Spending Category</h4>
-                  <div className="text-2xl font-bold text-orange-800 mb-2">{financialInsights.topSpendingCategory.category}</div>
+                  <h4 className="font-semibold text-red-600 mb-3">Avg. Debit</h4>
+                  <div className="text-2xl font-bold text-red-700 mb-2">₹5899</div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Accounts for <strong>{financialInsights.topSpendingCategory.percentage}%</strong> of your total expenses
+                    Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> debit transactions this month.
+                  </p>
+                </div>
+                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-purple-700 mb-3">Highest Credit Month</h4>
+                  <div className="text-2xl font-bold text-purple-800 mb-2">May</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Highest credit of ₹9000
+                  </p>
+                </div>
+                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-orange-600 mb-3">Lowest Credit Month</h4>
+                  <div className="text-2xl font-bold text-orange-700 mb-2">February</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Lowest credit of ₹2000
+                  </p>
+                </div>
+                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-red-400 mb-3">Avg. Credit </h4>
+                  <div className="text-2xl font-bold text-red-500 mb-2">₹5050</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> credit transactions this month.
                   </p>
                 </div>
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
@@ -146,17 +170,17 @@ export default function DashboardContent() {
                   </p>
                 </div>
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-red-600 mb-3">Avg. Transaction Size</h4>
-                  <div className="text-2xl font-bold text-red-700 mb-2">₹{financialInsights.avgTransactionSize.amount.toLocaleString()}</div>
+                  <h4 className="font-semibold text-orange-700 mb-3">Top Spending Category</h4>
+                  <div className="text-2xl font-bold text-orange-800 mb-2">{financialInsights.topSpendingCategory.category}</div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> transactions this month.
+                    Accounts for <strong>{financialInsights.topSpendingCategory.percentage}%</strong> of your total expenses
                   </p>
                 </div>
                 <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-green-600 mb-3">Income vs Expense</h4>
                   <div className="text-2xl font-bold text-green-700 mb-2">{financialInsights.incomeVsExpense.ratio}</div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Income is <strong>{financialInsights.incomeVsExpense.percentageHigher}% higher</strong> than total expenses.
+                    Credits is <strong>{financialInsights.incomeVsExpense.percentageHigher}% higher</strong> than total debits.
                   </p>
                 </div>
               </div>
