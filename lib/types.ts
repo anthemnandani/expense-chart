@@ -80,3 +80,31 @@ export interface TreeNode {
     name: string
     color?: string
 }
+
+export interface FinancialInsight {
+  bestPerformingMonth: {
+    month: string;
+    savingsRate: number;
+    amountSaved: number;
+  };
+  lowestIncomeMonth: {
+    month: string;
+    income: number;
+  };
+  topSpendingCategory: {
+    category: string;
+    percentage: number;
+  };
+  thisMonthTrend: {
+    trend: string;
+    percentageChange: number;
+  };
+  avgTransactionSize: {
+    amount: number;
+    transactionCount: number;
+  };
+  incomeVsExpense: {
+    ratio: string;
+    percentageHigher: number;
+  };
+}

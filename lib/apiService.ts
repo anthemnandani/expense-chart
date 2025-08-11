@@ -1,4 +1,4 @@
-import { CategoryData, ExpenseData, ExpenseEntry, ExpenseRecord } from "./types";
+import { CategoryData, ExpenseData, ExpenseEntry, ExpenseRecord, FinancialInsight } from "./types";
 
 // Define types for API responses if needed
 interface TreeNode {
@@ -144,6 +144,32 @@ export const apiService = {
     } catch (error) {
       console.error("Error fetching yearly stats:", error);
       return [];
+    }
+  },
+
+  // Fetch financial insights data
+  async getFinancialInsights(
+    groupId: string,
+    year: number,
+    month: number
+  ): Promise<FinancialInsight> {
+    try {
+      const res = await fetch(
+        `/api/financial-insights?groupId=${groupId}&year=${year}&month=${month}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error("Failed to fetch financial insights");
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching financial insights:", error);
+      return {
+        bestPerformingMonth: { month: "N/A", savingsRate: 0, amountSaved: 0 },
+        lowestIncomeMonth: { month: "N/A", income: 0 },
+        topSpendingCategory: { category: "N/A", percentage: 0 },
+        thisMonthTrend: { trend: "N/A", percentageChange: 0 },
+        avgTransactionSize: { amount: 0, transactionCount: 0 },
+        incomeVsExpense: { ratio: "N/A", percentageHigher: 0 },
+      };
     }
   },
 };
