@@ -4,8 +4,9 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 if (typeof Highcharts === "function") {
     HighchartsMore(Highcharts);
@@ -22,8 +23,8 @@ const AdvancedPolarChart = () => {
     const [monthlyData, setMonthlyData] = useState<MonthlyRecord[]>([]);
     const [selectedMonth, setSelectedMonth] = useState("8");
     const [selectedYear, setSelectedYear] = useState(2025);
-     const { user } = useAuth()
-     const groupId = user?.groupId
+    const { user } = useAuth()
+    const groupId = user?.groupId
     const darkBg = "#1f1836"
     const lightBg = "#ffffff"
 
@@ -33,7 +34,6 @@ const AdvancedPolarChart = () => {
     const chartBg = isDarkMode ? darkBg : lightBg
     const textColor = isDarkMode ? darkText : lightText
     const borderColor = isDarkMode ? "#46465C" : "#e0e0e0"
-    const secondaryBg = isDarkMode ? "#023e8a" : "#3a86ff"
     const secondaryNewBg = isDarkMode ? "rgba(59,130,246,0.1)" : "#eee"
 
     const colors = (Highcharts.getOptions().colors ?? []).map((c: any) =>
@@ -59,16 +59,15 @@ const AdvancedPolarChart = () => {
         return () => observer.disconnect()
     }, [])
 
-    // 1️⃣ Effect for fetching data
+    // Effect for fetching data
     useEffect(() => {
         const fetchMonthlyData = async () => {
-             if (!groupId) return
+            if (!groupId) return
             try {
-                const res = await fetch(
-                    `/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`
-                );
-                if (!res.ok) throw new Error("Failed to fetch monthly data");
-                const data = await res.json();
+                // const res = await fetch(
+                //     `/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`
+                // );
+                const data = await apiService.getDailyExpenses(groupId, selectedYear, selectedMonth)
                 setMonthlyData(data);
             } catch (err) {
                 console.error(err);
@@ -85,7 +84,7 @@ const AdvancedPolarChart = () => {
         const debitSeries = monthlyData.map((entry, i) => [i + 1, 2, entry.debit]);
         const totalDays = monthlyData.length;
 
-                const scoreData = [
+        const scoreData = [
             {
                 x: 1,
                 low: 0,
@@ -428,12 +427,8 @@ const AdvancedPolarChart = () => {
             <CardHeader className="pb-2 flex justify-between lg:flex-row flex-col">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-                        {/* <BarChart3 className="h-5 w-5 text-green-600" /> */}
                         Weekly Credit vs Debit
                     </CardTitle>
-                    {/* <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-                        Analyze trends across the month
-                    </CardDescription> */}
                 </div>
                 <div className="flex gap-2">
                     <select

@@ -14,17 +14,11 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "@/components/ui/card"
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/auth-context";
-
-interface ExpenseRecord {
-  month: string;
-  totalDebit: number;
-  totalCredit: number;
-}
+import { apiService } from "@/lib/apiService";
 
 export default function MonthlyRadarChart() {
 
@@ -37,13 +31,7 @@ export default function MonthlyRadarChart() {
     if (!groupId) return
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          `/api/yearly-expense?groupId=${groupId}&year=${selectedYear}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch category expenses");
-        const data: ExpenseRecord[] = await res.json();
-
-        // Prepare monthly income & expense mapping
+        const data = await apiService.getYearlyExpense(groupId, selectedYear);
         const months = [
           "Jan", "Feb", "Mar", "Apr", "May", "Jun",
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const HighchartsReact = dynamic(() => import("highcharts-react-official"), { ssr: false });
 
-const categories = ["Party", "Tea", "Water", "Other"];
 const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -16,11 +16,11 @@ const months = [
 export default function AnnualCategoryTrendsChart() {
   const [Highcharts, setHighcharts] = useState<any>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [year, setYear] = useState(2025);
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [categories, setCategories] = useState<string[]>([]);
   const [heatmapData, setHeatmapData] = useState<[number, number, number][]>([]);
- const { user } = useAuth()
-     const groupId = user?.groupId
+  const { user } = useAuth()
+  const groupId = user?.groupId
   // Load Highcharts modules
   useEffect(() => {
     (async () => {
@@ -46,19 +46,17 @@ export default function AnnualCategoryTrendsChart() {
 
   useEffect(() => {
     async function fetchData() {
-       if (!groupId) return
+      if (!groupId) return
       try {
-        const res = await fetch(`/api/annual-category-trends?groupId=${groupId}&year=${year}`);
-        if (!res.ok) throw new Error("Failed to fetch chart data");
-        const json = await res.json();
-        setCategories(json.categories);
-        setHeatmapData(json.data);
+        const data = await apiService.getAnnualCategoryTrends(groupId, selectedYear)
+        setCategories(data.categories);
+        setHeatmapData(data.data);
       } catch (err) {
         console.error(err);
       }
     }
     fetchData();
-  }, [year, groupId]);
+  }, [selectedYear, groupId]);
 
   if (!Highcharts) return <div>Loading chart...</div>;
 
@@ -124,8 +122,8 @@ export default function AnnualCategoryTrendsChart() {
         <CardTitle className="text-lg">Annual Category Trends (Heatmap)</CardTitle>
         <div>
           <select
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
           >
             {[2023, 2024, 2025].map((y) => (

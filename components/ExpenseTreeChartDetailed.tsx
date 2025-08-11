@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useRef } from "react"
 import ReactECharts from "echarts-for-react"
+import { apiService } from "@/lib/apiService"
+import { useAuth } from "@/context/auth-context"
 
 type TreeNode = {
     id: string
@@ -14,14 +16,15 @@ export default function ExpenseTreeChartDetailed() {
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const chartRef = useRef<any>(null)
+    const { user } = useAuth()
+    const groupId = user?.groupId
 
     useEffect(() => {
         async function fetchData() {
-            
+            if (!groupId) return
             try {
-                const res = await fetch("/api/treegraph")
-                const flatData: TreeNode[] = await res.json()
-                const nested = buildTree(flatData)
+                const data = await apiService.getTreeGraphData(groupId)
+                const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {
                 console.error("Failed to load tree data", err)
@@ -39,9 +42,9 @@ export default function ExpenseTreeChartDetailed() {
         flat.forEach((node) => {
             const level = node.id.split("-").length - 1
             let symbol = "circle"
-            if (level === 0) symbol = "rect" // year
-            else if (level === 1) symbol = "circle" // month
-            else symbol = "diamond" // category
+            if (level === 0) symbol = "rect"
+            else if (level === 1) symbol = "circle"
+            else symbol = "diamond"
 
             idMap[node.id] = {
                 ...node,

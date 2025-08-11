@@ -4,6 +4,7 @@ import { ChartContainer } from "@/components/ui/chart"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/auth-context"
 import { ExpenseRecord } from "@/lib/types"
+import { apiService } from "@/lib/apiService"
 
 export function DailyExpenseChart() {
     const [data, setData] = useState<ExpenseRecord[]>([])
@@ -22,10 +23,8 @@ export function DailyExpenseChart() {
         const fetchData = async () => {
             setLoading(true)
             try {
-                const res = await fetch(`/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`)
-                if (!res.ok) throw new Error('Failed to fetch')
-                const result: ExpenseRecord[] = await res.json()
-                setData(result)
+                const data = await apiService.getDailyExpenses(groupId, selectedYear, selectedMonth)
+                setData(data);
             } catch (error) {
                 console.error('Error fetching daily expenses:', error)
             } finally {

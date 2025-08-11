@@ -5,6 +5,7 @@ import HighchartsReact from 'highcharts-react-official'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/context/auth-context'
+import { apiService } from '@/lib/apiService'
 
 const NetBalanceChart = () => {
   const [chartData, setChartData] = useState<[number, number][]>([])
@@ -17,9 +18,7 @@ const NetBalanceChart = () => {
     if (!groupId) return
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/net-balance?groupId=${groupId}&year=${selectedYear}`);
-        if (!res.ok) throw new Error("Failed to fetch day-wise net balance");
-        const data: [number, number][] = await res.json();
+        const data = await apiService.getNetBalance(groupId, selectedYear);
         setChartData(data);
       } catch (err) {
         console.error("Error fetching net balance:", err);

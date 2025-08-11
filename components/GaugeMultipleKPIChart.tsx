@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
 import { CategoryData } from "@/lib/types";
+import { apiService } from "@/lib/apiService";
 
 if (typeof HighchartsMore === "function") HighchartsMore(Highcharts);
 if (typeof SolidGauge === "function") SolidGauge(Highcharts);
@@ -23,15 +24,10 @@ export default function GaugeMultipleKPIChart() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!groupId) return
+      if (!groupId) return;
       try {
-        const res = await fetch(
-          `/api/expense-monthswise?groupId=${groupId}&year=${selectedYear}&months=${selectedMonth}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch");
-        const json = await res.json();
-        // Filter out empty category names
-        setCategoryData(json.filter((d: CategoryData) => d.expenseDescType?.trim() !== ""));
+        const data = await apiService.getExpenseByMonth(groupId, selectedYear, selectedMonth);
+        setCategoryData(data.filter((d: CategoryData) => d.expenseDescType?.trim() !== ""));
       } catch (error) {
         console.error("Error loading category data:", error);
       }

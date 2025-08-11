@@ -4,13 +4,8 @@ import React, { useEffect, useState, useRef } from "react"
 import ReactECharts from "echarts-for-react"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { useAuth } from "@/context/auth-context"
-
-type TreeNode = {
-    id: string
-    parent?: string
-    name: string
-    color?: string
-}
+import { apiService } from "@/lib/apiService"
+import { TreeNode } from "@/lib/types"
 
 export default function ExpenseTreeChart() {
     const [treeData, setTreeData] = useState<any[]>([])
@@ -38,9 +33,8 @@ export default function ExpenseTreeChart() {
         async function fetchData() {
              if (!groupId) return
             try {
-                const res = await fetch(`/api/treegraph?groupId=${groupId}`)
-                const flatData: TreeNode[] = await res.json()
-                const nested = buildTree(flatData)
+                 const data = await apiService.getTreeGraphData(groupId)
+                const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {
                 console.error("Failed to load tree data", err)
@@ -64,16 +58,16 @@ export default function ExpenseTreeChart() {
 
             if (node.id === "root") {
                 symbol = "diamond"
-                customColor = isDark ? "#fb8b24" : "#e36414" // orange variant
+                customColor = isDark ? "#fb8b24" : "#e36414"
             } else if (node.parent === "root") {
                 symbol = "rect"
-                customColor = isDark ? "#48cae4" : "#0077b6" // blue variant
+                customColor = isDark ? "#48cae4" : "#0077b6"
             } else if (level === 1) {
                 symbol = "circle"
-                customColor = isDark ? "#a7c957" : "#6a994e" // green variant
+                customColor = isDark ? "#a7c957" : "#6a994e"
             } else {
                 symbol = "diamond"
-                customColor = isDark ? "#89c2d9" : "#02c39a" // yellow variant
+                customColor = isDark ? "#89c2d9" : "#02c39a"
             }
 
             idMap[node.id] = {

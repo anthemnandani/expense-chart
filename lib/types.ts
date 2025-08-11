@@ -73,3 +73,10 @@ export interface ExpenseData {
   totalDebit: number
   totalCredit: number
 }
+
+export interface TreeNode {
+    id: string
+    parent?: string
+    name: string
+    color?: string
+}

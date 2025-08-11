@@ -2,19 +2,14 @@
 
 import Highcharts from "highcharts/highstock"
 import HighchartsReact from "highcharts-react-official"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/auth-context"
 import { ExpenseData } from "@/lib/types"
-
-// interface ExpenseData {
-//   month: string
-//   totalDebit: number
-//   totalCredit: number
-// }
+import { apiService } from "@/lib/apiService"
 
 export default function AreaYearlyExpenseChart() {
-  const [year, setYear] = useState(2025)
+  const [selectedYear, setSelectedYear] = useState(2025)
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([])
   const { user } = useAuth()
   const groupId = user?.groupId
@@ -22,10 +17,7 @@ export default function AreaYearlyExpenseChart() {
     const fetchData = async () => {
       if (!groupId) return
       try {
-        const res = await fetch(`/api/yearly-expense?groupId=${groupId}&year=${year}`);
-        if (!res.ok) throw new Error("Failed to fetch yearly expense data");
-        const data = await res.json();
-
+         const data = await apiService.getYearlyExpense(groupId, selectedYear)
         // Transform API months into readable labels
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const transformed = data.map((item: any) => ({
@@ -41,7 +33,7 @@ export default function AreaYearlyExpenseChart() {
     };
 
     fetchData();
-  }, [year, groupId]);
+  }, [selectedYear, groupId]);
 
   const chartOptions: Highcharts.Options = {
     chart: {
@@ -203,8 +195,8 @@ export default function AreaYearlyExpenseChart() {
         <div className="flex gap-2 items-center">
           <select
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
           >
             {[2025, 2024, 2023].map((y) => (
               <option key={y} value={y}>

@@ -6,11 +6,7 @@ import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { useAuth } from "@/context/auth-context"
 import { ExpenseCategory } from "@/lib/types"
-
-// interface ExpenseCategory {
-//     expenseDescType: string
-//     totalExpenses: number
-// }
+import { apiService } from "@/lib/apiService"
 
 const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
@@ -51,11 +47,7 @@ export default function HighLevelPieChart() {
         const fetchData = async () => {
             try {
                 setLoading(true)
-                const res = await fetch(
-                    `/api/expense-monthswise?groupId=${groupId}&year=${selectedYear}&months=${selectedMonth}`
-                )
-                if (!res.ok) throw new Error("Failed to fetch category data")
-                const data = await res.json()
+                 const data = await apiService.getExpenseByMonth(groupId, selectedYear, selectedMonth);
                 setCategoryData(data)
             } catch (err) {
                 console.error("Error fetching category data:", err)
@@ -158,9 +150,6 @@ export default function HighLevelPieChart() {
                     <CardTitle className="flex items-center gap-2">
                         Expense Distribution
                     </CardTitle>
-                    {/* <CardDescription>
-                        Animated pie chart showing category-wise expense shares
-                    </CardDescription> */}
                 </div>
                 <div className="flex gap-2 flex-col lg:flex-row">
                     <select
