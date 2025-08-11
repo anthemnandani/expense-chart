@@ -1,32 +1,60 @@
-"use client"
+"use client";
 
-import Highcharts from "highcharts/highstock"
-import HighchartsReact from "highcharts-react-official"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
-import { useAuth } from "@/context/auth-context"
-import { ExpenseData } from "@/lib/types"
-import { apiService } from "@/lib/apiService"
+import React, { useEffect, useState } from "react";
+import ReactECharts from "echarts-for-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
+import { ExpenseData } from "@/lib/types";
 
 export default function AreaYearlyExpenseChart() {
-  const [selectedYear, setSelectedYear] = useState(2025)
-  const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([])
-  const { user } = useAuth()
-  const groupId = user?.groupId
+  const [selectedYear, setSelectedYear] = useState(2025);
+  const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const { user } = useAuth();
+  const groupId = user?.groupId;
+
   useEffect(() => {
     const fetchData = async () => {
-      if (!groupId) return
+      if (!groupId) return;
       try {
-         const data = await apiService.getYearlyExpense(groupId, selectedYear)
-        // Transform API months into readable labels
+        const data = await apiService.getYearlyExpense(groupId, selectedYear);
+        const categoryExpenses = await apiService.getCategoryExpenses(groupId, selectedYear);
+
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const transformed = data.map((item: any) => ({
-          month: months[parseInt(item.month) - 1],
-          totalDebit: item.totalDebit,
-          totalCredit: item.totalCredit,
-        }));
+
+        // ✅ Ensure all 12 months exist, filling missing with zeros
+        const transformed = months.map((m, idx) => {
+          const found = data.find((item: any) => parseInt(item.month, 10) - 1 === idx);
+          return {
+            month: m,
+            totalDebit: found?.totalDebit || 0,
+            totalCredit: found?.totalCredit || 0,
+            netBalance: (found?.totalCredit || 0) - (found?.totalDebit || 0),
+          };
+        });
+
+        // ✅ Get unique categories, filter out empty/undefined
+        const uniqueCategories = Array.from(
+          new Set(categoryExpenses.map((e: any) => e.expenseDescType).filter(Boolean))
+        );
+
+        // ✅ Month-wise category map with dynamic categories
+        const categoryMap = months.map((month, idx) => {
+          const monthData = categoryExpenses.filter(
+            (e: any) => parseInt(e.month, 10) - 1 === idx
+          );
+          return uniqueCategories.reduce(
+            (acc, cat) => ({
+              ...acc,
+              [cat]: monthData.find((d: any) => d.expenseDescType === cat)?.totalExpenses || 0,
+            }),
+            { month }
+          );
+        });
 
         setMonthlyExpenseData(transformed);
+        setCategoryData(categoryMap);
       } catch (err) {
         console.error("Error fetching yearly expense data:", err);
       }
@@ -35,180 +63,101 @@ export default function AreaYearlyExpenseChart() {
     fetchData();
   }, [selectedYear, groupId]);
 
-  const chartOptions: Highcharts.Options = {
-    chart: {
-      type: "areaspline",
-      backgroundColor: "transparent",
-      style: {
-        fontFamily: "'Inter', sans-serif",
-      },
-    },
-    title: {
-      text: undefined,
-    },
-    xAxis: {
-      categories: monthlyExpenseData.map((d) => d.month),
-      tickmarkPlacement: "on",
-      lineColor: "#ccc",
-      labels: {
-        style: {
-          color: "#888",
-        },
-      },
-      title: { enabled: false },
-    },
-    yAxis: {
-      title: { text: "Amount (₹)" },
-      gridLineColor: "#eee",
-      labels: {
-        style: {
-          color: "#888",
-        },
-        formatter: function () {
-          return `₹${this.value}`;
-        },
-      },
-    },
+  const option = {
     tooltip: {
-      shared: true,
-      useHTML: true,
-      backgroundColor: "#fff",
-      borderColor: "#ddd",
-      borderRadius: 8,
-      shadow: true,
-      formatter: function () {
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const points = this.points || [];
-        const rows = points
+      trigger: "axis",
+      axisPointer: { type: "cross", crossStyle: { color: "#999" } },
+      formatter: (params: any) => {
+        if (!params || !params.length) return "";
+        const monthIndex = params[0]?.dataIndex ?? 0;
+
+        if (!monthlyExpenseData[monthIndex]) return "";
+
+        const catInfo = categoryData[monthIndex]
+          ? Object.entries(categoryData[monthIndex])
+              .filter(([key]) => key !== "month")
+              .map(([cat, val]) => `<div style="color:#666;">${cat}: ₹${val}</div>`)
+              .join("")
+          : "";
+
+        const seriesInfo = params
           .map(
-            (point) =>
-              `<div style="margin-bottom:4px;"><span style="color:${point.color}; font-weight:600;">●</span> ${point.series.name}: ₹${point.y}</div>`
+            (p: any) =>
+              `<div><span style="color:${p.color};font-weight:600;">●</span> ${p.seriesName}: ₹${p.value}</div>`
           )
           .join("");
-        return `<strong style="padding-bottom:4px;">${months[this.point.index]}</strong><br/>${rows}`;
-      },
 
+        return `<strong>${monthlyExpenseData[monthIndex].month}</strong><br/>${seriesInfo}<hr/>${catInfo}`;
+      },
     },
     legend: {
-      itemStyle: {
-        color: "#555",
-        fontWeight: "500",
-      },
-      itemHoverStyle: {
-        color: "#000",
-      },
+      data: ["Expenses", "Credits", "Net Balance"],
     },
-    plotOptions: {
-      areaspline: {
-        stacking: "normal",
-        lineWidth: 2,
-        marker: {
-          radius: 4,
-          symbol: "circle",
-          states: {
-            hover: {
-              enabled: true,
-              fillColor: "#fff",
-              lineWidth: 2,
-            },
-          },
-        },
-        states: {
-          inactive: {
-            opacity: 0.5,
-          },
-          hover: {
-            halo: {
-              size: 0
-            }
-          }
-        },
-        events: {
-          mouseOver: function () {
-            this.chart.series.forEach(series => {
-              if (series !== this) {
-                series.setState('inactive');
-              } else {
-                series.setState('hover');
-              }
-            });
-          },
-          mouseOut: function () {
-            this.chart.series.forEach(series => {
-              series.setState('inactive', false);
-            });
-          }
-        }
+    xAxis: [
+      {
+        type: "category",
+        data: monthlyExpenseData.map((d) => d.month),
+        axisPointer: { type: "shadow" },
       },
-      series: {
-        marker: {
-          enabled: false,
-        },
-        states: {
-          hover: {
-            enabled: true,
-            brightness: 0
-          }
-        }
-      }
-    },
+    ],
+    yAxis: [
+      {
+        type: "value",
+        name: "Amount (₹)",
+        axisLabel: { formatter: "₹{value}" },
+      },
+      {
+        type: "value",
+        name: "Net Balance",
+        axisLabel: { formatter: "₹{value}" },
+      },
+    ],
     series: [
       {
         name: "Expenses",
-        type: "areaspline",
+        type: "bar",
+        tooltip: { valueFormatter: (v: any) => `₹${v}` },
         data: monthlyExpenseData.map((d) => d.totalDebit),
-        color: {
-          linearGradient: [0, 0, 0, 300],
-          stops: [
-            [0, "#1D4ED8"],
-            [1, "#1d4fd8a1"],
-          ],
-        },
+        itemStyle: { color: "#2563eb" },
       },
       {
         name: "Credits",
-        type: "areaspline",
+        type: "bar",
+        tooltip: { valueFormatter: (v: any) => `₹${v}` },
         data: monthlyExpenseData.map((d) => d.totalCredit),
-        color: {
-          linearGradient: [0, 0, 0, 600],
-          stops: [
-            [0, "#14532D"],
-            [0.5, "#4ade80"],
-            [1, "#64ff9da3"],
-          ],
-        },
+        itemStyle: { color: "#22c55e" },
+      },
+      {
+        name: "Net Balance",
+        type: "line",
+        yAxisIndex: 1,
+        tooltip: { valueFormatter: (v: any) => `₹${v}` },
+        data: monthlyExpenseData.map((d) => d.netBalance),
+        itemStyle: { color: "#f59e0b" },
+        smooth: true,
       },
     ],
-    credits: {
-      enabled: false,
-    },
-  }
+  };
 
   return (
     <Card className="shadow-lg border-0 bg-white col-span-1 lg:col-span-3 dark:bg-gray-800">
-      <CardHeader className="flex justify-between lg:flex-row lex-col">
-        <div>
-          <CardTitle className="text-lg font-semibold">
-            Yearly Credit & Debit Overview
-          </CardTitle>
-        </div>
-        <div className="flex gap-2 items-center">
-          <select
-            className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-          >
-            {[2025, 2024, 2023].map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
+      <CardHeader className="flex justify-between lg:flex-row flex-col">
+        <CardTitle className="text-lg font-semibold">Yearly Credit, Debit & Net Balance</CardTitle>
+        <select
+          className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+        >
+          {[2025, 2024, 2023].map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
       </CardHeader>
       <CardContent>
-        <HighchartsReact highcharts={Highcharts} constructorType="chart" options={chartOptions} />
+        <ReactECharts option={option} style={{ height: "400px" }} />
       </CardContent>
     </Card>
-  )
+  );
 }
