@@ -1,5 +1,6 @@
-// components/charts/StackedBarCategoryChart.tsx
-import React, { useEffect, useRef } from 'react';
+"use client";
+
+import React, { useEffect, useRef, useState } from 'react';
 import Highcharts from 'highcharts';
 import { apiService } from '@/lib/apiService';
 import { CardContent, CardHeader, Card, CardTitle } from './ui/card';
@@ -14,10 +15,29 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
   years,
   height = 600,
 }) => {
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<Highcharts.Chart | null>(null);
   const { user } = useAuth()
   const groupId = user?.groupId
+
+  useEffect(() => {
+    const checkDarkMode = () =>
+      document.documentElement.classList.contains("dark")
+
+    setIsDarkMode(checkDarkMode())
+
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(checkDarkMode())
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!groupId) return
@@ -66,6 +86,7 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             chart: {
               type: 'column',
               height: height,
+              backgroundColor: "transparent",
             },
             title: {
               text: undefined,
@@ -86,12 +107,22 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             tooltip: {
               pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
               shared: true,
+              backgroundColor: isDarkMode ? "#111827" : "#ffffff",
               style: {
-                padding: '10px',    // Add padding here
-                fontSize: '13px',   // Optional: adjust font size if needed
-              }
+                color: isDarkMode ? "#f3f4f6" : "#111827",
+                padding: "10px",
+                fontSize: "13px",
+              },
             },
-
+            legend: {
+              itemStyle: {
+                color: isDarkMode ? "#f3f4f6" : "#111827", // Legend text color
+                fontSize: '12px',
+              },
+              itemHoverStyle: {
+                color: isDarkMode ? "#e5e7eb" : "#000000", // Hover color
+              },
+            },
             plotOptions: {
               column: {
                 stacking: 'percent',
@@ -162,3 +193,5 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
     </Card>
   );
 };
+
+export default StackedBarCategoryChart;

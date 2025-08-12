@@ -104,9 +104,10 @@ export const apiService = {
   },
 
   // Fetch tree graph data for ExpenseTreeChart
-  async getTreeGraphData(groupId: string): Promise<TreeNode[]> {
+  async getTreeGraphData(groupId: string, years: number[]): Promise<TreeNode[]> {
     try {
-      const res = await fetch(`/api/treegraph?groupId=${groupId}`, {
+      const yearParams = years.join(","); 
+      const res = await fetch(`/api/treegraph?groupId=${groupId}&years=${yearParams}`, {
         cache: "no-store",
       });
       if (!res.ok) throw new Error("Failed to fetch tree graph data");
@@ -191,6 +192,19 @@ export const apiService = {
     } catch (error) {
       console.error("Error fetching yearly category expenses:", error);
       return { years: [], categories: [], data: [] };
+    }
+  },
+
+    // Fetch available years dynamically from backend
+  async getAvailableYears(groupId: string): Promise<number[]> {
+    try {
+      const res = await fetch(`/api/available-years?groupId=${groupId}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch available years");
+      const data = await res.json();
+      return data.years ?? [];
+    } catch (error) {
+      console.error("Error fetching available years:", error);
+      return [];
     }
   },
 };

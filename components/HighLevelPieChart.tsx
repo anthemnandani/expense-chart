@@ -8,11 +8,15 @@ import { useAuth } from "@/context/auth-context"
 import { ExpenseCategory } from "@/lib/types"
 import { apiService } from "@/lib/apiService"
 
+interface HighLevelPieChart {
+    years: number[];
+}
+
 const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
 ]
 
-export default function HighLevelPieChart() {
+export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years}) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [selectedYear, setSelectedYear] = useState(2025)
     const [selectedMonth, setSelectedMonth] = useState(8)
@@ -117,7 +121,7 @@ export default function HighLevelPieChart() {
             itemMarginTop: 6,
             itemMarginBottom: 6,
             itemStyle: {
-                color: "#444",
+                color:  isDarkMode ? "#fff" : "#444",
                 fontWeight: "500",
                 fontSize: "14px",
             },
@@ -168,7 +172,7 @@ export default function HighLevelPieChart() {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                     >
-                        {[2023, 2024, 2025].map((year) => (
+                        {years.map((year) => (
                             <option key={year} value={year}>
                                 {year}
                             </option>
@@ -188,3 +192,5 @@ export default function HighLevelPieChart() {
         </Card>
     )
 }
+
+export default HighLevelPieChart;

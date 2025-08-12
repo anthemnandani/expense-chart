@@ -104,18 +104,18 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:bg-gradient-to-br dark:from-neutral-950 dark:to-indigo-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 rounded-full flex items-center justify-center">
                 <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
               </div>
-            <h1 className="text-3xl font-bold text-gray-900">Expense Tracker</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">Expense Tracker</h1>
           </div>
-          <p className="text-gray-600">Track your expenses with ease</p>
+          <p className="text-gray-600 dark:text-gray-300">Track your expenses with ease</p>
         </div>
-        <Card className="shadow-xl">
+        <Card className="shadow-xl bg-gray-50 dark:bg-gray-800">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Sign in to your account</CardTitle>
             <CardDescription className="text-center">
@@ -172,7 +172,7 @@ export default function SignInPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+                className="w-full h-12 bg-blue-600 dark:text-white hover:bg-blue-700"
               >
                 {isSubmitting ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -196,12 +196,12 @@ export default function SignInPage() {
               {/* <Button variant="link" className="text-sm text-blue-600 hover:text-blue-700">
                 Forgot Password?
               </Button> */}
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {"Don't have an account? "}
                 <Button
                   variant="link"
                   onClick={handleRegisterRedirect}
-                  className="text-blue-600 hover:text-blue-700 p-0"
+                  className="text-blue-600 hover:text-blue-700 p-0 dark:text-blue-400 dark:hover:text-blue-500"
                 >
                   Sign Up
                 </Button>
@@ -209,7 +209,7 @@ export default function SignInPage() {
             </div>
           </CardContent>
         </Card>
-        <div className="text-center mt-8 text-sm text-gray-500">
+        <div className="text-center mt-8 text-sm text-gray-500 dark:text-gray-300">
           <p>Copyright © 2025 Anthem Infotech Private Limited. All rights reserved.</p>
           <p className="mt-1">Powered by Anthem Infotech Pvt. Ltd.</p>
         </div>

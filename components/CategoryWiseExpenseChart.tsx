@@ -7,6 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
 
+interface CategoryWiseExpenseChart {
+  years: number[];
+}
+
 const dashStyles = [
     "Solid"
 ];
@@ -16,7 +20,7 @@ const monthLabels = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-export default function CategoryWiseExpenseChart() {
+export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({years}) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedYear, setSelectedYear] = useState(2025);
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
@@ -134,7 +138,7 @@ export default function CategoryWiseExpenseChart() {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                     >
-                        {[2025, 2024, 2023].map((year) => (
+                        {years.map((year) => (
                             <option key={year} value={year}>{year}</option>
                         ))}
                     </select>
@@ -146,3 +150,5 @@ export default function CategoryWiseExpenseChart() {
         </Card>
     );
 }
+
+export default CategoryWiseExpenseChart;

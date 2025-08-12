@@ -7,7 +7,11 @@ import { useAuth } from "@/context/auth-context"
 import { apiService } from "@/lib/apiService"
 import { TreeNode } from "@/lib/types"
 
-export default function ExpenseTreeChart() {
+interface ExpenseTreeChart {
+    years: number[];
+}
+
+export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years}) => {
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const chartRef = useRef<any>(null)
@@ -31,9 +35,9 @@ export default function ExpenseTreeChart() {
 
     useEffect(() => {
         async function fetchData() {
-             if (!groupId) return
+             if (!groupId || years.length === 0) return;
             try {
-                 const data = await apiService.getTreeGraphData(groupId)
+                 const data = await apiService.getTreeGraphData(groupId, years)
                 const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {
@@ -43,7 +47,7 @@ export default function ExpenseTreeChart() {
             }
         }
         fetchData()
-    }, [groupId])
+    }, [groupId, years])
 
     function buildTree(flat: TreeNode[], isDark: boolean): any[] {
         const idMap: Record<string, any> = {}
@@ -109,7 +113,7 @@ export default function ExpenseTreeChart() {
                 top: "5%",
                 left: "15%",
                 bottom: "5%",
-                right: "15%",
+                right: "20%",
                 symbolSize: 14,
                 label: {
                     position: "left",
@@ -228,3 +232,5 @@ export default function ExpenseTreeChart() {
         </Card>
     )
 }
+
+export default ExpenseTreeChart;

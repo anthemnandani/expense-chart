@@ -13,17 +13,42 @@ type TreeNode = {
 }
 
 export default function ExpenseTreeChartDetailed() {
+    const [isDark, setIsDark] = useState(false)
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [years, setYears] = useState<number[]>([]);
     const chartRef = useRef<any>(null)
     const { user } = useAuth()
     const groupId = user?.groupId
 
+    // Watch Tailwind's dark mode
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDark(document.documentElement.classList.contains("dark"))
+        })
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"]
+        })
+        setIsDark(document.documentElement.classList.contains("dark"))
+        return () => observer.disconnect()
+    }, [])
+
+    useEffect(() => {
+        const fetchYears = async () => {
+            if (!groupId) return;
+            const fetchedYears = await apiService.getAvailableYears(groupId);
+            setYears(fetchedYears);
+            console.log("years: ", years);
+        };
+        fetchYears();
+    }, [groupId]);
+
     useEffect(() => {
         async function fetchData() {
-            if (!groupId) return
+            if (!groupId || years.length === 0) return
             try {
-                const data = await apiService.getTreeGraphData(groupId)
+                const data = await apiService.getTreeGraphData(groupId, years)
                 const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {
@@ -33,25 +58,39 @@ export default function ExpenseTreeChartDetailed() {
             }
         }
         fetchData()
-    }, [])
+    }, [years, groupId])
 
-    function buildTree(flat: TreeNode[]): any[] {
+    function buildTree(flat: TreeNode[], isDark: boolean): any[] {
         const idMap: Record<string, any> = {}
         const roots: any[] = []
 
         flat.forEach((node) => {
-            const level = node.id.split("-").length - 1
+            const parts = node.id.split("-")
+            const level = parts.length - 1
+
             let symbol = "circle"
-            if (level === 0) symbol = "rect"
-            else if (level === 1) symbol = "circle"
-            else symbol = "diamond"
+            let customColor = "#9ca3af"
+
+            if (node.id === "root") {
+                symbol = "diamond"
+                customColor = isDark ? "#fb8b24" : "#e36414"
+            } else if (node.parent === "root") {
+                symbol = "rect"
+                customColor = isDark ? "#48cae4" : "#0077b6"
+            } else if (level === 1) {
+                symbol = "circle"
+                customColor = isDark ? "#a7c957" : "#6a994e"
+            } else {
+                symbol = "diamond"
+                customColor = isDark ? "#89c2d9" : "#02c39a"
+            }
 
             idMap[node.id] = {
                 ...node,
                 children: [],
                 symbol,
                 symbolSize: 14,
-                itemStyle: node.color ? { color: node.color } : undefined
+                itemStyle: { color: customColor }
             }
         })
 
@@ -67,9 +106,13 @@ export default function ExpenseTreeChartDetailed() {
     }
 
     const option = {
+        backgroundColor: isDark ? "#1f2937" : "#ffffff",
         tooltip: {
             trigger: "item",
             triggerOn: "mousemove",
+            backgroundColor: isDark ? "#374151" : "#f9fafb",
+            borderColor: isDark ? "#4b5563" : "#e5e7eb",
+            textStyle: { color: isDark ? "#f9fafb" : "#111827" },
             formatter: (params: any) => `<b>${params.data.name}</b>`
         },
         series: [
@@ -87,17 +130,19 @@ export default function ExpenseTreeChartDetailed() {
                     position: "left",
                     verticalAlign: "middle",
                     align: "right",
-                    fontSize: 13
+                    fontSize: 13,
+                    color: isDark ? "#f9fafb" : "#111827"
                 },
                 leaves: {
                     label: {
                         position: "right",
                         verticalAlign: "middle",
                         align: "left",
-                        fontSize: 13
+                        fontSize: 13,
+                        color: isDark ? "#f9fafb" : "#111827"
                     }
                 },
-                lineStyle: { color: "#ccc" },
+                lineStyle: { color: isDark ? "#6b7280" : "#d1d5db" },
                 expandAndCollapse: true,
                 initialTreeDepth: 999,
                 animationDuration: 350,

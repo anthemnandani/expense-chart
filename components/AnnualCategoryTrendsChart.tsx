@@ -12,8 +12,13 @@ const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+interface AnnualCategoryTrendsChart {
+  years: number[];
+}
 
-export default function AnnualCategoryTrendsChart() {
+export const AnnualCategoryTrendsChart: React.FC<AnnualCategoryTrendsChart> = ({
+  years
+}) =>  {
   const [Highcharts, setHighcharts] = useState<any>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedYear, setSelectedYear] = useState(2025);
@@ -126,7 +131,7 @@ export default function AnnualCategoryTrendsChart() {
             onChange={(e) => setSelectedYear(Number(e.target.value))}
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
           >
-            {[2023, 2024, 2025].map((y) => (
+            {years.map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
@@ -138,3 +143,5 @@ export default function AnnualCategoryTrendsChart() {
     </Card>
   );
 }
+
+export default AnnualCategoryTrendsChart;

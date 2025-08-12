@@ -20,12 +20,34 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
 
-export default function MonthlyRadarChart() {
+interface MonthlyRadarChart {
+  years: number[];
+}
 
+export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedYear, setSelectedYear] = useState(2025);
   const [chartData, setChartData] = useState<any[]>([]);
   const { user } = useAuth()
   const groupId = user?.groupId
+
+  useEffect(() => {
+    const checkDarkMode = () =>
+      document.documentElement.classList.contains("dark")
+
+    setIsDarkMode(checkDarkMode())
+
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(checkDarkMode())
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!groupId) return
@@ -78,7 +100,7 @@ export default function MonthlyRadarChart() {
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
           >
-            {[2025, 2024, 2023].map((year) => (
+            {years.map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -99,10 +121,22 @@ export default function MonthlyRadarChart() {
             <PolarAngleAxis dataKey="month" tick={{ fill: "#6b7280", fontSize: 12 }} />
             <PolarRadiusAxis angle={30} domain={[0, 11000]} tick={{ fill: "#9ca3af", fontSize: 11 }} />
             <Tooltip
-              wrapperStyle={{ backgroundColor: "#fff", borderRadius: 8 }}
-              contentStyle={{ fontSize: 12 }}
+              wrapperStyle={{
+                backgroundColor: isDarkMode ? "#1f2937" : "#fff",
+                borderRadius: 8,
+                color: isDarkMode ? "#f9fafb" : "#111827"
+              }}
+              contentStyle={{
+                fontSize: 12,
+                backgroundColor: isDarkMode ? "#1f2937" : "#fff",
+                border: "none"
+              }}
             />
-            <Legend verticalAlign="bottom" iconType="circle" height={36} />
+            <Legend verticalAlign="bottom" iconType="circle" height={36} formatter={(value) => (
+              <span style={{ color: isDarkMode ? "#f9fafb" : "#111827" }}>
+                {value}
+              </span>
+            )} />
             <Radar
               name="Credit"
               dataKey="income"
@@ -123,3 +157,5 @@ export default function MonthlyRadarChart() {
     </Card>
   )
 }
+
+export default MonthlyRadarChart;

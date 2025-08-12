@@ -28,6 +28,7 @@ export default function DashboardContent() {
   const [financialInsights, setFinancialInsights] = useState<FinancialInsight | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [years, setYears] = useState<number[]>([]);
 
   useEffect(() => {
     if (!groupId) {
@@ -52,7 +53,16 @@ export default function DashboardContent() {
     fetchData();
   }, [groupId, selectedYear, selectedMonth]);
 
-  const years = [2023, 2024, 2025];
+  useEffect(() => {
+    const fetchYears = async () => {
+      if (!groupId) return;
+      const fetchedYears = await apiService.getAvailableYears(groupId);
+      setYears(fetchedYears);
+      console.log("years: ", years);
+      if (fetchedYears.length > 0) setSelectedYear(fetchedYears[fetchedYears.length - 1]); // default to latest year
+    };
+    fetchYears();
+  }, [groupId]);
 
   return (
     <div className="space-y-6 max-w-full overflow-hidden">
@@ -71,7 +81,7 @@ export default function DashboardContent() {
             onChange={(e) => setSelectedYear(Number(e.target.value))}
             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
           >
-            {[2025, 2024, 2023].map((y) => (
+            {years.map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>
@@ -85,28 +95,28 @@ export default function DashboardContent() {
         <UniqueStatCards selectedYear={selectedYear} />
         {/* Financial Overview and Expense Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <AreaYearlyExpenseChart />
-          <HighLevelPieChart />
+          <AreaYearlyExpenseChart years={years} />
+          <HighLevelPieChart years={years} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <NetBalanceChart />
+          <NetBalanceChart years={years} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <TreeGraphChart />
+          <TreeGraphChart years={years} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <MonthlyRadarChart />
-          <CategoryWiseExpenseChart />
+          <MonthlyRadarChart years={years} />
+          <CategoryWiseExpenseChart years={years} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <DailyExpenseChart />
+          <DailyExpenseChart years={years} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <StackedBarCategoryChart years={years} />
-          <AdvancedPolarChart />
+          <AdvancedPolarChart years={years} />
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <AnnualCategoryTrendsChart />
+          <AnnualCategoryTrendsChart years={years} />
         </div>
 
         {/* Financial Insights */}
@@ -120,66 +130,66 @@ export default function DashboardContent() {
           <CardContent>
             {financialInsights ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-emerald-700 mb-3">Highest Debit Month</h4>
-                  <div className="text-2xl font-bold text-emerald-800 mb-2">{financialInsights.bestPerformingMonth.month}</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-3">Highest Debit Month</h4>
+                  <div className="text-2xl font-bold text-emerald-800 dark:text-emerald-500 mb-2">{financialInsights.bestPerformingMonth.month}</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Highest expenses of ₹9048
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-sky-600 mb-3">Lowest Debit Month</h4>
-                  <div className="text-2xl font-bold text-sky-700 mb-2">{financialInsights.lowestIncomeMonth?.month ?? "N/A"}</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-sky-600 dark:text-sky-500 mb-3">Lowest Debit Month</h4>
+                  <div className="text-2xl font-bold text-sky-700 dark:text-sky-500 mb-2">{financialInsights.lowestIncomeMonth?.month ?? "N/A"}</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Lowest expenses of ₹{financialInsights.lowestIncomeMonth?.income ?? 0}
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-red-600 mb-3">Avg. Debit</h4>
-                  <div className="text-2xl font-bold text-red-700 mb-2">₹5899</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <div className="text-2xl font-bold text-red-600 mb-2">₹5899</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> debit transactions this month.
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-purple-700 mb-3">Highest Credit Month</h4>
-                  <div className="text-2xl font-bold text-purple-800 mb-2">May</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-purple-700 dark:text-purple-600 mb-3">Highest Credit Month</h4>
+                  <div className="text-2xl font-bold text-purple-800 dark:text-purple-600 mb-2">May</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Highest credit of ₹9000
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-orange-600 mb-3">Lowest Credit Month</h4>
-                  <div className="text-2xl font-bold text-orange-700 mb-2">February</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-orange-600 dark:text-orange-500 mb-3">Lowest Credit Month</h4>
+                  <div className="text-2xl font-bold text-orange-700 dark:text-orange-500 mb-2">February</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Lowest credit of ₹2000
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-red-400 mb-3">Avg. Credit </h4>
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-red-500 mb-3">Avg. Credit </h4>
                   <div className="text-2xl font-bold text-red-500 mb-2">₹5050</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> credit transactions this month.
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-lime-600 mb-3">This Month’s Trend</h4>
-                  <div className="text-2xl font-bold text-lime-700 mb-2">{financialInsights.thisMonthTrend.trend === "Downward" ? "📉 Downward" : "📈 Upward"}</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-lime-600 dark:text-lime-500 mb-3">This Month’s Trend</h4>
+                  <div className="text-2xl font-bold text-lime-700 dark:text-lime-500 mb-2">{financialInsights.thisMonthTrend.trend === "Downward" ? "📉 Downward" : "📈 Upward"}</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Spending is <strong>{financialInsights.thisMonthTrend.percentageChange}% {financialInsights.thisMonthTrend.trend.toLowerCase()}</strong> than last month.
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-orange-700 mb-3">Top Spending Category</h4>
-                  <div className="text-2xl font-bold text-orange-800 mb-2">{financialInsights.topSpendingCategory.category}</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-orange-700 dark:text-orange-500 mb-3">Top Spending Category</h4>
+                  <div className="text-2xl font-bold text-orange-800 dark:text-orange-500 mb-2">{financialInsights.topSpendingCategory.category}</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Accounts for <strong>{financialInsights.topSpendingCategory.percentage}%</strong> of your total expenses
                   </p>
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-green-600 mb-3">Income vs Expense</h4>
-                  <div className="text-2xl font-bold text-green-700 mb-2">{financialInsights.incomeVsExpense.ratio}</div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+                  <h4 className="font-semibold text-green-600 dark:text-green-400 mb-3">Income vs Expense</h4>
+                  <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">{financialInsights.incomeVsExpense.ratio}</div>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     Credits is <strong>{financialInsights.incomeVsExpense.percentageHigher}% higher</strong> than total debits.
                   </p>
                 </div>

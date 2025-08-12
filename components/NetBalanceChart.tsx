@@ -7,7 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/context/auth-context'
 import { apiService } from '@/lib/apiService'
 
-const NetBalanceChart = () => {
+interface NetBalanceChart {
+    years: number[];
+}
+
+export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
   const [selectedYear, setSelectedYear] = useState(2025)
   const { user } = useAuth()
@@ -207,7 +211,7 @@ const NetBalanceChart = () => {
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
           >
-            {[2025, 2024, 2023].map((year) => (
+            {years.map((year) => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>

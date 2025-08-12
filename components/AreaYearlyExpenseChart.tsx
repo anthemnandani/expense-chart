@@ -7,12 +7,37 @@ import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
 import { ExpenseData } from "@/lib/types";
 
-export default function AreaYearlyExpenseChart() {
+interface AreaYearlyExpenseChart {
+  years: number[];
+}
+
+export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
+  years
+}) => {
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedYear, setSelectedYear] = useState(2025);
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
   const { user } = useAuth();
   const groupId = user?.groupId;
+
+  useEffect(() => {
+    const checkDarkMode = () =>
+      document.documentElement.classList.contains("dark")
+
+    setIsDarkMode(checkDarkMode())
+
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(checkDarkMode())
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +92,9 @@ export default function AreaYearlyExpenseChart() {
     tooltip: {
       trigger: "axis",
       axisPointer: { type: "cross", crossStyle: { color: "#999" } },
+      backgroundColor: isDarkMode ? "#374151" : "#fff",
+      borderColor: isDarkMode ? "#4b5563" : "#e5e7eb",
+      textStyle: { color: isDarkMode ? "#f9fafb" : "#111827" },
       formatter: (params: any) => {
         if (!params || !params.length) return "";
         const monthIndex = params[0]?.dataIndex ?? 0;
@@ -75,9 +103,9 @@ export default function AreaYearlyExpenseChart() {
 
         const catInfo = categoryData[monthIndex]
           ? Object.entries(categoryData[monthIndex])
-              .filter(([key]) => key !== "month")
-              .map(([cat, val]) => `<div style="color:#666;">${cat}: ₹${val}</div>`)
-              .join("")
+            .filter(([key]) => key !== "month")
+            .map(([cat, val]) => `<div style=color:${isDarkMode ? "#d1d5db" : "#666"};>${cat}: ₹${val}</div>`)
+            .join("")
           : "";
 
         const seriesInfo = params
@@ -92,24 +120,29 @@ export default function AreaYearlyExpenseChart() {
     },
     legend: {
       data: ["Expenses", "Credits", "Net Balance"],
+      textStyle: { color: isDarkMode ? "#e5e7eb" : "#374151" },
     },
     xAxis: [
       {
         type: "category",
         data: monthlyExpenseData.map((d) => d.month),
         axisPointer: { type: "shadow" },
+        axisLabel: { color: isDarkMode ? "#d1d5db" : "#374151" },
+        axisLine: { lineStyle: { color: isDarkMode ? "#6b7280" : "#9ca3af" } },
       },
     ],
     yAxis: [
       {
         type: "value",
         name: "Amount (₹)",
-        axisLabel: { formatter: "₹{value}" },
+        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151" },
+        splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
       },
       {
         type: "value",
         name: "Net Balance",
-        axisLabel: { formatter: "₹{value}" },
+        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151"  },
+         splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
       },
     ],
     series: [
@@ -148,7 +181,7 @@ export default function AreaYearlyExpenseChart() {
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
         >
-          {[2025, 2024, 2023].map((y) => (
+          {years.map((y) => (
             <option key={y} value={y}>
               {y}
             </option>
@@ -161,3 +194,5 @@ export default function AreaYearlyExpenseChart() {
     </Card>
   );
 }
+
+export default AreaYearlyExpenseChart;

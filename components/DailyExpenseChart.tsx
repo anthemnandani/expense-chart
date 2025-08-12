@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
@@ -6,7 +8,11 @@ import { useAuth } from "@/context/auth-context"
 import { ExpenseRecord } from "@/lib/types"
 import { apiService } from "@/lib/apiService"
 
-export function DailyExpenseChart() {
+interface DailyExpenseChart {
+    years: number[];
+}
+
+export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years}) => {
     const [data, setData] = useState<ExpenseRecord[]>([])
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1) // current month
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
@@ -57,7 +63,7 @@ export function DailyExpenseChart() {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                     >
-                        {[2023, 2024, 2025].map((year) => (
+                        {years.map((year) => (
                             <option key={year} value={year}>{year}</option>
                         ))}
                     </select>
@@ -105,3 +111,5 @@ export function DailyExpenseChart() {
         </Card>
     )
 }
+
+export default DailyExpenseChart;
