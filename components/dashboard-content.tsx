@@ -130,67 +130,102 @@ export default function DashboardContent() {
           <CardContent>
             {financialInsights ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Highest Debit Month */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-3">Highest Debit Month</h4>
-                  <div className="text-2xl font-bold text-emerald-800 dark:text-emerald-500 mb-2">{financialInsights.bestPerformingMonth.month}</div>
+                  <div className="text-2xl font-bold text-emerald-800 dark:text-emerald-500 mb-2">
+                    {financialInsights.highestDebitMonth.month}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Highest expenses of ₹9048
+                    Highest expenses of ₹{parseFloat(financialInsights.highestDebitMonth.amount).toFixed(2)}
                   </p>
                 </div>
+
+                {/* Lowest Debit Month */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-sky-600 dark:text-sky-500 mb-3">Lowest Debit Month</h4>
-                  <div className="text-2xl font-bold text-sky-700 dark:text-sky-500 mb-2">{financialInsights.lowestIncomeMonth?.month ?? "N/A"}</div>
+                  <div className="text-2xl font-bold text-sky-700 dark:text-sky-500 mb-2">
+                    {financialInsights.lowestDebitMonth.month}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Lowest expenses of ₹{financialInsights.lowestIncomeMonth?.income ?? 0}
+                    Lowest expenses of ₹{parseFloat(financialInsights.lowestDebitMonth.amount).toFixed(2)}
                   </p>
                 </div>
+
+                {/* Avg Debit */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-red-600 mb-3">Avg. Debit</h4>
-                  <div className="text-2xl font-bold text-red-600 mb-2">₹5899</div>
+                  <div className="text-2xl font-bold text-red-600 mb-2">
+                    ₹{parseFloat(financialInsights.avgDebit.amount).toFixed(2)}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> debit transactions this month.
+                    Across <strong>{financialInsights.avgDebit.transactionCount}</strong> debit transactions this month.
                   </p>
                 </div>
+
+                {/* Highest Credit Month */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-purple-700 dark:text-purple-600 mb-3">Highest Credit Month</h4>
-                  <div className="text-2xl font-bold text-purple-800 dark:text-purple-600 mb-2">May</div>
+                  <div className="text-2xl font-bold text-purple-800 dark:text-purple-600 mb-2">
+                    {financialInsights.highestCreditMonth.month}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Highest credit of ₹9000
+                    Highest credit of ₹{parseFloat(financialInsights.highestCreditMonth.amount).toFixed(2)}
                   </p>
                 </div>
+
+                {/* Lowest Credit Month */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-orange-600 dark:text-orange-500 mb-3">Lowest Credit Month</h4>
-                  <div className="text-2xl font-bold text-orange-700 dark:text-orange-500 mb-2">February</div>
+                  <div className="text-2xl font-bold text-orange-700 dark:text-orange-500 mb-2">
+                    {financialInsights.lowestCreditMonth.month}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Lowest credit of ₹2000
+                    Lowest credit of ₹{parseFloat(financialInsights.lowestCreditMonth.amount).toFixed(2)}
                   </p>
                 </div>
+
+                {/* Avg Credit */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-red-500 mb-3">Avg. Credit </h4>
-                  <div className="text-2xl font-bold text-red-500 mb-2">₹5050</div>
+                  <h4 className="font-semibold text-red-500 mb-3">Avg. Credit</h4>
+                  <div className="text-2xl font-bold text-red-500 mb-2">
+                    ₹{parseFloat(financialInsights.avgCredit.amount).toFixed(2)}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Across <strong>{financialInsights.avgTransactionSize.transactionCount}</strong> credit transactions this month.
+                    Across <strong>{financialInsights.avgCredit.transactionCount}</strong> credit transactions this month.
                   </p>
                 </div>
+
+                {/* This Month’s Trend */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-lime-600 dark:text-lime-500 mb-3">This Month’s Trend</h4>
-                  <div className="text-2xl font-bold text-lime-700 dark:text-lime-500 mb-2">{financialInsights.thisMonthTrend.trend === "Downward" ? "📉 Downward" : "📈 Upward"}</div>
+                  <div className="text-2xl font-bold text-lime-700 dark:text-lime-500 mb-2">
+                    {financialInsights.thisMonthTrend.trend === "Downward" ? "📉 Downward" : "📈 Upward"}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Spending is <strong>{financialInsights.thisMonthTrend.percentageChange}% {financialInsights.thisMonthTrend.trend.toLowerCase()}</strong> than last month.
+                    Spending is <strong>{parseFloat(financialInsights.thisMonthTrend.percentageChange).toFixed(2)}% {financialInsights.thisMonthTrend.trend.toLowerCase()}</strong> than last month.
                   </p>
                 </div>
+
+                {/* Top Spending Category */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-orange-700 dark:text-orange-500 mb-3">Top Spending Category</h4>
-                  <div className="text-2xl font-bold text-orange-800 dark:text-orange-500 mb-2">{financialInsights.topSpendingCategory.category}</div>
+                  <div className="text-2xl font-bold text-orange-800 dark:text-orange-500 mb-2">
+                    {financialInsights.topSpendingCategory.category}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Accounts for <strong>{financialInsights.topSpendingCategory.percentage}%</strong> of your total expenses
+                    Accounts for <strong>{parseFloat(financialInsights.topSpendingCategory.percentage).toFixed(2)}%</strong> of your total expenses
                   </p>
                 </div>
+
+                {/* Income vs Expense */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-green-600 dark:text-green-400 mb-3">Income vs Expense</h4>
-                  <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">{financialInsights.incomeVsExpense.ratio}</div>
+                  <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">
+                    {financialInsights.incomeVsExpense.ratio}
+                  </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Credits is <strong>{financialInsights.incomeVsExpense.percentageHigher}% higher</strong> than total debits.
+                    Credits is <strong>{parseFloat(financialInsights.incomeVsExpense.percentageHigher).toFixed(2)}% higher</strong> than total debits.
                   </p>
                 </div>
               </div>
@@ -198,6 +233,7 @@ export default function DashboardContent() {
               <p className="text-gray-600 dark:text-gray-400">No financial insights available.</p>
             )}
           </CardContent>
+
         </Card>
       </div>
     </div>

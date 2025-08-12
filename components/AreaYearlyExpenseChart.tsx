@@ -121,6 +121,10 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
     legend: {
       data: ["Expenses", "Credits", "Net Balance"],
       textStyle: { color: isDarkMode ? "#e5e7eb" : "#374151" },
+      align: "right",
+      layout: "vertical",
+      margin: 0,
+      verticalAlign: "middle",
     },
     xAxis: [
       {
@@ -141,8 +145,8 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
       {
         type: "value",
         name: "Net Balance",
-        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151"  },
-         splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
+        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151" },
+        splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
       },
     ],
     series: [

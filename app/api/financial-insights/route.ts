@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
 
-// Hardcoded months array
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
 ];
 
 export async function GET(req: NextRequest) {
@@ -23,37 +12,25 @@ export async function GET(req: NextRequest) {
   const year = searchParams.get("year");
   const month = searchParams.get("month");
 
-  // Validate query parameters
   if (!groupId || !year || !month) {
-    return NextResponse.json(
-      { error: "Missing required query params: groupId, year, or month" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing query params" }, { status: 400 });
   }
-  if (isNaN(parseInt(year)) || isNaN(parseInt(month)) || parseInt(month) < 1 || parseInt(month) > 12) {
-    return NextResponse.json({ error: "Invalid year or month" }, { status: 400 });
-  }
-
-  // Normalize month
-  const normalizedMonth = parseInt(month).toString();
 
   try {
-    // Initialize the SQL connection
     const pool = await sql.connect(config);
+    const monthName = (m: number) => months[m - 1] || "Unknown";
 
-    // Helper to convert month number to name
-    const monthName = (monthNum: string) => months[parseInt(monthNum) - 1] || "Unknown";
-
-    // 1. Best Performing Month (Highest Savings Rate)
-    const yearlyData = await pool
-      .request()
+    // ---------- 1. Yearly Credit/Debit Summary ----------
+    const yearlyData = await pool.request()
       .input("groupId", groupId)
       .input("year", year)
       .query(`
         SELECT 
           MONTH(Date) AS month,
-          SUM(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalCredit,
-          SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalDebit
+          SUM(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalCredit,
+          SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalDebit
         FROM tbl_Expenses
         WHERE GroupId = @groupId
           AND YEAR(Date) = @year
@@ -61,192 +38,177 @@ export async function GET(req: NextRequest) {
         GROUP BY MONTH(Date)
       `);
 
-    console.log("Yearly Data:", JSON.stringify(yearlyData.recordset, null, 2));
+    // Filter out zero months for lowest-month calculation
+    const debitMonths = yearlyData.recordset.filter(m => m.totalDebit > 0);
+    const creditMonths = yearlyData.recordset.filter(m => m.totalCredit > 0);
 
-    const bestPerformingMonth = yearlyData.recordset.reduce(
-      (best: any, curr: any) => {
-        const savings = curr.totalCredit - curr.totalDebit;
-        const savingsRate = curr.totalCredit > 0 ? (savings / curr.totalCredit) * 100 : -Infinity;
-        return savingsRate > (best.savingsRate || -Infinity) && savings > 0
-          ? { month: monthName(curr.month.toString()), savingsRate, amountSaved: savings }
-          : best;
-      },
-      { month: "N/A", savingsRate: 0, amountSaved: 0 }
-    );
+    const highestDebitMonth = debitMonths.length
+      ? debitMonths.reduce((max, curr) =>
+          curr.totalDebit > max.amount
+            ? { month: monthName(curr.month), amount: curr.totalDebit }
+            : max,
+        { month: monthName(debitMonths[0].month), amount: debitMonths[0].totalDebit })
+      : { month: "N/A", amount: 0 };
 
-    // 2. Lowest Income Month
-    const lowestIncomeMonth = yearlyData.recordset.reduce(
-      (lowest: any, curr: any) =>
-        curr.totalDebit > 0 && curr.totalDebit < (lowest.debit || Infinity)
-          ? { month: monthName(curr.month.toString()), debit: curr.totalDebit }
-          : lowest,
-      { month: "N/A", debit: Infinity }
-    );
+    const lowestDebitMonth = debitMonths.length > 1
+      ? debitMonths.reduce((min, curr) =>
+          curr.totalDebit < min.amount
+            ? { month: monthName(curr.month), amount: curr.totalDebit }
+            : min,
+        { month: monthName(debitMonths[0].month), amount: debitMonths[0].totalDebit })
+      : { month: debitMonths.length ? monthName(debitMonths[0].month) : "N/A", amount: debitMonths.length ? debitMonths[0].totalDebit : 0 };
 
-    // 3. Top Spending Category
-    const expenseByCategory = await pool
-      .request()
+    const highestCreditMonth = creditMonths.length
+      ? creditMonths.reduce((max, curr) =>
+          curr.totalCredit > max.amount
+            ? { month: monthName(curr.month), amount: curr.totalCredit }
+            : max,
+        { month: monthName(creditMonths[0].month), amount: creditMonths[0].totalCredit })
+      : { month: "N/A", amount: 0 };
+
+    const lowestCreditMonth = creditMonths.length > 1
+      ? creditMonths.reduce((min, curr) =>
+          curr.totalCredit < min.amount
+            ? { month: monthName(curr.month), amount: curr.totalCredit }
+            : min,
+        { month: monthName(creditMonths[0].month), amount: creditMonths[0].totalCredit })
+      : { month: creditMonths.length ? monthName(creditMonths[0].month) : "N/A", amount: creditMonths.length ? creditMonths[0].totalCredit : 0 };
+
+    // ---------- 2. Average Debit ----------
+    const avgDebitData = await pool.request()
       .input("groupId", groupId)
       .input("year", year)
       .input("month", month)
       .query(`
         SELECT 
-          COALESCE(e.ExpenseDescType, 'Unknown') AS expenseDescType,
-          SUM(CASE WHEN ISNUMERIC(e.Expenses) = 1 THEN CAST(e.Expenses AS FLOAT) ELSE 0 END) AS totalExpenses
-        FROM tbl_Expenses e
-        WHERE e.GroupId = @groupId
-          AND YEAR(e.Date) = @year
-          AND MONTH(e.Date) = @month
-          AND e.ExpenseTypeId = 2
-          AND e.IsDeleted = 0
-        GROUP BY e.ExpenseDescType
+          AVG(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE NULL END) AS avg_amount,
+          COUNT(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                     THEN 1 ELSE NULL END) AS transaction_count
+        FROM tbl_Expenses
+        WHERE GroupId = @groupId
+          AND YEAR(Date) = @year
+          AND MONTH(Date) = @month
+          AND IsDeleted = 0
       `);
+    const avgDebit = avgDebitData.recordset[0] || { avg_amount: 0, transaction_count: 0 };
 
-    console.log("Expense by Category:", JSON.stringify(expenseByCategory.recordset, null, 2));
+    // ---------- 3. Average Credit ----------
+    const avgCreditData = await pool.request()
+      .input("groupId", groupId)
+      .input("year", year)
+      .input("month", month)
+      .query(`
+        SELECT 
+          AVG(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE NULL END) AS avg_amount,
+          COUNT(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 
+                     THEN 1 ELSE NULL END) AS transaction_count
+        FROM tbl_Expenses
+        WHERE GroupId = @groupId
+          AND YEAR(Date) = @year
+          AND MONTH(Date) = @month
+          AND IsDeleted = 0
+      `);
+    const avgCredit = avgCreditData.recordset[0] || { avg_amount: 0, transaction_count: 0 };
 
-    const totalExpenses = expenseByCategory.recordset.reduce(
-      (sum: number, curr: any) => sum + (curr.totalExpenses || 0),
-      0
-    );
-    const topSpendingCategory = expenseByCategory.recordset.reduce(
-      (top: any, curr: any) =>
-        curr.totalExpenses > (top.totalExpenses || 0)
-          ? {
-            category: curr.expenseDescType,
-            percentage: totalExpenses > 0 ? (curr.totalExpenses / totalExpenses) * 100 : 0,
-          }
-          : top,
-      { category: "N/A", percentage: 0, totalExpenses: 0 }
-    );
-
-    // 4. This Month’s Trend
+    // ---------- 4. This Month’s Trend ----------
     const prevMonth = parseInt(month) - 1;
     let prevMonthTotal = 0;
     if (prevMonth > 0) {
-      const prevMonthData = await pool
-        .request()
+      const prevData = await pool.request()
         .input("groupId", groupId)
         .input("year", year)
-        .input("prevMonth", prevMonth)
+        .input("month", prevMonth)
         .query(`
-          SELECT SUM(CASE WHEN ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalExpenses
+          SELECT SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                          THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS total
           FROM tbl_Expenses
           WHERE GroupId = @groupId
             AND YEAR(Date) = @year
-            AND MONTH(Date) = @prevMonth
-            AND ExpenseTypeId = 2
+            AND MONTH(Date) = @month
             AND IsDeleted = 0
         `);
-      prevMonthTotal = prevMonthData.recordset[0]?.totalExpenses || 0;
+      prevMonthTotal = prevData.recordset[0]?.total || 0;
     }
-    const currentMonthData = await pool
-      .request()
+    const currentData = await pool.request()
       .input("groupId", groupId)
       .input("year", year)
       .input("month", month)
       .query(`
-        SELECT SUM(CASE WHEN ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalExpenses
+        SELECT SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                        THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS total
         FROM tbl_Expenses
         WHERE GroupId = @groupId
           AND YEAR(Date) = @year
           AND MONTH(Date) = @month
-          AND ExpenseTypeId = 2
           AND IsDeleted = 0
       `);
-    const currentMonthTotal = currentMonthData.recordset[0]?.totalExpenses || 0;
-    const percentageChange =
-      prevMonthTotal > 0
-        ? ((currentMonthTotal - prevMonthTotal) / prevMonthTotal) * 100
-        : currentMonthTotal > 0
-          ? 100
-          : 0;
+    const currentTotal = currentData.recordset[0]?.total || 0;
+    const trendChange = prevMonthTotal > 0
+      ? ((currentTotal - prevMonthTotal) / prevMonthTotal) * 100
+      : (currentTotal > 0 ? 100 : 0);
 
-    // 5. Average Transaction Size
-    const avgTransaction = await pool
-      .request()
+    // ---------- 5. Top Spending Category ----------
+    const categoryData = await pool.request()
       .input("groupId", groupId)
       .input("year", year)
       .input("month", month)
       .query(`
         SELECT 
-          AVG(CASE WHEN ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE NULL END) AS avg_amount, 
-          COUNT(CASE WHEN ISNUMERIC(Expenses) = 1 THEN 1 ELSE NULL END) AS transaction_count
-        FROM tbl_Expenses
-        WHERE GroupId = @groupId
-          AND YEAR(Date) = @year
-          AND MONTH(Date) = @month
-          AND ExpenseTypeId = 2
-          AND IsDeleted = 0
-      `);
-    const transactionData = avgTransaction.recordset[0] || { avg_amount: 0, transaction_count: 0 };
-
-    // 6. Income vs Expense
-    const monthlySummary = await pool
-      .request()
-      .input("groupId", groupId)
-      .input("year", year)
-      .input("month", month)
-      .query(`
-        SELECT 
-          SUM(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalCredit,
-          SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS totalDebit
+          COALESCE(ExpenseDescType, 'Unknown') AS category,
+          SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS total
         FROM tbl_Expenses
         WHERE GroupId = @groupId
           AND YEAR(Date) = @year
           AND MONTH(Date) = @month
           AND IsDeleted = 0
+        GROUP BY ExpenseDescType
       `);
-    const { totalCredit = 0, totalDebit = 0 } = monthlySummary.recordset[0] || {};
-    const incomeVsExpense = {
-      ratio: totalDebit > 0 ? (totalCredit / totalDebit).toFixed(1) + " : 1" : "N/A",
-      percentageHigher: totalDebit > 0 ? ((totalCredit - totalDebit) / totalDebit) * 100 : 0,
-    };
-
-    // Construct the response
-    const insights = {
-      bestPerformingMonth: {
-        month: bestPerformingMonth.month,
-        savingsRate: parseFloat(bestPerformingMonth.savingsRate.toFixed(1)) || 0,
-        amountSaved: Math.round(bestPerformingMonth.amountSaved) || 0,
-      },
-      lowestIncomeMonth: {
-        month: lowestIncomeMonth.month === "N/A" && lowestIncomeMonth.debit === Infinity ? "N/A" : lowestIncomeMonth.month,
-        income: lowestIncomeMonth.debit === Infinity ? 0 : lowestIncomeMonth.debit,
-      },
-      topSpendingCategory: {
-        category: topSpendingCategory.category,
-        percentage: parseFloat(topSpendingCategory.percentage.toFixed(1)) || 0,
-      },
-      thisMonthTrend: {
-        trend: percentageChange < 0 ? "Downward" : "Upward",
-        percentageChange: Math.abs(parseFloat(percentageChange.toFixed(1))) || 0,
-      },
-      avgTransactionSize: {
-        amount: Math.round(transactionData.avg_amount || 0),
-        transactionCount: transactionData.transaction_count || 0,
-      },
-      incomeVsExpense: {
-        ratio: incomeVsExpense.ratio,
-        percentageHigher: parseFloat(incomeVsExpense.percentageHigher.toFixed(1)) || 0,
-      },
-    };
-
-    console.log("Financial Insights Response:", JSON.stringify(insights, null, 2));
-    return NextResponse.json(insights);
-  } catch (error) {
-    console.error("Error fetching financial insights:", {
-      message: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-      groupId,
-      year,
-      month,
-    });
-    return NextResponse.json(
-      {
-        error: "Failed to load financial insights",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
+    const totalMonthExpense = categoryData.recordset.reduce((sum, row) => sum + (row.total || 0), 0);
+    const topCategory = categoryData.recordset.reduce(
+      (max, row) => row.total > (max.total || 0)
+        ? { category: row.category, percentage: totalMonthExpense > 0 ? (row.total / totalMonthExpense) * 100 : 0 }
+        : max,
+      { category: "N/A", percentage: 0 }
     );
+
+    // ---------- 6. Income vs Expense ----------
+    const summaryData = await pool.request()
+      .input("groupId", groupId)
+      .input("year", year)
+      .input("month", month)
+      .query(`
+        SELECT 
+          SUM(CASE WHEN ExpenseTypeId = 1 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS credit,
+          SUM(CASE WHEN ExpenseTypeId = 2 AND ISNUMERIC(Expenses) = 1 
+                   THEN CAST(Expenses AS FLOAT) ELSE 0 END) AS debit
+        FROM tbl_Expenses
+        WHERE GroupId = @groupId
+          AND YEAR(Date) = @year
+          AND MONTH(Date) = @month
+          AND IsDeleted = 0
+      `);
+    const { credit = 0, debit = 0 } = summaryData.recordset[0] || {};
+    const ratio = debit > 0 ? `${(credit / debit).toFixed(1)} : 1` : "N/A";
+
+    // Final Response
+    return NextResponse.json({
+      highestDebitMonth,
+      lowestDebitMonth,
+      avgDebit: { amount: Math.round(avgDebit.avg_amount || 0), transactionCount: avgDebit.transaction_count || 0 },
+      highestCreditMonth,
+      lowestCreditMonth,
+      avgCredit: { amount: Math.round(avgCredit.avg_amount || 0), transactionCount: avgCredit.transaction_count || 0 },
+      thisMonthTrend: { trend: trendChange < 0 ? "Downward" : "Upward", percentageChange: Math.abs(trendChange.toFixed(1)) },
+      topSpendingCategory: { category: topCategory.category, percentage: parseFloat(topCategory.percentage.toFixed(1)) },
+      incomeVsExpense: { ratio, percentageHigher: debit > 0 ? ((credit - debit) / debit) * 100 : 0 }
+    });
+
+  } catch (err) {
+    console.error("Error in financial insights:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
