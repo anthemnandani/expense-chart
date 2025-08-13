@@ -107,8 +107,20 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
               },
             },
             tooltip: {
-              pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>${currency}{point.y}</b> ({point.percentage:.0f}%)<br/>',
               shared: true,
+              formatter: function () {
+                let tooltipHtml = `<b>${this.x}</b><br/>`; // x-axis label (month/year etc.)
+
+                this.points?.forEach(point => {
+                  const formattedValue = Number(point.y).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  });
+                  tooltipHtml += `<span style="color:${point.color}">●</span> ${point.series.name}: <b>${currency}${formattedValue}</b> (${point.percentage?.toFixed(0) || 0}%)<br/>`;
+                });
+
+                return tooltipHtml;
+              },
               backgroundColor: isDarkMode ? "#111827" : "#ffffff",
               style: {
                 color: isDarkMode ? "#f3f4f6" : "#111827",
@@ -116,6 +128,7 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
                 fontSize: "13px",
               },
             },
+
             legend: {
               itemStyle: {
                 color: isDarkMode ? "#f3f4f6" : "#111827", // Legend text color
