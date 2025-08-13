@@ -7,6 +7,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const groupId = searchParams.get("groupId");
     const yearsParam = searchParams.get("years");
+    const currencyParam = searchParams.get("currency");
     const availableYears = yearsParam ? yearsParam.split(",").map(Number) : [];
 
     if (!groupId || availableYears.length === 0) {
@@ -35,7 +36,7 @@ export async function GET(req: Request) {
       nodes.push({
         id: `${year}`,
         parent: "root",
-        name: `${year} (Cr ₹${totalCredit}, Dr ₹${totalDebit})`,
+        name: `${year} (Cr ${currencyParam}${totalCredit}, Dr ${currencyParam}${totalDebit})`,
         color: "#3b82f6"
       });
 
@@ -59,7 +60,7 @@ export async function GET(req: Request) {
         nodes.push({
           id: `${year}-${m}`,
           parent: `${year}`,
-          name: `${monthName} (₹${monthTotalExpense})`,
+          name: `${monthName} (${currencyParam}${monthTotalExpense})`,
           color: "#22c55e"
         });
 
@@ -69,7 +70,7 @@ export async function GET(req: Request) {
             nodes.push({
               id: `${year}-${m}-${idx}`,
               parent: `${year}-${m}`,
-              name: `${c.expenseDescType}: ₹${c.totalExpenses}`,
+              name: `${c.expenseDescType}: ${currencyParam}${c.totalExpenses}`,
               color: "#f59e0b"
             });
           });

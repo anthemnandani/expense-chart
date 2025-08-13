@@ -9,9 +9,10 @@ import { TreeNode } from "@/lib/types"
 
 interface ExpenseTreeChart {
     years: number[];
+    currency: string;
 }
 
-export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years}) => {
+export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years, currency}) => {
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const chartRef = useRef<any>(null)
@@ -37,7 +38,7 @@ export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years}) => {
         async function fetchData() {
              if (!groupId || years.length === 0) return;
             try {
-                 const data = await apiService.getTreeGraphData(groupId, years)
+                 const data = await apiService.getTreeGraphData(groupId, years, currency)
                 const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {

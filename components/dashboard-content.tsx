@@ -29,6 +29,7 @@ export default function DashboardContent() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
+  const [currency, setCurrency] = useState<string>("");
 
   useEffect(() => {
     if (!groupId) {
@@ -59,9 +60,20 @@ export default function DashboardContent() {
       const fetchedYears = await apiService.getAvailableYears(groupId);
       setYears(fetchedYears);
       console.log("years: ", years);
-      if (fetchedYears.length > 0) setSelectedYear(fetchedYears[fetchedYears.length - 1]); // default to latest year
+      if (fetchedYears.length > 0) setSelectedYear(fetchedYears[fetchedYears.length - 1]);
+    };
+    const fetchCurrency = async () => {
+      if (!groupId) return;
+      const fetchedCurrency = await apiService.getCurrency(groupId);
+      if (fetchedCurrency.currency == "INR") {
+        setCurrency("₹");
+      }
+      else if (fetchedCurrency.currency == "USD") {
+        setCurrency("$");
+      }
     };
     fetchYears();
+    fetchCurrency();
   }, [groupId]);
 
   return (
@@ -92,31 +104,30 @@ export default function DashboardContent() {
 
       {/* Comprehensive Dashboard */}
       <div className="space-y-6">
-        <UniqueStatCards selectedYear={selectedYear} />
-        {/* Financial Overview and Expense Distribution */}
+        <UniqueStatCards selectedYear={selectedYear} currency={currency} />
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <AreaYearlyExpenseChart years={years} />
-          <HighLevelPieChart years={years} />
+          <AreaYearlyExpenseChart years={years} currency={currency} />
+          <HighLevelPieChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <NetBalanceChart years={years} />
+          <NetBalanceChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <TreeGraphChart years={years} />
+          <TreeGraphChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <MonthlyRadarChart years={years} />
-          <CategoryWiseExpenseChart years={years} />
+          <MonthlyRadarChart years={years} currency={currency} />
+          <CategoryWiseExpenseChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <DailyExpenseChart years={years} />
+          <DailyExpenseChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <StackedBarCategoryChart years={years} />
-          <AdvancedPolarChart years={years} />
+          <StackedBarCategoryChart years={years} currency={currency} />
+          <AdvancedPolarChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <AnnualCategoryTrendsChart years={years} />
+          <AnnualCategoryTrendsChart years={years} currency={currency} />
         </div>
 
         {/* Financial Insights */}
@@ -137,7 +148,7 @@ export default function DashboardContent() {
                     {financialInsights.highestDebitMonth.month}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Highest expenses of ₹{parseFloat(financialInsights.highestDebitMonth.amount).toFixed(2)}
+                    Highest expenses of {currency}{parseFloat(financialInsights.highestDebitMonth.amount).toFixed(2)}
                   </p>
                 </div>
 
@@ -148,7 +159,7 @@ export default function DashboardContent() {
                     {financialInsights.lowestDebitMonth.month}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Lowest expenses of ₹{parseFloat(financialInsights.lowestDebitMonth.amount).toFixed(2)}
+                    Lowest expenses of {currency}{parseFloat(financialInsights.lowestDebitMonth.amount).toFixed(2)}
                   </p>
                 </div>
 
@@ -156,7 +167,7 @@ export default function DashboardContent() {
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-red-600 mb-3">Avg. Debit</h4>
                   <div className="text-2xl font-bold text-red-600 mb-2">
-                    ₹{parseFloat(financialInsights.avgDebit.amount).toFixed(2)}
+                    {currency}{parseFloat(financialInsights.avgDebit.amount).toFixed(2)}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
                     Across <strong>{financialInsights.avgDebit.transactionCount}</strong> debit transactions this month.
@@ -170,7 +181,7 @@ export default function DashboardContent() {
                     {financialInsights.highestCreditMonth.month}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Highest credit of ₹{parseFloat(financialInsights.highestCreditMonth.amount).toFixed(2)}
+                    Highest credit of {currency}{parseFloat(financialInsights.highestCreditMonth.amount).toFixed(2)}
                   </p>
                 </div>
 
@@ -181,7 +192,7 @@ export default function DashboardContent() {
                     {financialInsights.lowestCreditMonth.month}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Lowest credit of ₹{parseFloat(financialInsights.lowestCreditMonth.amount).toFixed(2)}
+                    Lowest credit of {currency}{parseFloat(financialInsights.lowestCreditMonth.amount).toFixed(2)}
                   </p>
                 </div>
 
@@ -189,7 +200,7 @@ export default function DashboardContent() {
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-red-500 mb-3">Avg. Credit</h4>
                   <div className="text-2xl font-bold text-red-500 mb-2">
-                    ₹{parseFloat(financialInsights.avgCredit.amount).toFixed(2)}
+                    {currency}{parseFloat(financialInsights.avgCredit.amount).toFixed(2)}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
                     Across <strong>{financialInsights.avgCredit.transactionCount}</strong> credit transactions this month.
@@ -233,7 +244,6 @@ export default function DashboardContent() {
               <p className="text-gray-600 dark:text-gray-400">No financial insights available.</p>
             )}
           </CardContent>
-
         </Card>
       </div>
     </div>

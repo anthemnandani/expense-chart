@@ -14,10 +14,12 @@ const months = [
 ];
 interface AnnualCategoryTrendsChart {
   years: number[];
+  currency: string;
 }
 
 export const AnnualCategoryTrendsChart: React.FC<AnnualCategoryTrendsChart> = ({
-  years
+  years,
+  currency
 }) =>  {
   const [Highcharts, setHighcharts] = useState<any>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -105,7 +107,7 @@ export const AnnualCategoryTrendsChart: React.FC<AnnualCategoryTrendsChart> = ({
     tooltip: {
       formatter: function () {
         const point = this.point as any;
-        return `<b>${categories[point.y]}</b><br>${months[point.x]}: ₹${point.value}`;
+        return `<b>${categories[point.y]}</b><br>${months[point.x]}: ${currency} ${point.value}`;
       },
     },
     series: [

@@ -33,7 +33,7 @@ export const apiService = {
     }
   },
 
-  // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
+    // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
   async getExpenseByMonth(
     groupId: string,
     year: number,
@@ -49,6 +49,19 @@ export const apiService = {
     } catch (error) {
       console.error("Error fetching expense by month:", error);
       return [];
+    }
+  },
+
+
+  // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
+  async getCurrency(groupId: string): Promise<{ currency: string }> {
+    try {
+      const res = await fetch(`/api/currency?groupId=${groupId}`);
+      if (!res.ok) throw new Error("Failed to fetch currency");
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching currency:", error);
+      return { currency: "" };
     }
   },
 
@@ -104,10 +117,10 @@ export const apiService = {
   },
 
   // Fetch tree graph data for ExpenseTreeChart
-  async getTreeGraphData(groupId: string, years: number[]): Promise<TreeNode[]> {
+  async getTreeGraphData(groupId: string, years: number[], currency: string): Promise<TreeNode[]> {
     try {
-      const yearParams = years.join(","); 
-      const res = await fetch(`/api/treegraph?groupId=${groupId}&years=${yearParams}`, {
+      const yearParams = years.join(",");
+      const res = await fetch(`/api/treegraph?groupId=${groupId}&years=${yearParams}&currency=${currency}`, {
         cache: "no-store",
       });
       if (!res.ok) throw new Error("Failed to fetch tree graph data");
@@ -149,33 +162,33 @@ export const apiService = {
   },
 
   // Fetch financial insights data
- async getFinancialInsights(
-  groupId: string,
-  year: number,
-  month: number
-): Promise<FinancialInsight> {
-  try {
-    const res = await fetch(
-      `/api/financial-insights?groupId=${groupId}&year=${year}&month=${month}`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) throw new Error("Failed to fetch financial insights");
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching financial insights:", error);
-    return {
-      highestDebitMonth: { month: "N/A", amount: 0 },
-      lowestDebitMonth: { month: "N/A", amount: 0 },
-      highestCreditMonth: { month: "N/A", amount: 0 },
-      lowestCreditMonth: { month: "N/A", amount: 0 },
-      avgDebit: { amount: 0, transactionCount: 0 },
-      avgCredit: { amount: 0, transactionCount: 0 },
-      thisMonthTrend: { trend: "N/A", percentageChange: 0 },
-      topSpendingCategory: { category: "N/A", percentage: 0 },
-      incomeVsExpense: { ratio: "N/A", percentageHigher: 0 },
-    };
-  }
-},
+  async getFinancialInsights(
+    groupId: string,
+    year: number,
+    month: number
+  ): Promise<FinancialInsight> {
+    try {
+      const res = await fetch(
+        `/api/financial-insights?groupId=${groupId}&year=${year}&month=${month}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error("Failed to fetch financial insights");
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching financial insights:", error);
+      return {
+        highestDebitMonth: { month: "N/A", amount: 0 },
+        lowestDebitMonth: { month: "N/A", amount: 0 },
+        highestCreditMonth: { month: "N/A", amount: 0 },
+        lowestCreditMonth: { month: "N/A", amount: 0 },
+        avgDebit: { amount: 0, transactionCount: 0 },
+        avgCredit: { amount: 0, transactionCount: 0 },
+        thisMonthTrend: { trend: "N/A", percentageChange: 0 },
+        topSpendingCategory: { category: "N/A", percentage: 0 },
+        incomeVsExpense: { ratio: "N/A", percentageHigher: 0 },
+      };
+    }
+  },
 
   async getYearlyCategoryExpenses(
     groupId: string,
@@ -198,7 +211,7 @@ export const apiService = {
     }
   },
 
-    // Fetch available years dynamically from backend
+  // Fetch available years dynamically from backend
   async getAvailableYears(groupId: string): Promise<number[]> {
     try {
       const res = await fetch(`/api/available-years?groupId=${groupId}`, { cache: "no-store" });

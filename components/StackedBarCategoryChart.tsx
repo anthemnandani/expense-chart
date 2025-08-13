@@ -9,11 +9,13 @@ import { useAuth } from '@/context/auth-context';
 interface StackedBarCategoryChartProps {
   years: number[];
   height?: number;
+  currency: string;
 }
 
 export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = ({
   years,
   height = 600,
+  currency
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -105,7 +107,7 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
               },
             },
             tooltip: {
-              pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+              pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>${currency}{point.y}</b> ({point.percentage:.0f}%)<br/>',
               shared: true,
               backgroundColor: isDarkMode ? "#111827" : "#ffffff",
               style: {
@@ -166,17 +168,6 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
 
 
     fetchDataAndRenderChart();
-
-    // // Cleanup on unmount
-    // return () => {
-    //   if (chartRef.current && typeof chartRef.current.destroy === 'function') {
-    //     try {
-    //       chartRef.current.destroy();
-    //     } catch (e) {
-    //       console.warn('Chart already destroyed:', e);
-    //     }
-    //   }
-    // };
 
   }, [groupId, years, height]);
 

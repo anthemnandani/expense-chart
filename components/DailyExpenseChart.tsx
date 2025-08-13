@@ -10,9 +10,10 @@ import { apiService } from "@/lib/apiService"
 
 interface DailyExpenseChart {
     years: number[];
+    currency: string;
 }
 
-export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years}) => {
+export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years, currency}) => {
     const [data, setData] = useState<ExpenseRecord[]>([])
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1) // current month
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
@@ -94,8 +95,8 @@ export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years}) => {
                                         return (
                                             <div className="bg-white p-2 border shadow rounded text-sm">
                                                 <p><strong>{d.date}</strong></p>
-                                                <p>Credit: ₹{d.credit}</p>
-                                                <p>Debit: ₹{d.debit}</p>
+                                                <p>Credit: {currency}{d.credit}</p>
+                                                <p>Debit: {currency}{d.debit}</p>
                                             </div>
                                         )
                                     }

@@ -10,13 +10,14 @@ import { apiService } from "@/lib/apiService"
 
 interface HighLevelPieChart {
     years: number[];
+    currency: string;
 }
 
 const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
 ]
 
-export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years}) => {
+export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency}) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [selectedYear, setSelectedYear] = useState(2025)
     const [selectedMonth, setSelectedMonth] = useState(8)
@@ -85,7 +86,7 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years}) => {
             },
         },
         tooltip: {
-            pointFormat: "<b>₹{point.y:,.0f}</b> ({point.percentage:.1f}%)",
+            pointFormat: `<b>${currency}{point.y:,.0f}</b> ({point.percentage:.1f}%)`,
             style: { fontSize: "13px", color: isDarkMode ? "#f3f4f6" : "#111827" },
             backgroundColor: isDarkMode ? "#374151" : "#ffffff",
         },

@@ -9,6 +9,7 @@ import { apiService } from "@/lib/apiService";
 
 interface CategoryWiseExpenseChart {
   years: number[];
+  currency: string;
 }
 
 const dashStyles = [
@@ -20,7 +21,7 @@ const monthLabels = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({years}) => {
+export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({years, currency}) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedYear, setSelectedYear] = useState(2025);
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
@@ -87,7 +88,7 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
             gridLineColor: isDarkMode ? "#374151" : "#e5e7eb",
         },
         yAxis: {
-            title: { text: "Total Expenses (₹)", style: { color: isDarkMode ? "#d1d5db" : "#4b5563" } },
+            title: { text: `Total Expenses (${currency})`, style: { color: isDarkMode ? "#d1d5db" : "#4b5563" } },
             labels: { style: { color: isDarkMode ? "#d1d5db" : "#4b5563" } },
             gridLineColor: isDarkMode ? "#374151" : "#e5e7eb",
         },
@@ -107,7 +108,7 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
         },
         tooltip: {
             shared: true,
-            valuePrefix: "₹",
+            valuePrefix: `${currency}`,
             stickOnContact: true,
             backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
             style: { color: isDarkMode ? "#f9fafb" : "#1f2937" },

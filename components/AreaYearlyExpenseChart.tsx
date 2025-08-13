@@ -9,10 +9,12 @@ import { ExpenseData } from "@/lib/types";
 
 interface AreaYearlyExpenseChart {
   years: number[];
+  currency: string;
 }
 
 export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
-  years
+  years,
+  currency
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedYear, setSelectedYear] = useState(2025);
@@ -104,14 +106,14 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
         const catInfo = categoryData[monthIndex]
           ? Object.entries(categoryData[monthIndex])
             .filter(([key]) => key !== "month")
-            .map(([cat, val]) => `<div style=color:${isDarkMode ? "#d1d5db" : "#666"};>${cat}: ₹${val}</div>`)
+            .map(([cat, val]) => `<div style=color:${isDarkMode ? "#d1d5db" : "#666"};>${cat}: ${currency}${val}</div>`)
             .join("")
           : "";
 
         const seriesInfo = params
           .map(
             (p: any) =>
-              `<div><span style="color:${p.color};font-weight:600;">●</span> ${p.seriesName}: ₹${p.value}</div>`
+              `<div><span style="color:${p.color};font-weight:600;">●</span> ${p.seriesName}: ${currency}${p.value}</div>`
           )
           .join("");
 
@@ -138,14 +140,14 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
     yAxis: [
       {
         type: "value",
-        name: "Amount (₹)",
-        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151" },
+        name: `Amount (${currency})`,
+        axisLabel: { formatter: `${currency}{value}`, color: isDarkMode ? "#d1d5db" : "#374151" },
         splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
       },
       {
         type: "value",
         name: "Net Balance",
-        axisLabel: { formatter: "₹{value}", color: isDarkMode ? "#d1d5db" : "#374151" },
+        axisLabel: { formatter: `${currency}{value}`, color: isDarkMode ? "#d1d5db" : "#374151" },
         splitLine: { lineStyle: { color: isDarkMode ? "#4b5563" : "#e5e7eb" } },
       },
     ],
@@ -153,14 +155,14 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
       {
         name: "Expenses",
         type: "bar",
-        tooltip: { valueFormatter: (v: any) => `₹${v}` },
+        tooltip: { valueFormatter: (v: any) => `${currency}${v}` },
         data: monthlyExpenseData.map((d) => d.totalDebit),
         itemStyle: { color: "#2563eb" },
       },
       {
         name: "Credits",
         type: "bar",
-        tooltip: { valueFormatter: (v: any) => `₹${v}` },
+        tooltip: { valueFormatter: (v: any) => `${currency}${v}` },
         data: monthlyExpenseData.map((d) => d.totalCredit),
         itemStyle: { color: "#22c55e" },
       },
@@ -168,7 +170,7 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
         name: "Net Balance",
         type: "line",
         yAxisIndex: 1,
-        tooltip: { valueFormatter: (v: any) => `₹${v}` },
+        tooltip: { valueFormatter: (v: any) => `${currency}${v}` },
         data: monthlyExpenseData.map((d) => d.netBalance),
         itemStyle: { color: "#f59e0b" },
         smooth: true,

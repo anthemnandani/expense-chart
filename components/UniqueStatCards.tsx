@@ -25,7 +25,7 @@ function animateValue(start: number, end: number, duration: number, onUpdate: (v
   requestAnimationFrame(step)
 }
 
-export default function UniqueStatCards({ selectedYear }: { selectedYear: number }) {
+export default function UniqueStatCards({ selectedYear, currency }: { selectedYear: number, currency: string }) {
   const { user } = useAuth()
   const groupId = user?.groupId
 
@@ -89,7 +89,7 @@ export default function UniqueStatCards({ selectedYear }: { selectedYear: number
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {metrics.map(({ key, title, value, change, color }) => {
         const Icon = iconMap[key as keyof typeof iconMap]
-        const displayVal = key === "months" ? `${value} / 12` : `₹${value.toLocaleString()}`
+        const displayVal = key === "months" ? `${value} / 12` : `${currency}${value.toLocaleString()}`
         return (
           <div
             key={key}

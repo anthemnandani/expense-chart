@@ -12,7 +12,13 @@ type TreeNode = {
     color?: string
 }
 
-export default function ExpenseTreeChartDetailed() {
+interface ExpenseTreeChartDetailed {
+  currency: string;
+}
+
+export const ExpenseTreeChartDetailed: React.FC<ExpenseTreeChartDetailed> = ({
+  currency
+}) => {
     const [isDark, setIsDark] = useState(false)
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
@@ -48,7 +54,7 @@ export default function ExpenseTreeChartDetailed() {
         async function fetchData() {
             if (!groupId || years.length === 0) return
             try {
-                const data = await apiService.getTreeGraphData(groupId, years)
+                const data = await apiService.getTreeGraphData(groupId, years, currency)
                 const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {
@@ -178,3 +184,5 @@ export default function ExpenseTreeChartDetailed() {
         </div>
     )
 }
+
+export default ExpenseTreeChartDetailed;

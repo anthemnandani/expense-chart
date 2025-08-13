@@ -9,9 +9,10 @@ import { apiService } from '@/lib/apiService'
 
 interface NetBalanceChart {
     years: number[];
+    currency: string;
 }
 
-export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
+export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
   const [selectedYear, setSelectedYear] = useState(2025)
   const { user } = useAuth()
@@ -88,7 +89,7 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
     yAxis: {
       opposite: false,
       title: {
-        text: '₹ (Balance)',
+        text: `${currency} (Balance)`,
         style: {
           color: textColor,
         }
@@ -96,9 +97,9 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
       labels: {
         formatter: function () {
           const value = this.value as number
-          if (Math.abs(value) >= 100000) return '₹' + (value / 100000).toFixed(1) + 'L'
-          if (Math.abs(value) >= 1000) return '₹' + (value / 1000).toFixed(1) + 'K'
-          return '₹' + value
+          if (Math.abs(value) >= 100000) return `${currency}` + (value / 100000).toFixed(1) + 'L'
+          if (Math.abs(value) >= 1000) return `${currency}` + (value / 1000).toFixed(1) + 'K'
+          return currency + value
         },
         style: {
           color: textColor,
@@ -112,7 +113,7 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
     tooltip: {
       shared: true,
       xDateFormat: '%A, %b %e, %Y',
-      valuePrefix: '₹',
+      valuePrefix: `${currency}`,
       valueDecimals: 0,
       backgroundColor: isDarkMode ? '#111827' : '#ffffff',
       style: {
@@ -203,7 +204,7 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years}) => {
     <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between flex-col lg:flex-row'>
         <CardTitle className="text-lg text-gray-800 dark:text-white">
-          Net Balance (₹) - Week-wise ({selectedYear})
+          Net Balance ({currency}) - Week-wise ({selectedYear})
         </CardTitle>
         <div className="flex gap-2 items-center">
           <select
