@@ -12,17 +12,12 @@ type TreeNode = {
     color?: string
 }
 
-interface ExpenseTreeChartDetailed {
-  currency: string;
-}
-
-export const ExpenseTreeChartDetailed: React.FC<ExpenseTreeChartDetailed> = ({
-  currency
-}) => {
+export default function ExpenseTreeChartDetailed() {
     const [isDark, setIsDark] = useState(false)
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [years, setYears] = useState<number[]>([]);
+    const [currency, setCurrency] = useState<string>("");
     const chartRef = useRef<any>(null)
     const { user } = useAuth()
     const groupId = user?.groupId
@@ -40,6 +35,7 @@ export const ExpenseTreeChartDetailed: React.FC<ExpenseTreeChartDetailed> = ({
         return () => observer.disconnect()
     }, [])
 
+
     useEffect(() => {
         const fetchYears = async () => {
             if (!groupId) return;
@@ -47,12 +43,23 @@ export const ExpenseTreeChartDetailed: React.FC<ExpenseTreeChartDetailed> = ({
             setYears(fetchedYears);
             console.log("years: ", years);
         };
+        const fetchCurrency = async () => {
+            if (!groupId) return;
+            const fetchedCurrency = await apiService.getCurrency(groupId);
+            if (fetchedCurrency.currency == "INR") {
+                setCurrency("₹");
+            }
+            else if (fetchedCurrency.currency == "USD") {
+                setCurrency("$");
+            }
+        };
         fetchYears();
+        fetchCurrency();
     }, [groupId]);
 
     useEffect(() => {
         async function fetchData() {
-            if (!groupId || years.length === 0) return
+            if (!groupId || !currency || years.length === 0) return
             try {
                 const data = await apiService.getTreeGraphData(groupId, years, currency)
                 const nested = buildTree(data)
@@ -184,5 +191,3 @@ export const ExpenseTreeChartDetailed: React.FC<ExpenseTreeChartDetailed> = ({
         </div>
     )
 }
-
-export default ExpenseTreeChartDetailed;
