@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -128,14 +127,14 @@ export default function ExpensesPage() {
       body: tableRows,
       startY: 30,
       styles: {
-        fontSize: 9, // Global font size for the table
+        fontSize: 9, 
       },
       columnStyles: {
-        0: { cellWidth: 28 }, // Date
-        1: { cellWidth: 88 }, // Description (wider)
-        2: { cellWidth: 28 }, // Category
-        3: { cellWidth: 25 }, // Type
-        4: { cellWidth: 35 }, // Amount
+        0: { cellWidth: 28 },
+        1: { cellWidth: 88 },
+        2: { cellWidth: 28 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 35 },
       },
     })
 
@@ -166,13 +165,6 @@ export default function ExpensesPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* <div>
-                <Label htmlFor="search">Search</Label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input id="search" placeholder="Search expenses..." className="pl-10" />
-                </div>
-              </div> */}
               <div>
                 <Label htmlFor="category">Category</Label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -272,7 +264,7 @@ export default function ExpensesPage() {
                         </td>
 
                         <td
-                          className={`py-3 px-4 text-right text-sm ${expense.Type === "Cr." ? "text-green-600" : "text-red-600"
+                          className={`py-3 px-4 text-right text-sm ${expense.Type === "Cr." ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"
                             }`}
                         >
                           {expense.Type === "Cr." ? "+" : "-"}₹

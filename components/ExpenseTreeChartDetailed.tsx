@@ -57,6 +57,8 @@ export default function ExpenseTreeChartDetailed() {
         fetchCurrency();
     }, [groupId]);
 
+    
+
     useEffect(() => {
         async function fetchData() {
             if (!groupId || !currency || years.length === 0) return

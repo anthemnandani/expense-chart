@@ -57,7 +57,7 @@ export default function ExpenseTypesPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expense Types</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your expense categories</p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">
+          <Button className="bg-blue-600 hover:bg-blue-700 dark:text-white">
             <Plus className="h-4 w-4 mr-2" />
             Add Type
           </Button>
@@ -152,7 +152,7 @@ export default function ExpenseTypesPage() {
                             style={{ width: `${(fakeCount / 45) * 100}%` }}
                           />
                         </div>
-                        <span className="text-sm text-gray-500 w-16 text-right">{fakeCount} uses</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-300 w-16 text-right">{fakeCount} uses</span>
                       </div>
                     </div>
                   )
