@@ -1,4 +1,4 @@
-// /api/auth/signin/route.ts
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
 import jwt from "jsonwebtoken";

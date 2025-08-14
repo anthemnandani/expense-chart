@@ -1,4 +1,4 @@
-// app/api/net-balance-daywise/route.ts
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;

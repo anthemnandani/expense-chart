@@ -1,4 +1,5 @@
 // /api/auth/google/route.ts
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 
 const GOOGLE_REDIRECT_URL = "https://accounts.google.com/o/oauth2/v2/auth";
