@@ -49,6 +49,7 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
 
         // Calculate total expense per category across all years
         const categoryTotals: { [key: string]: number } = {};
+        console.log("data: ", data);
         categories.forEach(category => {
           categoryTotals[category] = 0;
           data.forEach(yearData => {
@@ -100,25 +101,25 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             yAxis: {
               min: 0,
               title: {
-                text: 'Percentage',
+                text: `Amount (${currency})`,
               },
               labels: {
-                format: '{value}%',
-              },
+                formatter: function () {
+                  return currency + Highcharts.numberFormat(this.value, 0, '.', ',');
+                }
+              }
             },
             tooltip: {
               shared: true,
               formatter: function () {
-                let tooltipHtml = `<b>${this.x}</b><br/>`; // x-axis label (month/year etc.)
-
+                let tooltipHtml = `<b>${this.x}</b><br/>`;
                 this.points?.forEach(point => {
                   const formattedValue = Number(point.y).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   });
-                  tooltipHtml += `<span style="color:${point.color}">●</span> ${point.series.name}: <b>${currency}${formattedValue}</b> (${point.percentage?.toFixed(0) || 0}%)<br/>`;
+                  tooltipHtml += `<span style="color:${point.color}">●</span> ${point.series.name}: <b>${currency}${formattedValue}</b><br/>`;
                 });
-
                 return tooltipHtml;
               },
               backgroundColor: isDarkMode ? "#111827" : "#ffffff",
@@ -128,23 +129,24 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
                 fontSize: "13px",
               },
             },
-
             legend: {
               itemStyle: {
-                color: isDarkMode ? "#f3f4f6" : "#111827", // Legend text color
+                color: isDarkMode ? "#f3f4f6" : "#111827", 
                 fontSize: '12px',
               },
               itemHoverStyle: {
-                color: isDarkMode ? "#e5e7eb" : "#000000", // Hover color
+                color: isDarkMode ? "#e5e7eb" : "#000000", 
               },
             },
             plotOptions: {
               column: {
-                stacking: 'percent',
+                stacking: 'normal',
                 dataLabels: {
                   enabled: true,
-                  format: '{point.percentage:.0f}%',
-                  color: '#ffffff',
+                  formatter: function () {
+                    return currency + Number(this.y).toLocaleString();
+                  },
+                  color: isDarkMode ? '#f3f4f6' : '#111827',
                   style: {
                     textOutline: 'none',
                   },
@@ -185,7 +187,7 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
   }, [groupId, years, height]);
 
   return (
-    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-6 col-span-full">
+    <Card className="shadow-lg border-0 bg-white col-span-6 dark:bg-gray-800 lg:col-span-6">
       <CardHeader className="pb-2 flex justify-between flex-col lg:flex-row">
         <div>
           <CardTitle className="text-gray-800 dark:text-white">Yearly Expenses by Category</CardTitle>
