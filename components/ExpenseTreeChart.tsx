@@ -215,7 +215,7 @@ export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years, currency})
 
                     {/* View Detailed Map button */}
                     <button
-                        onClick={() => window.open("/detailed-map", "")}
+                        onClick={() => window.open("/expenses/detailed-map", "")}
                         className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                     >
                         View Detailed Map

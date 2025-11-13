@@ -14,7 +14,7 @@ interface NetBalanceChart {
 
 export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
-  const [selectedYear, setSelectedYear] = useState(2025)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const { user } = useAuth()
   const groupId = user?.groupId
   const [isDarkMode, setIsDarkMode] = useState(false)

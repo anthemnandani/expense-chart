@@ -26,7 +26,7 @@ interface MonthlyRadarChart {
 
 export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [chartData, setChartData] = useState<any[]>([]);
   const { user } = useAuth()
   const groupId = user?.groupId

@@ -111,15 +111,15 @@ export default function SignInPage() {
             <div className="w-10 h-10 rounded-full flex items-center justify-center">
                 <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
               </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">Expense Tracker</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">Dashboards</h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-300">Track your expenses with ease</p>
+          <p className="text-gray-600 dark:text-gray-300">Stay organized and manage your operations seamlessly</p>
         </div>
         <Card className="shadow-xl bg-gray-50 dark:bg-gray-800">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Sign in to your account</CardTitle>
+            <CardTitle className="text-2xl text-center">Sign in to Continue</CardTitle>
             <CardDescription className="text-center">
-              Enter your credentials to access your expense tracker
+              Sign in to access your personalized dashboards
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

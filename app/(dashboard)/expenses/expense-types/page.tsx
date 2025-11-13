@@ -1,6 +1,5 @@
 "use client"
 
-import DashboardLayout from "@/components/dashboard-layout"
 import {
   Card,
   CardContent,
@@ -50,7 +49,7 @@ export default function ExpenseTypesPage() {
   ]
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -162,6 +161,6 @@ export default function ExpenseTypesPage() {
           </Card>
         )}
       </div>
-    </DashboardLayout>
+    </>
   )
 }

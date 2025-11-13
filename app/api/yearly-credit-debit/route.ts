@@ -15,34 +15,34 @@ export async function GET(req: Request) {
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-     const responses = await Promise.all(
+  const responses = await Promise.all(
       months.map((m) =>
         fetch(
           `${BASE_URL}/api/Analytics/GetMonthlyExpenseDrandCr?groupId=${groupId}&year=${year}&months=${m}`,
-          { cache: "no-store" } // ✅ FORCE FRESH DATA (Fix Oct-Nov Missing)
+          { cache: "no-store" } // <== Force fresh data (fix Oct/Nov issue)
         )
           .then((res) => res.json())
           .catch(() => [])
       )
     );
 
-    // Flatten & transform to [timestamp, netBalance]
-    const daywiseData: [number, number][] = responses
-      .flat()
-      .map((item: any) => {
-        const dateParts = item.date.split("/"); // dd/mm/yyyy
-        const day = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]) - 1;
-        const yr = parseInt(dateParts[2]);
-        const timestamp = new Date(yr, month, day).getTime();
-        const balance = (item.credit || 0) - (item.debit || 0);
-        return [timestamp, balance] as [number, number];
-      })
-      .sort((a, b) => a[0] - b[0]); // sort by date
+    const creditData: [number, number][] = [];
+    const debitData: [number, number][] = [];
 
-    return NextResponse.json(daywiseData);
+    responses.flat().forEach((item: any) => {
+      const [dd, mm, yyyy] = item.date.split("/").map(Number);
+      const timestamp = new Date(yyyy, mm - 1, dd).getTime();
+
+      creditData.push([timestamp, item.credit || 0]);
+      debitData.push([timestamp, item.debit || 0]);
+    });
+
+    return NextResponse.json({
+      credit: creditData.sort((a, b) => a[0] - b[0]),
+      debit: debitData.sort((a, b) => a[0] - b[0])
+    });
   } catch (error) {
-    console.error("API proxy error:", error);
+    console.error("API error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

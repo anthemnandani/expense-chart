@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useEffect, useState, useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { useAuth } from "@/context/auth-context"
@@ -17,15 +17,15 @@ const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
 ]
 
-export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency}) => {
+export const HighLevelPieChart: React.FC<HighLevelPieChart> = ({ years, currency }) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
-    const [selectedYear, setSelectedYear] = useState(2025)
-    const [selectedMonth, setSelectedMonth] = useState(8)
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
     const [categoryData, setCategoryData] = useState<ExpenseCategory[]>([])
     const [loading, setLoading] = useState(true)
     const { user } = useAuth()
     const groupId = user?.groupId
-    // Detect dark mode
+
     useEffect(() => {
         const observer = new MutationObserver(() => {
             setIsDarkMode(document.documentElement.classList.contains("dark"))
@@ -35,7 +35,6 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
         return () => observer.disconnect()
     }, [])
 
-    // Load Highcharts modules
     useEffect(() => {
         const initializeHighcharts = async () => {
             const HighchartsMore = (await import("highcharts/highcharts-more")).default
@@ -46,13 +45,12 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
         initializeHighcharts()
     }, [])
 
-    // Fetch API data
     useEffect(() => {
         if (!groupId) return
         const fetchData = async () => {
             try {
                 setLoading(true)
-                 const data = await apiService.getExpenseByMonth(groupId, selectedYear, selectedMonth);
+                const data = await apiService.getExpenseByMonth(groupId, selectedYear, selectedMonth);
                 setCategoryData(data)
             } catch (err) {
                 console.error("Error fetching category data:", err)
@@ -64,15 +62,15 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
         fetchData()
     }, [selectedYear, selectedMonth, groupId])
 
+    const chartData = useMemo(() => {
+        return categoryData.map((cat, index) => ({
+            name: cat.expenseDescType,
+            y: cat.totalExpenses,
+            color: COLORS[index % COLORS.length],
+        }))
+    }, [categoryData])
 
-    const total = categoryData.reduce((sum, cat) => sum + (cat.totalExpenses || 0), 0)
-    const chartData = categoryData.map((cat, index) => ({
-        name: cat.expenseDescType,
-        y: cat.totalExpenses,
-        color: COLORS[index % COLORS.length],
-    }))
-
-    const options: Highcharts.Options = {
+    const options: Highcharts.Options = useMemo(() => ({
         accessibility: { enabled: false },
         chart: {
             type: "pie",
@@ -81,13 +79,10 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
         },
         title: {
             text: undefined,
-            style: {
-                color: isDarkMode ? "#f3f4f6" : "#111827",
-            },
+            style: { color: isDarkMode ? "#f3f4f6" : "#111827" },
         },
         tooltip: {
             pointFormat: `<b>${currency}{point.y:,.0f}</b> ({point.percentage:.1f}%)`,
-            style: { fontSize: "13px", color: isDarkMode ? "#f3f4f6" : "#111827" },
             backgroundColor: isDarkMode ? "#374151" : "#ffffff",
         },
         plotOptions: {
@@ -105,32 +100,17 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
                     format: "{point.name}: {point.percentage:.1f}%",
                     style: { fontSize: "11px" },
                 },
-                animation: {
-                    duration: 1200,
-                    easing: "linear",
-                },
+                animation: { duration: 1200, easing: "linear" },
             },
         },
         legend: {
             layout: "horizontal",
             align: "center",
             verticalAlign: "bottom",
-            itemDistance: 20,
-            symbolRadius: 15,
-            symbolHeight: 15,
-            symbolWidth: 15,
-            itemMarginTop: 6,
-            itemMarginBottom: 6,
             itemStyle: {
-                color:  isDarkMode ? "#fff" : "#444",
+                color: isDarkMode ? "#fff" : "#444",
                 fontWeight: "500",
                 fontSize: "14px",
-            },
-            itemHoverStyle: {
-                color: "#1f2937",
-            },
-            itemHiddenStyle: {
-                color: "#ccc",
             },
         },
         series: [
@@ -141,7 +121,7 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
             },
         ],
         credits: { enabled: false },
-    }
+    }), [chartData, isDarkMode, currency])
 
     const monthOptions = [
         "January", "February", "March", "April", "May", "June",
@@ -150,12 +130,9 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
 
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-2 col-span-1">
-            <CardHeader className="flex justify-between flex-col lg:flex-row">
-                <div>
-                    <CardTitle className="flex items-center gap-2">
-                        Expense Distribution
-                    </CardTitle>
-                </div>
+            <CardHeader className="flex justify-between mb-14 flex-col lg:flex-row">
+                <CardTitle>Expense Distribution</CardTitle>
+
                 <div className="flex gap-2 flex-col lg:flex-row">
                     <select
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-1 py-1"
@@ -163,28 +140,28 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
                         onChange={(e) => setSelectedMonth(Number(e.target.value))}
                     >
                         {monthOptions.map((month, idx) => (
-                            <option key={month} value={idx + 1}>
-                                {month}
-                            </option>
+                            <option key={month} value={idx + 1}>{month}</option>
                         ))}
                     </select>
+
                     <select
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                     >
                         {years.map((year) => (
-                            <option key={year} value={year}>
-                                {year}
-                            </option>
+                            <option key={year} value={year}>{year}</option>
                         ))}
                     </select>
                 </div>
             </CardHeader>
+
             <CardContent>
-                <div className="h-[300px] min-h-fit flex items-center justify-center">
-                    {loading ? (
-                        <div className="animate-pulse w-50 h-50 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="h-[300px] flex items-center justify-center">
+                    {loading || categoryData.length === 0 ? (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                            Loading chart...
+                        </div>
                     ) : (
                         <HighchartsReact highcharts={Highcharts} options={options} />
                     )}
@@ -194,4 +171,4 @@ export const HighLevelPieChart : React.FC<HighLevelPieChart> = ({years, currency
     )
 }
 
-export default HighLevelPieChart;
+export default HighLevelPieChart

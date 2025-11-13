@@ -20,8 +20,12 @@ export async function GET(req: Request) {
 
     for (let year of availableYears) {
       // 1️⃣ Yearly Credit & Debit totals
-      const yearRes = await fetch(
-        `${BASE_URL}/api/Analytics/GetCrAndDRYearwise?groupId=${groupId}&year=${year}`
+      // const yearRes = await fetch(
+      //   `${BASE_URL}/api/Analytics/GetCrAndDRYearwise?groupId=${groupId}&year=${year}`
+      // );
+       const yearRes = await fetch(
+        `${BASE_URL}/api/Analytics/GetCrAndDRYearwise?groupId=${groupId}&year=${year}`,
+        { cache: "no-store" }
       );
       const yearData = await yearRes.json();
 
@@ -42,8 +46,12 @@ export async function GET(req: Request) {
       });
 
       // 2️⃣ Category-wise expenses
-      const catRes = await fetch(
-        `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`
+      // const catRes = await fetch(
+      //   `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`
+      // );
+       const catRes = await fetch(
+        `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`,
+        { cache: "no-store" }
       );
       const cats = await catRes.json();
 

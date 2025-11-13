@@ -13,7 +13,8 @@ export async function GET(req: Request) {
 
   try {
     const apiUrl = `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`;
-    const res = await fetch(apiUrl);
+    const res = await fetch(apiUrl, { cache: "no-store" }
+);
 
     if (!res.ok) {
       return NextResponse.json({ error: "Failed to fetch data" }, { status: res.status });

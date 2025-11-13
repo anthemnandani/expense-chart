@@ -21,8 +21,9 @@ type MonthlyRecord = {
 const AdvancedPolarChart = () => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [monthlyData, setMonthlyData] = useState<MonthlyRecord[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState("8");
-    const [selectedYear, setSelectedYear] = useState(2025);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth()
     const groupId = user?.groupId
     const darkBg = "#1f1836"
@@ -62,7 +63,11 @@ const AdvancedPolarChart = () => {
     // Effect for fetching data
     useEffect(() => {
         const fetchMonthlyData = async () => {
-            if (!groupId) return
+            if (!groupId) {
+                setIsLoading(false);
+                return;
+            }
+            setIsLoading(true);
             try {
                 // const res = await fetch(
                 //     `/api/monthly-credit-debit?groupId=${groupId}&year=${selectedYear}&month=${selectedMonth}`
@@ -71,6 +76,8 @@ const AdvancedPolarChart = () => {
                 setMonthlyData(data);
             } catch (err) {
                 console.error(err);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -78,11 +85,34 @@ const AdvancedPolarChart = () => {
     }, [groupId, selectedMonth, selectedYear]);
 
     useEffect(() => {
+          if (monthlyData.length === 0) return;
+
+  const maxCredit = Math.max(...monthlyData.map((d) => d.credit || 0)) || 1;
+  const maxDebit = Math.max(...monthlyData.map((d) => d.debit || 0)) || 1;
+
+  // Normalize z values (so even large 20k values appear in correct proportion)
+  const normalize = (value: number, maxValue: number) => {
+    // clamp between 0 and 100 (you can tune this)
+    return Math.sqrt(value / maxValue) * 100;
+  };
+
+  const creditSeries = monthlyData.map((entry, i) => [
+    i + 1,
+    1,
+    normalize(entry.credit, maxCredit),
+  ]);
+  const debitSeries = monthlyData.map((entry, i) => [
+    i + 1,
+    2,
+    normalize(entry.debit, maxDebit),
+  ]);
+
+  const totalDays = monthlyData.length;
         if (monthlyData.length === 0) return;
 
-        const creditSeries = monthlyData.map((entry, i) => [i + 1, 1, entry.credit]);
-        const debitSeries = monthlyData.map((entry, i) => [i + 1, 2, entry.debit]);
-        const totalDays = monthlyData.length;
+        // const creditSeries = monthlyData.map((entry, i) => [i + 1, 1, entry.credit]);
+        // const debitSeries = monthlyData.map((entry, i) => [i + 1, 2, entry.debit]);
+        // const totalDays = monthlyData.length;
 
         const scoreData = [
             {
@@ -294,6 +324,56 @@ const AdvancedPolarChart = () => {
                     fontSize: '0.9em'
                 }
             },
+            tooltip: {
+                useHTML: true,
+                formatter: function () {
+                    const record = monthlyData[this.point.x - 1];
+                    const formattedAmount = this.point.z?.toLocaleString("en-IN") ?? 0;
+
+                    // For CREDIT / DEBIT bubbles:
+                    if (this.series.type === 'bubble') {
+                        return `
+        <div style="padding:6px 10px;">
+          <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${this.series.name}</div>
+          <div><b>Date:</b> ${record?.date || '-'}</div>
+          <div><b>Day:</b> ${this.point.x}</div>
+          <div><b>Amount:</b> ₹ ${formattedAmount}</div>
+        </div>
+      `;
+                    }
+
+                    // For WEEKLY TOTAL columnrange:
+                    // For WEEKLY TOTAL columnrange:
+                    if (this.series.type === 'columnrange') {
+                        const week = this.point.week || 1;
+                        const startIndex = (week - 1) * 7;
+                        const endIndex = Math.min(startIndex + 6, monthlyData.length - 1);
+
+                        // Calculate real totals from actual daily data
+                        let totalCredit = 0;
+                        let totalDebit = 0;
+
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            totalCredit += monthlyData[i]?.credit || 0;
+                            totalDebit += monthlyData[i]?.debit || 0;
+                        }
+
+                        const startDate = monthlyData[startIndex]?.date || "-";
+                        const endDate = monthlyData[endIndex]?.date || "-";
+
+                        return `
+    <div style="padding:8px 10px; font-size:12px;">
+      <div style="font-weight:600; font-size:14px; margin-bottom:6px;">Week ${week}</div>
+      <div><b>Start Date:</b> ${startDate}</div>
+      <div><b>End Date:</b> ${endDate}</div>
+      <div><b>Total Credit:</b> ₹ ${totalCredit.toLocaleString("en-IN")}</div>
+      <div><b>Total Debit:</b> ₹ ${totalDebit.toLocaleString("en-IN")}</div>
+    </div>
+  `;
+                    }
+
+                }
+            },
             series: [
                 // Team series (bubbles)
                 {
@@ -306,8 +386,10 @@ const AdvancedPolarChart = () => {
                         lineColor: colors[9 % colors.length].tweenTo(colors[0], 0.25).toString(),
                         lineWidth: 2
                     },
-                    maxSize: '4%',
-                    minSize: '1%',
+                    zMin: 0,           // values start from 0 safely
+                    zMax: 100,
+                    minSize: "2px",    // not percentage. Always visible.
+                    maxSize: "15px",
                     clip: false,
                     tooltip: {
                         headerFormat: '<div class="team-day center">' +
@@ -333,8 +415,10 @@ const AdvancedPolarChart = () => {
                         lineColor: colors[9 % colors.length].tweenTo(colors[8 % colors.length], 0.65).toString(),
                         lineWidth: 2
                     },
-                    maxSize: '4%',
-                    minSize: '1%',
+                    zMin: 0,           // values start from 0 safely
+                    zMax: 100,
+                    minSize: "2px",    // not percentage. Always visible.
+                    maxSize: "15px",
                     clip: false,
                     tooltip: {
                         headerFormat: '<div class="team-day center">' +
@@ -396,23 +480,23 @@ const AdvancedPolarChart = () => {
                     borderWidth: 2,
                     pointPlacement: 'on',
                     pointStart: 1,
-                    tooltip: {
-                        headerFormat: '<span class="team-day center">' +
-                            '<span class="large-size">' +
-                            '<b style="color:{point.color};">Week {point.week}</b></span>',
-                        pointFormat:
-                            '<span class="col-display-fieldwrap">' +
-                            '<span class="symbolSize" style="color:{point.color};">●</span> ' +
-                            '<b>Credit Total: </b><span>{point.high}</span></span>' +
-                            '<span class="col-display-fieldwrap">' +
-                            '<span class="symbolSize" style="color:{point.color};">●</span> ' +
-                            '<b>Debit Total: </b><span>{point.low}</span></span>' +
-                            '<span class="col-display-fieldwrap">' +
-                            '<span class="symbolSize" style="color:{point.color};">●</span> ' +
-                            '<b>Net Avg: </b><span>{point.avg}</span></span>' +
-                            '<span class="col-display-fieldwrap">',
-                        useHTML: true
-                    } as any,
+                    // tooltip: {
+                    //     headerFormat: '<span class="team-day center">' +
+                    //         '<span class="large-size">' +
+                    //         '<b style="color:{point.color};">Week {point.week}</b></span>',
+                    //     pointFormat:
+                    //         '<span class="col-display-fieldwrap">' +
+                    //         '<span class="symbolSize" style="color:{point.color};">●</span> ' +
+                    //         '<b>Credit Total: </b><span>{point.high}</span></span>' +
+                    //         '<span class="col-display-fieldwrap">' +
+                    //         '<span class="symbolSize" style="color:{point.color};">●</span> ' +
+                    //         '<b>Debit Total: </b><span>{point.low}</span></span>' +
+                    //         '<span class="col-display-fieldwrap">' +
+                    //         '<span class="symbolSize" style="color:{point.color};">●</span> ' +
+                    //         '<b>Net Avg: </b><span>{point.avg}</span></span>' +
+                    //         '<span class="col-display-fieldwrap">',
+                    //     useHTML: true
+                    // } as any,
                     animation: false,
                     color: isDarkMode ? '#2CAFFE' : '#3A86FF',
                 }
@@ -435,6 +519,7 @@ const AdvancedPolarChart = () => {
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-1 py-1"
+                        disabled={isLoading}
                     >
                         {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                             <option key={m} value={m}>
@@ -446,6 +531,7 @@ const AdvancedPolarChart = () => {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
+                        disabled={isLoading}
                     >
                         {[2023, 2024, 2025].map((y) => (
                             <option key={y} value={y}>
@@ -456,7 +542,16 @@ const AdvancedPolarChart = () => {
                 </div>
             </CardHeader>
             <CardContent className="pt-6 pb-4">
-                <div id="polar-container" className="w-full h-full"></div>
+                {isLoading ? (
+                    <div className="w-full h-64 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Loading chart data...</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div id="polar-container" className="w-full h-full"></div>
+                )}
             </CardContent>
         </Card>
     )

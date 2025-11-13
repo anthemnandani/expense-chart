@@ -11,9 +11,9 @@ import UniqueStatCards from "./UniqueStatCards";
 import { FinancialInsight } from "@/lib/types";
 import { StackedBarCategoryChart } from "./StackedBarCategoryChart";
 
+const YearlyCreditDebitChart = dynamic(() => import("./YearlyCreditDebitChart"), { ssr: false });
 const AreaYearlyExpenseChart = dynamic(() => import("./AreaYearlyExpenseChart"), { ssr: false });
 const CategoryWiseExpenseChart = dynamic(() => import("./CategoryWiseExpenseChart"), { ssr: false });
-const GaugeMultipleKPIChart = dynamic(() => import("./GaugeMultipleKPIChart"), { ssr: false });
 const HighLevelPieChart = dynamic(() => import("./HighLevelPieChart"), { ssr: false });
 const NetBalanceChart = dynamic(() => import("./NetBalanceChart"), { ssr: false });
 const AnnualCategoryTrendsChart = dynamic(() => import("./AnnualCategoryTrendsChart"), { ssr: false });
@@ -23,8 +23,8 @@ const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: 
 export default function DashboardContent() {
   const { user } = useAuth();
   const groupId = user?.groupId;
-  const [selectedYear, setSelectedYear] = useState(2025);
-  const [selectedMonth, setSelectedMonth] = useState(8);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const [financialInsights, setFinancialInsights] = useState<FinancialInsight | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,19 +115,22 @@ export default function DashboardContent() {
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <TreeGraphChart years={years} currency={currency} />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+          <YearlyCreditDebitChart years={years} currency={currency} />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <MonthlyRadarChart years={years} currency={currency} />
           <CategoryWiseExpenseChart years={years} currency={currency} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <DailyExpenseChart years={years} currency={currency} />
+        <div className="grid grid-cols-1 gap-6">
+          <AnnualCategoryTrendsChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <StackedBarCategoryChart years={years} currency={currency} />
           <AdvancedPolarChart years={years} currency={currency} />
         </div>
-        <div className="grid grid-cols-1 gap-6">
-          <AnnualCategoryTrendsChart years={years} currency={currency} />
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+          <DailyExpenseChart years={years} currency={currency} />
         </div>
 
         {/* Financial Insights */}

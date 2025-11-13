@@ -1,7 +1,7 @@
 "use client"
 
-import DashboardLayout from "@/components/dashboard-layout"
-import DashboardContent from "@/components/dashboard-content"
+import MainDashboard from "@/components/main-dashboard"
+// import DashboardContent from "@/components/dashboard-content"
 import { createContext, useContext, useState } from "react"
 interface ThemeContextType {
   primaryColor: string
@@ -22,10 +22,9 @@ export default function Dashboard() {
   const [secondaryColor, setSecondaryColor] = useState("#f59e0b")
 
   return (
-    <DashboardLayout>
       <ThemeContext.Provider value={{ primaryColor, secondaryColor, setPrimaryColor, setSecondaryColor }}>
-        <DashboardContent />
+        {/* <DashboardContent /> */}
+        <MainDashboard />
       </ThemeContext.Provider>
-    </DashboardLayout>
   )
 }

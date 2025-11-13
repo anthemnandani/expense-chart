@@ -15,8 +15,8 @@ if (typeof SolidGauge === "function") SolidGauge(Highcharts);
 
 export default function GaugeMultipleKPIChart() {
   const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState("8"); // August
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1) // August
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const { user } = useAuth()
   const groupId = user?.groupId
 

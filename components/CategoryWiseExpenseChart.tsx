@@ -23,7 +23,7 @@ const monthLabels = [
 
 export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({years, currency}) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [selectedYear, setSelectedYear] = useState(2025);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
     const { user } = useAuth()
     const groupId = user?.groupId

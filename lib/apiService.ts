@@ -52,6 +52,16 @@ export const apiService = {
     }
   },
 
+  async getYearlyCreditDebit(groupId: string, year: number): Promise<{ credit: [number, number][], debit: [number, number][] }> {
+  try {
+    const res = await fetch(`/api/yearly-credit-debit?groupId=${groupId}&year=${year}`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch yearly credit debit");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching yearly credit debit:", error);
+    return { credit: [], debit: [] };
+  }
+},
 
   // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
   async getCurrency(groupId: string): Promise<{ currency: string }> {

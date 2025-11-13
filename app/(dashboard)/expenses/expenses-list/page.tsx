@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import DashboardLayout from "@/components/dashboard-layout"
 import {
   Card,
   CardContent,
@@ -143,7 +142,7 @@ export default function ExpensesPage() {
 
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -152,7 +151,7 @@ export default function ExpensesPage() {
               Manage your income and expenses
             </p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Add Expense
           </Button>
@@ -289,6 +288,6 @@ export default function ExpensesPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
+    </>
   )
 }
