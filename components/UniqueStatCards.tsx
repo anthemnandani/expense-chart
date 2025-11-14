@@ -32,7 +32,7 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
   const [metrics, setMetrics] = useState([
     { key: "income", title: "Total Credits", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
     { key: "expenses", title: "Total Debits", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
-    { key: "savings", title: "Net Savings", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
+    { key: "savings", title: "Net Balances", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
     { key: "months", title: "Active Months", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
   ])
 
@@ -67,7 +67,7 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
       const updatedMetrics = [
         { key: "income", title: "Total Income", final: currTotalCredit, change: getChange(currTotalCredit, prevTotalCredit), color: "from-blue-300 to-blue-700" },
         { key: "expenses", title: "Total Expenses", final: currTotalDebit, change: getChange(currTotalDebit, prevTotalDebit), color: "from-blue-300 to-blue-700" },
-        { key: "savings", title: "Net Savings", final: currNetSavings, change: getChange(currNetSavings, prevNetSavings), color: "from-blue-300 to-blue-700" },
+        { key: "savings", title: "Net Balances", final: currNetSavings, change: getChange(currNetSavings, prevNetSavings), color: "from-blue-300 to-blue-700" },
         { key: "months", title: "Active Months", final: currActiveMonths, change: getChange(currActiveMonths, prevActiveMonths), color: "from-blue-300 to-blue-700" },
       ]
 

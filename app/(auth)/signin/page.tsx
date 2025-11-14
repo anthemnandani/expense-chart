@@ -181,7 +181,7 @@ export default function SignInPage() {
                 )}
               </Button>
             </form>
-            <div className="flex justify-center items-center w-full cursor-pointer">
+            {/* <div className="flex justify-center items-center w-full cursor-pointer">
               <div
                 className="flex border gap-2 rounded w-full justify-center items-center px-6 py-2"
                 onClick={() => {
@@ -191,7 +191,7 @@ export default function SignInPage() {
                 <Image src="/images/google.png" alt="Google" width={24} height={24} />
                 <div className="google">Sign In with Google</div>
               </div>
-            </div>
+            </div> */}
             <div className="text-center space-y-2">
               {/* <Button variant="link" className="text-sm text-blue-600 hover:text-blue-700">
                 Forgot Password?

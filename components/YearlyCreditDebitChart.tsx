@@ -38,6 +38,7 @@ export const YearlyCreditDebitChart = ({
     return () => observer.disconnect();
   }, []);
 
+  // Fetch data
   useEffect(() => {
     if (!groupId) return;
     apiService.getYearlyCreditDebit(groupId, selectedYear).then(setData);
@@ -79,8 +80,12 @@ export const YearlyCreditDebitChart = ({
       tickColor: isDarkMode ? "#374151" : "#d1d5db",
     },
     yAxis: {
-      title: { text: `${currency}` },
+      opposite: false,
+      title: { text: `Amount(${currency})` },
       labels: {
+        formatter() {
+          return `${currency}${this.value}`;
+        },
         style: {
           color: isDarkMode ? "#d1d5db" : "#374151",
         },
@@ -89,7 +94,9 @@ export const YearlyCreditDebitChart = ({
     },
     tooltip: {
       shared: true,
-      valuePrefix: currency,
+      pointFormatter() {
+        return `<span style="color:${this.color}">\u25CF</span> <b>${this.series.name}: ${currency}${this.y}</b><br/>`;
+      },
       backgroundColor: isDarkMode ? "#111827" : "#ffffff",
       borderColor: isDarkMode ? "#374151" : "#d1d5db",
       style: {
@@ -97,32 +104,73 @@ export const YearlyCreditDebitChart = ({
         fontSize: "13px",
       },
     },
-    legend: {
-      itemStyle: {
-        color: isDarkMode ? "#f3f4f6" : "#111827",
-        fontSize: "12px",
+    plotOptions: {
+      series: {
+        marker: {
+          enabled: true,
+          radius: 3,
+          states: {
+            hover: { radius: 5 },
+          },
+          // Show marker only if value > 0
+          symbol: 'circle',
+          fillColor: undefined, // default will be series color
+        },
+        dataLabels: {
+          enabled: false,
+        },
       },
-      itemHoverStyle: {
-        color: isDarkMode ? "#e5e7eb" : "#000000",
+      spline: {
+        states: {
+          hover: {
+            lineWidth: 4,
+          },
+        },
+        marker: {
+          enabled: true,
+          radius: 3,
+          symbol: 'circle',
+          fillColor: undefined,
+        },
       },
     },
     series: [
       {
         name: "Credit",
-        data: data.credit,
+        data: data.credit.map(([x, y]) => ({
+          x,
+          y,
+          marker: { enabled: y > 0 },
+        })),
         type: "spline",
         color: "#10B981",
-        lineWidth: 3,
+        lineWidth: 2,
       },
       {
         name: "Debit",
-        data: data.debit,
+        data: data.debit.map(([x, y]) => ({
+          x,
+          y,
+          marker: { enabled: y > 0 },
+        })),
         type: "spline",
         color: "#EF4444",
-        lineWidth: 3,
+        lineWidth: 2,
       },
     ],
     credits: { enabled: false },
+    legend: {
+      layout: "horizontal",
+      align: "center",
+      verticalAlign: "bottom",
+      itemStyle: {
+        color: isDarkMode ? "#f3f4f6" : "#111827",
+        fontSize: "13px",
+      },
+      itemHoverStyle: {
+        color: isDarkMode ? "#10B981" : "#10B981", // hover highlight
+      },
+    },
   };
 
   return (
@@ -151,6 +199,17 @@ export const YearlyCreditDebitChart = ({
           constructorType="stockChart"
           options={options}
         />
+        {/* Color legend at bottom */}
+        <div className="flex justify-center gap-4 mt-4 text-sm">
+          <div className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+            Credit
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+            Debit
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

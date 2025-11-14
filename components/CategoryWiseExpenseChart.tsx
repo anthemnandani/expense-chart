@@ -76,7 +76,7 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
     // Chart Options
     const options: Highcharts.Options = {
         accessibility: { enabled: false },
-        chart: { type: "line", backgroundColor: "transparent" },
+        chart: { type: "spline", backgroundColor: "transparent" },
         title: {
             text: undefined,
             style: { color: isDarkMode ? "#f9fafb" : "#1f2937" },
