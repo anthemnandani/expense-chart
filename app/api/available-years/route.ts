@@ -1,6 +1,11 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
+import { corsHeaders } from "@/lib/cors";
+
+export async function OPTIONS() {
+    return new Response(null, { headers: corsHeaders });
+}
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -19,12 +24,15 @@ export async function GET(req: NextRequest) {
 
         const years = result.recordset.map(row => row.year);
 
-        return NextResponse.json({ years });
+        return NextResponse.json({ years }, {
+            status: 200,
+            headers: corsHeaders,   // ⭐ CORS added here
+        });
     } catch (error) {
         console.error("Error fetching available years from DB:", error);
         return NextResponse.json(
             { error: "Failed to fetch available years" },
-            { status: 500 }
+            { status: 500,  headers: corsHeaders, }
         );
     }
 }
