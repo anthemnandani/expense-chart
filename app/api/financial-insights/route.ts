@@ -2,10 +2,16 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
 
+import { corsHeaders } from "@/lib/cors"; 
+
 const months = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December"
 ];
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -206,10 +212,10 @@ export async function GET(req: NextRequest) {
       thisMonthTrend: { trend: trendChange < 0 ? "Downward" : "Upward", percentageChange: Math.abs(trendChange.toFixed(1)) },
       topSpendingCategory: { category: topCategory.category, percentage: parseFloat(topCategory.percentage.toFixed(1)) },
       incomeVsExpense: { ratio, percentageHigher: debit > 0 ? ((credit - debit) / debit) * 100 : 0 }
-    });
+    },  { status: 200, headers: corsHeaders });
 
   } catch (err) {
     console.error("Error in financial insights:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500, headers: corsHeaders });
   }
 }
