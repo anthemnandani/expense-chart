@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
+import { corsHeaders } from "@/lib/cors"; // <-- ADD THIS
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -9,21 +10,22 @@ export async function GET(req: Request) {
     const groupId = searchParams.get("groupId");
     const yearsParam = searchParams.get("years");
     const currencyParam = searchParams.get("currency");
+
     const availableYears = yearsParam ? yearsParam.split(",").map(Number) : [];
 
     if (!groupId || availableYears.length === 0) {
-      return NextResponse.json({ error: "Missing groupId or years" }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: "Missing groupId or years" }),
+        { status: 400, headers: corsHeaders } // ← CORS
+      );
     }
 
     const rootNode = [{ id: "root", name: "Expense Data" }];
     let nodes: any[] = [];
 
     for (let year of availableYears) {
-      // 1️⃣ Yearly Credit & Debit totals
-      // const yearRes = await fetch(
-      //   `${BASE_URL}/api/Analytics/GetCrAndDRYearwise?groupId=${groupId}&year=${year}`
-      // );
-       const yearRes = await fetch(
+      // 1️⃣ Yearly totals
+      const yearRes = await fetch(
         `${BASE_URL}/api/Analytics/GetCrAndDRYearwise?groupId=${groupId}&year=${year}`,
         { cache: "no-store" }
       );
@@ -45,11 +47,8 @@ export async function GET(req: Request) {
         color: "#3b82f6"
       });
 
-      // 2️⃣ Category-wise expenses
-      // const catRes = await fetch(
-      //   `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`
-      // );
-       const catRes = await fetch(
+      // 2️⃣ Category-wise
+      const catRes = await fetch(
         `${BASE_URL}/api/Analytics/GetExpensesByTypewise?groupId=${groupId}&year=${year}`,
         { cache: "no-store" }
       );
@@ -86,12 +85,20 @@ export async function GET(req: Request) {
       }
     }
 
-    return NextResponse.json([...rootNode, ...nodes]);
+    return new NextResponse(JSON.stringify([...rootNode, ...nodes]), {
+      status: 200,
+      headers: corsHeaders // ← CORS
+    });
   } catch (error) {
     console.error("TreeGraph API error:", error);
-    return NextResponse.json(
-      { error: "Failed to load tree data" },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to load tree data" }),
+      { status: 500, headers: corsHeaders } // ← CORS
     );
   }
+}
+
+// ✅ Preflight request handler
+export function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }

@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
+import { corsHeaders } from "@/lib/cors"; // <-- ADD THIS
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
@@ -10,23 +11,25 @@ export async function GET(req: Request) {
     const year = searchParams.get("year");
 
     if (!groupId || !year) {
-      return NextResponse.json({ error: "Missing groupId or year" }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: "Missing groupId or year" }),
+        { status: 400, headers: corsHeaders } // ← CORS
+      );
     }
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-     const responses = await Promise.all(
+    const responses = await Promise.all(
       months.map((m) =>
         fetch(
           `${BASE_URL}/api/Analytics/GetMonthlyExpenseDrandCr?groupId=${groupId}&year=${year}&months=${m}`,
-          { cache: "no-store" } // ✅ FORCE FRESH DATA (Fix Oct-Nov Missing)
+          { cache: "no-store" }
         )
           .then((res) => res.json())
           .catch(() => [])
       )
     );
 
-    // Flatten & transform to [timestamp, netBalance]
     const daywiseData: [number, number][] = responses
       .flat()
       .map((item: any) => {
@@ -38,11 +41,22 @@ export async function GET(req: Request) {
         const balance = (item.credit || 0) - (item.debit || 0);
         return [timestamp, balance] as [number, number];
       })
-      .sort((a, b) => a[0] - b[0]); // sort by date
+      .sort((a, b) => a[0] - b[0]);
 
-    return NextResponse.json(daywiseData);
+    return new NextResponse(JSON.stringify(daywiseData), {
+      status: 200,
+      headers: corsHeaders, // ← CORS
+    });
   } catch (error) {
     console.error("API proxy error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      { status: 500, headers: corsHeaders } // ← CORS
+    );
   }
+}
+
+// ✅ MUST HAVE for Preflight CORS Requests
+export function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }

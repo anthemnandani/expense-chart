@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { type NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
+import { corsHeaders } from "@/lib/cors"; // <-- ADD THIS
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,12 +18,23 @@ export async function GET(request: NextRequest) {
       ORDER BY ExpenseTypeId ASC
     `;
 
-    return NextResponse.json(result.recordset);
+    return new NextResponse(JSON.stringify(result.recordset), {
+      status: 200,
+      headers: corsHeaders, // <-- CORS ENABLE
+    });
   } catch (error: any) {
     console.error("❌ Fetch expense types error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: "Internal server error" }),
+      {
+        status: 500,
+        headers: corsHeaders, // <-- ERROR me bhi CORS zaroori
+      }
     );
   }
+}
+
+// ✅ IMPORTANT: CORS preflight (OPTIONS)
+export function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }

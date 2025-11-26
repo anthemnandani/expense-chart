@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
+import { corsHeaders } from "@/lib/cors"; // <-- ADD THIS
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
@@ -11,7 +12,10 @@ export async function GET(req: Request) {
     const month = searchParams.get("month");
 
     if (!groupId || !year || !month) {
-      return NextResponse.json({ error: "Missing query parameters" }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: "Missing query parameters" }),
+        { status: 400, headers: corsHeaders } // <-- CORS
+      );
     }
 
     const res = await fetch(
@@ -20,13 +24,28 @@ export async function GET(req: Request) {
     );
 
     if (!res.ok) {
-      return NextResponse.json({ error: "Failed to fetch data" }, { status: res.status });
+      return new NextResponse(
+        JSON.stringify({ error: "Failed to fetch data" }),
+        { status: res.status, headers: corsHeaders } // <-- CORS
+      );
     }
 
     const data = await res.json();
-    return NextResponse.json(data);
+
+    return new NextResponse(JSON.stringify(data), {
+      status: 200,
+      headers: corsHeaders, // <-- CORS
+    });
   } catch (error) {
     console.error("API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      { status: 500, headers: corsHeaders } // <-- CORS
+    );
   }
+}
+
+// ✅ Preflight Request Handler (required)
+export function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }
