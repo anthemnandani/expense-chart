@@ -11,9 +11,9 @@ export default function DashboardRootLayout({ children }: { children: React.Reac
   const router = useRouter();
 
   // Check auth on layout mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  // useEffect(() => {
+  //   checkAuth();
+  // }, []);
 
   // Redirect if not logged in
   useEffect(() => {

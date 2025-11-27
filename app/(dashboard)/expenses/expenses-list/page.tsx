@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useMemo, useState } from "react"
 import {
   Card,
@@ -23,8 +22,9 @@ import { Expense } from "@/lib/types"
 import CustomPagination from "@/components/CustomPagination"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-
+import { useAuth } from "@/context/auth-context"
 export default function ExpensesPage() {
+  const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -32,7 +32,19 @@ export default function ExpensesPage() {
   const [selectedType, setSelectedType] = useState<string>("all")
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [years, setYears] = useState<number[]>([])
+  const [selectedYear, setSelectedYear] = useState<string>("all")
   const [loading, setLoading] = useState(true)
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newExpense, setNewExpense] = useState({
+    Description: "",
+    Expenses: 0,
+    ExpenseTypeId: 0,
+    Date: new Date().toISOString(),
+    UserId: 0, // will be updated by useEffect
+    ExpenseDescType: "",
+    GroupId: 0, // will be updated by useEffect
+  });
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -42,7 +54,6 @@ export default function ExpensesPage() {
         if (!res.ok) throw new Error("Failed to fetch expenses")
         const data = await res.json()
         setExpenses(data)
-
         // Extract unique categories
         const uniqueCategories = [...new Set(data.map((exp: Expense) => exp.ExpenseDescType))]
         setCategories(uniqueCategories.filter(Boolean))
@@ -52,7 +63,6 @@ export default function ExpensesPage() {
         setLoading(false)
       }
     }
-
     fetchExpenses()
   }, [])
 
@@ -67,9 +77,23 @@ export default function ExpensesPage() {
         console.error("Error fetching expense types:", error)
       }
     }
-
     fetchExpenseTypes()
   }, [])
+
+  useEffect(() => {
+    const fetchYears = async () => {
+      if (!user?.groupId) return;
+      try {
+        const res = await fetch(`/api/available-years?groupId=${user.groupId}`)
+        if (!res.ok) throw new Error("Failed to fetch years")
+        const data = await res.json()
+        setYears(data.years || [])
+      } catch (error) {
+        console.error("Error fetching years:", error)
+      }
+    }
+    fetchYears()
+  }, [user])
 
   const enrichedExpenses = useMemo(() => {
     const typeMap = Object.fromEntries(
@@ -86,9 +110,10 @@ export default function ExpensesPage() {
       const typeMatch = selectedType === "all" || exp.Type === selectedType;
       const categoryMatch =
         selectedCategory === "all" || exp.ExpenseDescType === selectedCategory;
-      return typeMatch && categoryMatch;
+      const yearMatch = selectedYear === "all" || new Date(exp.Date).getFullYear().toString() === selectedYear;
+      return typeMatch && categoryMatch && yearMatch;
     });
-  }, [enrichedExpenses, selectedType, selectedCategory])
+  }, [enrichedExpenses, selectedType, selectedCategory, selectedYear])
 
   const paginatedExpenses = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage
@@ -98,20 +123,16 @@ export default function ExpensesPage() {
 
   const handleExportToPDF = () => {
     const doc = new jsPDF()
-
     doc.setFontSize(16)
     doc.text("Expenses Report", 14, 22)
-
     const tableColumn = ["Date", "Description", "Category", "Type", "Amount"]
     const tableRows: any[] = []
-
     filteredExpenses.forEach((exp) => {
       const date = new Date(exp.Date).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
         year: "numeric",
       })
-
       tableRows.push([
         date,
         exp.Description,
@@ -120,13 +141,12 @@ export default function ExpensesPage() {
         `${exp.Expenses.toLocaleString()}`,
       ])
     })
-
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 30,
       styles: {
-        fontSize: 9, 
+        fontSize: 9,
       },
       columnStyles: {
         0: { cellWidth: 28 },
@@ -136,9 +156,73 @@ export default function ExpensesPage() {
         4: { cellWidth: 35 },
       },
     })
-
     doc.save("expenses-report.pdf")
   }
+
+  // Updated handleAddExpense
+  const handleAddExpense = async (expenseData: typeof newExpense) => {
+    try {
+      // Map frontend fields to lowercase for backend
+      const payload = {
+        description: expenseData.Description,
+        expenses: expenseData.Expenses,
+        expenseTypeId: expenseData.ExpenseTypeId,
+        date: expenseData.Date,
+        userId: expenseData.UserId,
+        expenseDescType: expenseData.ExpenseDescType || null,
+        groupId: expenseData.GroupId, // optional if backend uses it
+      };
+      const res = await fetch("/api/expenses/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add expense");
+      alert("Expense added with ID: " + data.ExpenseId);
+    } catch (err) {
+      console.error(err);
+      alert("Error adding expense: " + (err as Error).message);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      setNewExpense((prev) => ({
+        ...prev,
+        UserId: user.userId,
+        GroupId: user.groupId,
+      }));
+    }
+  }, [user]);
+
+  const handleSendEmailReport = async () => {
+    try {
+      const res = await fetch("/api/expenses/send-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          expenses: filteredExpenses,
+          email: user?.email,
+          fullName: user?.fullName
+        })
+
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to send email");
+        return;
+      }
+
+      alert("Expense report emailed successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Error sending email");
+    }
+  };
+
 
 
   return (
@@ -151,19 +235,21 @@ export default function ExpensesPage() {
               Manage your income and expenses
             </p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => setShowAddModal(false)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Expense
           </Button>
         </div>
-
         {/* Filters */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <Label htmlFor="category">Category</Label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -193,20 +279,36 @@ export default function ExpensesPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-end gap-2">
-                {/* <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Apply
-                </Button> */}
+              <div>
+                <Label htmlFor="year">Year</Label>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All years" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All years</SelectItem>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="md:col-span-2 flex items-end gap-2">
                 <Button variant="outline" onClick={handleExportToPDF}>
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
+                <Button variant="outline" onClick={handleSendEmailReport}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Email Report
+                </Button>
+
               </div>
             </div>
           </CardContent>
         </Card>
-
         {/* Expenses Table */}
         <Card>
           <CardHeader>
@@ -251,7 +353,6 @@ export default function ExpensesPage() {
                             year: "numeric",
                           }).replace(" ", " ")}
                         </td>
-
                         <td className="py-3 px-4 text-sm">
                           {expense.Description}
                         </td>
@@ -261,7 +362,6 @@ export default function ExpensesPage() {
                             {expense.Type === "Cr." ? "Credit" : "Debit"}
                           </Badge>
                         </td>
-
                         <td
                           className={`py-3 px-4 text-right text-sm ${expense.Type === "Cr." ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"
                             }`}
@@ -269,14 +369,11 @@ export default function ExpensesPage() {
                           {expense.Type === "Cr." ? "+" : "-"}₹
                           {expense.Expenses.toLocaleString()}
                         </td>
-
-
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
-
               <CustomPagination
                 totalItems={filteredExpenses.length}
                 rowsPerPage={rowsPerPage}
@@ -287,6 +384,142 @@ export default function ExpensesPage() {
             </div>
           </CardContent>
         </Card>
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-lg shadow-xl border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Add New Expense
+              </h2>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleAddExpense(newExpense);
+                  setShowAddModal(false);
+                  setLoading(true);
+                  const res = await fetch("/api/expenses");
+                  const data = await res.json();
+                  setExpenses(data);
+                  setLoading(false);
+                }}
+                className="grid grid-cols-1 gap-4"
+              >
+                {/* Description */}
+                <div>
+                  <Label htmlFor="description" className="mb-1 block">Description</Label>
+                  <input
+                    id="description"
+                    type="text"
+                    placeholder="Enter expense description"
+                    value={newExpense.Description}
+                    onChange={(e) =>
+                      setNewExpense({ ...newExpense, Description: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                {/* Amount */}
+                <div>
+                  <Label htmlFor="amount" className="mb-1 block">Amount</Label>
+                  <input
+                    id="amount"
+                    type="number"
+                    placeholder="Enter amount"
+                    value={newExpense.Expenses}
+                    onChange={(e) =>
+                      setNewExpense({ ...newExpense, Expenses: Number(e.target.value) })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                {/* Category */}
+                <div>
+                  <Label htmlFor="category" className="mb-1 block">Category</Label>
+                  <select
+                    id="category"
+                    value={newExpense.ExpenseDescType}
+                    onChange={(e) => {
+                      const selectedCategory = e.target.value;
+                      let autoTypeId = 2; // default: Debit
+                      const creditCategories = ["salary", "income", "refund", "deposit"];
+                      if (creditCategories.includes(selectedCategory.toLowerCase())) {
+                        autoTypeId = 1; // Credit
+                      }
+                      setNewExpense({
+                        ...newExpense,
+                        ExpenseDescType: selectedCategory,
+                        ExpenseTypeId: autoTypeId,
+                      });
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Category</option>
+                    {categories
+                      .slice()
+                      .sort((a, b) => a.localeCompare(b))
+                      .map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                {/* Expense Type - Auto Filled and Disabled */}
+                <div>
+                  <Label htmlFor="expenseType" className="mb-1 block">Expense Type</Label>
+                  <select
+                    id="expenseType"
+                    disabled
+                    value={newExpense.ExpenseTypeId}
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-500
+              dark:bg-gray-800 dark:border-gray-700 cursor-not-allowed"
+                  >
+                    <option value={0}>Select Expense Type</option>
+                    {expenseTypes.map((expenseType) => (
+                      <option
+                        key={expenseType.ExpenseTypeId}
+                        value={expenseType.ExpenseTypeId}
+                      >
+                        {expenseType.Type === "Cr." ? "Credit" : "Debit"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Date */}
+                <div>
+                  <Label htmlFor="date" className="mb-1 block">Date</Label>
+                  <input
+                    id="date"
+                    type="date"
+                    max={new Date().toISOString().split("T")[0]}
+                    value={newExpense.Date.split("T")[0]}
+                    onChange={(e) =>
+                      setNewExpense({ ...newExpense, Date: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                {/* Buttons */}
+                <div className="flex justify-end gap-3 mt-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="border-gray-300 dark:border-gray-600"
+                  >
+                    Cancel
+                  </Button>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Add Expense
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )

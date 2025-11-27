@@ -22,6 +22,7 @@
     "@vercel/postgres": "^0.10.0",
     "apexcharts": "^5.3.2",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "echarts": "latest",
@@ -36,6 +37,7 @@
     "mssql": "^11.0.1",
     "next": "^14.2.31",
     "next-themes": "latest",
+    "nodemailer": "^7.0.10",
     "react": "^18",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^18",
@@ -47,6 +49,7 @@
   "devDependencies": {
     "@types/highcharts": "^7.0.0",
     "@types/node": "^22",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
