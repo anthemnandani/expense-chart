@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-
+import { corsHeaders } from "@/lib/cors";
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+export async function OPTIONS() {
+  return new Response(null, { headers: corsHeaders });
+}
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const groupId = searchParams.get("groupId");
@@ -36,9 +38,12 @@ export async function GET(req: Request) {
       }
     });
 
-    return NextResponse.json({ categories, data });
+    return NextResponse.json({ categories, data }, {
+      status: 200,
+      headers: corsHeaders,
+    });
   } catch (error: any) {
     console.error("API error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders, });
   }
 }
