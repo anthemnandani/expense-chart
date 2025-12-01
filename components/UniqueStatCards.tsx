@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { DollarSign, TrendingDown, Target, Calendar } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
-import { apiService } from "@/lib/apiService"
 
 const iconMap = {
   income: DollarSign,
@@ -31,55 +30,67 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
 
   const [metrics, setMetrics] = useState([
     { key: "income", title: "Total Credits", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
-    { key: "expenses", title: "Total Debits", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
-    { key: "savings", title: "Net Balances", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
-    { key: "months", title: "Active Months", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
+    { key: "expenses", title: "Total Debits", value: 0, final: 0, change: "+0%", color: "from-red-300 to-red-700" },
+    { key: "savings", title: "Net Balances", value: 0, final: 0, change: "", color: "from-green-300 to-green-700" }, // ← NO CHANGE
+    { key: "months", title: "Active Months", value: 0, final: 0, change: "+0%", color: "from-purple-300 to-purple-700" },
   ])
 
-   useEffect(() => {
+  // % CHANGE CALCULATOR
+  const getChange = (curr: number, prev: number) => {
+    if (prev === 0) return curr === 0 ? "0%" : "+100%"
+    const diff = ((curr - prev) / prev) * 100
+    return `${diff >= 0 ? "+" : ""}${diff.toFixed(1)}%`
+  }
+
+  useEffect(() => {
     const fetchStats = async () => {
       if (!groupId || !selectedYear) return
 
-      const prevYear = selectedYear - 1
+      try {
+        const res = await fetch(`/api/stats?groupId=${groupId}&year=${selectedYear}`)
+        const data = await res.json()
 
-      const [currData, prevData] = await Promise.all([
-        apiService.getYearlyExpense(groupId, selectedYear),
-        apiService.getYearlyExpense(groupId, prevYear),
-      ])
+        if (!data || !data.curr) return
 
-      const currTotalCredit = currData.reduce((sum, m) => sum + (m.totalCredit || 0), 0)
-      const currTotalDebit = currData.reduce((sum, m) => sum + (m.totalDebit || 0), 0)
-      const currNetSavings = currTotalCredit - currTotalDebit
-      const currActiveMonths = currData.filter((m) => (m.totalCredit || 0) > 0 || (m.totalDebit || 0) > 0).length
+        const curr = data.curr
+        const prev = data.prev
+        const netBalance = data.netBalance // Running balance
 
-      const prevTotalCredit = prevData.reduce((sum, m) => sum + (m.totalCredit || 0), 0)
-      const prevTotalDebit = prevData.reduce((sum, m) => sum + (m.totalDebit || 0), 0)
-      const prevNetSavings = prevTotalCredit - prevTotalDebit
-      const prevActiveMonths = prevData.filter((m) => (m.totalCredit || 0) > 0 || (m.totalDebit || 0) > 0).length
+        const updatedMetrics = [
+          {
+            ...metrics[0],
+            final: curr.totalCredit,
+            change: getChange(curr.totalCredit, prev.totalCredit),
+          },
+          {
+            ...metrics[1],
+            final: curr.totalDebit,
+            change: getChange(curr.totalDebit, prev.totalDebit),
+          },
+          {
+            ...metrics[2],
+            final: netBalance,
+            change: "", // 🚨 REMOVE % CHANGE FOR NET BALANCE
+          },
+          {
+            ...metrics[3],
+            final: curr.activeMonths,
+            change: getChange(curr.activeMonths, prev.activeMonths),
+          },
+        ]
 
-      const getChange = (curr: number, prev: number) => {
-        if (prev === 0) return curr === 0 ? "0%" : "+100%"
-        const diff = ((curr - prev) / prev) * 100
-        const sign = diff >= 0 ? "+" : ""
-        return `${sign}${diff.toFixed(1)}%`
-      }
-
-      const updatedMetrics = [
-        { key: "income", title: "Total Income", final: currTotalCredit, change: getChange(currTotalCredit, prevTotalCredit), color: "from-blue-300 to-blue-700" },
-        { key: "expenses", title: "Total Expenses", final: currTotalDebit, change: getChange(currTotalDebit, prevTotalDebit), color: "from-blue-300 to-blue-700" },
-        { key: "savings", title: "Net Balances", final: currNetSavings, change: getChange(currNetSavings, prevNetSavings), color: "from-blue-300 to-blue-700" },
-        { key: "months", title: "Active Months", final: currActiveMonths, change: getChange(currActiveMonths, prevActiveMonths), color: "from-blue-300 to-blue-700" },
-      ]
-
-      updatedMetrics.forEach((metric, i) => {
-        animateValue(metrics[i].value, metric.final, 1000, (val) => {
-          setMetrics((prev) => {
-            const newMetrics = [...prev]
-            newMetrics[i] = { ...metric, value: val }
-            return newMetrics
+        updatedMetrics.forEach((metric, i) => {
+          animateValue(metrics[i].value, metric.final, 1000, (val) => {
+            setMetrics((prev) => {
+              const newMetrics = [...prev]
+              newMetrics[i] = { ...metric, value: val }
+              return newMetrics
+            })
           })
         })
-      })
+      } catch (error) {
+        console.error("Error fetching stats:", error)
+      }
     }
 
     fetchStats()
@@ -89,7 +100,9 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {metrics.map(({ key, title, value, change, color }) => {
         const Icon = iconMap[key as keyof typeof iconMap]
-        const displayVal = key === "months" ? `${value} / 12` : `${currency}${value.toLocaleString()}`
+        const displayVal =
+          key === "months" ? `${value} / 12` : `${currency}${value.toLocaleString()}`
+
         return (
           <div
             key={key}
@@ -99,11 +112,11 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
               <Icon className="w-12 h-12" />
             </div>
             <div className="z-10 relative">
-              <div className="text-sm uppercase font-semibold tracking-wider">
-                {title}
-              </div>
+              <div className="text-sm uppercase font-semibold tracking-wider">{title}</div>
               <div className="text-3xl font-bold mt-2">{displayVal}</div>
-              <div className="text-xs mt-1 opacity-80">{change}</div>
+
+              {/* Change value only if available */}
+              {change && <div className="text-xs mt-1 opacity-80">{change}</div>}
             </div>
           </div>
         )
