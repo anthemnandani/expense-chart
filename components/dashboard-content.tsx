@@ -105,7 +105,7 @@ export default function DashboardContent() {
       {/* Comprehensive Dashboard */}
       <div className="space-y-6">
         <UniqueStatCards selectedYear={selectedYear} currency={currency} />
-        {/* <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <AreaYearlyExpenseChart years={years} currency={currency} />
           <HighLevelPieChart years={years} currency={currency} />
         </div>
@@ -131,9 +131,9 @@ export default function DashboardContent() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <DailyExpenseChart years={years} currency={currency} />
-        </div> */}
+        </div>
 
-        {/* Financial Insights */}
+             {/* Financial Insights */}
         <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Financial Insights & Recommendations</CardTitle>
@@ -144,6 +144,7 @@ export default function DashboardContent() {
           <CardContent>
             {financialInsights ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
                 {/* Highest Debit Month */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 mb-3">Highest Debit Month</h4>
@@ -210,36 +211,47 @@ export default function DashboardContent() {
                   </p>
                 </div>
 
-                {/* This Month’s Trend */}
+                {/* This Month’s Trend → UPDATED */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-lime-600 dark:text-lime-500 mb-3">This Month’s Trend</h4>
                   <div className="text-2xl font-bold text-lime-700 dark:text-lime-500 mb-2">
                     {financialInsights.thisMonthTrend.trend === "Downward" ? "📉 Downward" : "📈 Upward"}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Spending is <strong>{parseFloat(financialInsights.thisMonthTrend.percentageChange).toFixed(2)}% {financialInsights.thisMonthTrend.trend.toLowerCase()}</strong> than last month.
+                    Spending is <strong>
+                      {parseFloat(financialInsights.thisMonthTrend.percentageChange).toFixed(2)}%
+                      ({currency}{parseFloat(financialInsights.thisMonthTrend.amount).toFixed(2)})
+                      {financialInsights.thisMonthTrend.trend.toLowerCase()}
+                    </strong> than last month.
                   </p>
                 </div>
 
-                {/* Top Spending Category */}
+                {/* Top Spending Category → UPDATED */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-orange-700 dark:text-orange-500 mb-3">Top Spending Category</h4>
                   <div className="text-2xl font-bold text-orange-800 dark:text-orange-500 mb-2">
                     {financialInsights.topSpendingCategory.category}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Accounts for <strong>{parseFloat(financialInsights.topSpendingCategory.percentage).toFixed(2)}%</strong> of your total expenses
+                    Accounts for <strong>
+                      {parseFloat(financialInsights.topSpendingCategory.percentage).toFixed(2)}%
+                      ({currency}{parseFloat(financialInsights.topSpendingCategory.total).toFixed(2)})
+                    </strong> of your total expenses
                   </p>
                 </div>
 
-                {/* Income vs Expense */}
+                {/* Income vs Expense → UPDATED */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
                   <h4 className="font-semibold text-green-600 dark:text-green-400 mb-3">Credit vs Debit</h4>
                   <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">
                     {financialInsights.incomeVsExpense.ratio}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Credits is <strong>{parseFloat(financialInsights.incomeVsExpense.percentageHigher).toFixed(2)}% higher</strong> than total debits.
+                    Credits is <strong>
+                      {parseFloat(financialInsights.incomeVsExpense.percentageHigher).toFixed(2)}%
+                      ({currency}{parseFloat(financialInsights.incomeVsExpense.amountDifference).toFixed(2)})
+                      higher
+                    </strong> than total debits.
                   </p>
                 </div>
               </div>

@@ -210,9 +210,24 @@ export async function GET(req: NextRequest) {
       highestCreditMonth,
       lowestCreditMonth,
       avgCredit: { amount: Math.round(avgCredit.avg_amount || 0), transactionCount: avgCredit.transaction_count || 0 },
-      thisMonthTrend: { trend: trendChange < 0 ? "Downward" : "Upward", percentageChange: Math.abs(trendChange.toFixed(1)) },
-      topSpendingCategory: { category: topCategory.category, percentage: parseFloat(topCategory.percentage.toFixed(1)) },
-      incomeVsExpense: { ratio, percentageHigher: debit > 0 ? ((credit - debit) / debit) * 100 : 0 }
+      // thisMonthTrend: { trend: trendChange < 0 ? "Downward" : "Upward", percentageChange: Math.abs(trendChange.toFixed(1)) },
+      thisMonthTrend: {
+        trend: trendChange < 0 ? "Downward" : "Upward",
+        percentageChange: Math.abs(trendChange.toFixed(1)),
+        amount: currentTotal      // 👈 ADD THIS
+      },
+      // topSpendingCategory: { category: topCategory.category, percentage: parseFloat(topCategory.percentage.toFixed(1)) },
+      topSpendingCategory: {
+        category: topCategory.category,
+        percentage: parseFloat(topCategory.percentage.toFixed(1)),
+        total: topCategory.total      // 👈 ADD THIS
+      },
+      incomeVsExpense: {
+        ratio,
+        percentageHigher: debit > 0 ? ((credit - debit) / debit) * 100 : 0,
+        amountDifference: credit - debit      // 👈 ADD THIS
+      },
+      // incomeVsExpense: { ratio, percentageHigher: debit > 0 ? ((credit - debit) / debit) * 100 : 0 }
     }, { status: 200, headers: corsHeaders });
 
   } catch (err) {
