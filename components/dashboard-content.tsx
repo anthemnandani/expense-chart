@@ -105,7 +105,7 @@ export default function DashboardContent() {
       {/* Comprehensive Dashboard */}
       <div className="space-y-6">
         <UniqueStatCards selectedYear={selectedYear} currency={currency} />
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <AreaYearlyExpenseChart years={years} currency={currency} />
           <HighLevelPieChart years={years} currency={currency} />
         </div>
@@ -131,7 +131,7 @@ export default function DashboardContent() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <DailyExpenseChart years={years} currency={currency} />
-        </div>
+        </div> */}
 
         {/* Financial Insights */}
         <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-700">
@@ -173,7 +173,7 @@ export default function DashboardContent() {
                     {currency}{parseFloat(financialInsights.avgDebit.amount).toFixed(2)}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Across <strong>{financialInsights.avgDebit.transactionCount}</strong> debit transactions this month.
+                    Across <strong>{financialInsights.avgDebit.transactionCount}</strong> debit transactions this year.
                   </p>
                 </div>
 
@@ -206,7 +206,7 @@ export default function DashboardContent() {
                     {currency}{parseFloat(financialInsights.avgCredit.amount).toFixed(2)}
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Across <strong>{financialInsights.avgCredit.transactionCount}</strong> credit transactions this month.
+                    Across <strong>{financialInsights.avgCredit.transactionCount}</strong> credit transactions this year.
                   </p>
                 </div>
 
@@ -234,7 +234,7 @@ export default function DashboardContent() {
 
                 {/* Income vs Expense */}
                 <div className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-                  <h4 className="font-semibold text-green-600 dark:text-green-400 mb-3">Income vs Expense</h4>
+                  <h4 className="font-semibold text-green-600 dark:text-green-400 mb-3">Credit vs Debit</h4>
                   <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">
                     {financialInsights.incomeVsExpense.ratio}
                   </div>
