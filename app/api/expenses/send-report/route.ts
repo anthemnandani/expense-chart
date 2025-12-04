@@ -56,7 +56,10 @@ export async function POST(req: Request) {
         exp.Description,
         exp.ExpenseDescType,
         exp.Type === "Cr." ? "Credit" : "Debit",
-        `${exp.Expenses.toLocaleString()}`,
+        // `${exp.Expenses.toLocaleString()}`,
+        String(exp.Expenses)
+          .replace(/[^0-9.-]+/g, "")  // remove currency symbols and text
+          .toLocaleString()
       ]);
     });
 
