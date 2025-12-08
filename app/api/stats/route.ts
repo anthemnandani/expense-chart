@@ -62,10 +62,10 @@ export async function GET(req: NextRequest) {
     const latestBalanceResult = await pool.request()
       .input("groupId", groupId)
       .query(`
-        SELECT TOP 1 Balance
-        FROM tbl_Expenses
-        WHERE GroupId = @groupId AND IsDeleted = 0
-        ORDER BY Date DESC
+      SELECT TOP 1 Balance
+FROM tbl_Expenses
+WHERE GroupId = @groupId AND IsDeleted = 0
+ORDER BY ExpenseId DESC
       `);
 
     const latestBalance = latestBalanceResult.recordset[0]?.Balance || 0;
