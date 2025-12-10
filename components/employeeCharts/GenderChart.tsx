@@ -74,6 +74,7 @@ export default function GenderChart({ year = 2025 }) {
         // Slice styling
         series.slices.template.setAll({
             cornerRadius: 8,
+            tooltipText: "{category}: {value} ({valuePercentTotal.formatNumber('0.00')}%)"
         });
 
         // Colors for Male/Female
