@@ -19,9 +19,16 @@ export default function EmployeeChart() {
                 const json = await res.json();
 
                 if (json.success) {
+                    const shortRole = (role: string) => {
+                        if (!role) return "";
+
+                        return role
+                            .replace(/Senior Developer/gi, "Sr. Developer")
+                            .replace(/Junior Developer/gi, "Jr. Developer")
+                    };
                     const formatted = json.data.map((emp: any) => ({
                         name: emp.name,
-                        role: emp.role,
+                        role: shortRole(emp.role),
                         steps: emp.salary || 0, // 👈 steps = salary (same field you used)
                         pictureSettings: {
                             src:
