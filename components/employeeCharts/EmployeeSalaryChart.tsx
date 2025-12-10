@@ -76,7 +76,7 @@ export default function EmployeeChart() {
         xRenderer.labels.template.setAll({
             paddingTop: 40,
             dy: 20,           // name ko neeche shift, image se overlap hat gayi
-            fontSize: 13,
+            fontSize: 12,
             textAlign: "center",
         });
 
