@@ -16,6 +16,11 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
+const allowedEmployeeEmails = [
+  "nandani@antheminfotech.com",
+  "info@antheminfotech.com"
+];
+
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -24,28 +29,58 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
 
+  // const menuItems = [
+  //   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+  //   {
+  //     title: "Expenses",
+  //     icon: CreditCard,
+  //     href: "/expenses/dashboard",
+  //     children: [
+  //       { title: "Expenses List", href: "/expenses/expenses-list" },
+  //       { title: "Expense Types", href: "/expenses/expense-types" },
+  //     ],
+  //   },
+  //   {
+  //     title: "Employees",
+  //     icon: Users,
+  //     href: "/employees/dashboard",
+  //     children: [
+  //       { title: "Employee List", href: "/employees/employees-list" },
+  //       { title: "Roles", href: "/employees/roles" },
+  //       { title: "Departments", href: "/employees/departments" },
+  //     ],
+  //   },
+  // ]
+
   const menuItems = [
-    { title: "Dashboard", icon: LayoutDashboard, href: "/" },
-    {
-      title: "Expenses",
-      icon: CreditCard,
-      href: "/expenses/dashboard",
-      children: [
-        { title: "Expenses List", href: "/expenses/expenses-list" },
-        { title: "Expense Types", href: "/expenses/expense-types" },
-      ],
-    },
-    {
-      title: "Employees",
-      icon: Users,
-      href: "/employees/dashboard",
-      children: [
-        { title: "Employee List", href: "/employees/employees-list" },
-        { title: "Roles", href: "/employees/roles" },
-        { title: "Departments", href: "/employees/departments" },
-      ],
-    },
-  ]
+  { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+
+  {
+    title: "Expenses",
+    icon: CreditCard,
+    href: "/expenses/dashboard",
+    children: [
+      { title: "Expenses List", href: "/expenses/expenses-list" },
+      { title: "Expense Types", href: "/expenses/expense-types" },
+    ],
+  },
+
+  // ⭐ SHOW Employees menu ONLY if email is allowed  
+  ...(allowedEmployeeEmails.includes(user?.email)
+    ? [
+        {
+          title: "Employees",
+          icon: Users,
+          href: "/employees/dashboard",
+          children: [
+            { title: "Employee List", href: "/employees/employees-list" },
+            { title: "Roles", href: "/employees/roles" },
+            { title: "Departments", href: "/employees/departments" },
+          ],
+        },
+      ]
+    : []),
+];
 
   // Open submenu based on current path
   useEffect(() => {

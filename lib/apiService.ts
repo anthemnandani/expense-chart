@@ -233,4 +233,20 @@ export const apiService = {
       return [];
     }
   },
+
+  // Fetch available years dynamically from backend
+  async getAvailableEmployeeYears() {
+    try {
+      const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/employee/available-years`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch available years");
+      const data = await res.json();
+      const availableYears = data.availableYears ?? [];
+      // Sort in descending order (newest year first)
+      const sortedYears = [...availableYears].sort((a, b) => b - a);
+      return sortedYears;
+    } catch (error) {
+      console.error("Error fetching available years:", error);
+      return [];
+    }
+  },
 };
