@@ -1,36 +1,37 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
+import { useLayoutEffect, useState, useEffect } from "react";
+import * as am5 from "@amcharts/amcharts5";
+import * as am5percent from "@amcharts/amcharts5/percent";
+import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { CardHeader, CardTitle } from "../ui/card";
 
-const GenderChart = ({ year = 2025 }) => {
+export default function GenderChart({ year = 2025 }) {
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    // Fetch API
+    // Fetch data
     useEffect(() => {
         const fetchGenderStats = async () => {
             try {
-                const response = await fetch(
+                const res = await fetch(
                     `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${year}`
                 );
 
-                const result = await response.json();
+                const result = await res.json();
 
                 if (result.status) {
-                    setData(
-                        result.data.map((item) => ({
-                            gender: item.Gender,
-                            count: item.Count,
-                        }))
-                    );
+                    const formatted = result.data.map((item) => ({
+                        category: item.Gender,
+                        value: item.Count,
+                    }));
+
+                    setData(formatted);
                     setTotal(result.totalEmployees);
                 }
-            } catch (error) {
-                console.error("Error fetching gender stats:", error);
+            } catch (err) {
+                console.error("Gender chart fetch error", err);
             } finally {
                 setLoading(false);
             }
@@ -39,80 +40,87 @@ const GenderChart = ({ year = 2025 }) => {
         fetchGenderStats();
     }, [year]);
 
-    // Generate chart data
-    const chartData = useMemo(() => {
-        const sum = data.reduce((a, b) => a + b.count, 0) || 1;
+    // Render chart
+    useLayoutEffect(() => {
+        if (data.length === 0) return;
 
-        return data.map((item) => ({
-            name: item.gender,
-            y: item.count,
-            percentage: ((item.count / sum) * 100).toFixed(1),
+        let root = am5.Root.new("genderPieChart");
+
+        root.setThemes([am5themes_Animated.new(root)]);
+
+        // Create chart
+        let chart = root.container.children.push(
+            am5percent.PieChart.new(root, {
+                innerRadius: am5.percent(55),
+            })
+        );
+
+        // Series
+        let series = chart.series.push(
+            am5percent.PieSeries.new(root, {
+                valueField: "value",
+                categoryField: "category",
+                alignLabels: false,
+            })
+        );
+
+        // Arc labels (circular)
+        series.labels.template.setAll({
+            textType: "circular",
+            radius: 10,
+            fontSize: 12,
+        });
+
+        // Slice styling
+        series.slices.template.setAll({
+            cornerRadius: 8,
+        });
+
+        // Colors for Male/Female
+        series.set("colors", am5.ColorSet.new(root, {
+            colors: [
+                am5.color("#3b82f6"), // blue → male
+                am5.color("#ec4899"), // pink → female
+                am5.color("#10b981"), // other → green
+            ]
         }));
+
+        // Legend with percentage
+        const legend = chart.children.push(
+            am5.Legend.new(root, {
+                 centerX: am5.percent(50),
+        x: am5.percent(50),
+        marginTop: 20,
+        marginBottom: 10,
+        layout: root.horizontalLayout,
+        y: am5.percent(100),    // 👈 Bottom me rakhta hai
+        centerY: am5.percent(100)
+            })
+        );
+
+        // Custom legend label text (Category + Percentage)
+        legend.itemContainers.template.adapters.add("text", (text, target) => {
+            const dataItem = target.dataItem?.dataContext;
+            if (dataItem) {
+                const total = data.reduce((sum, item) => sum + item.value, 0);
+                const percent = ((dataItem.value / total) * 100).toFixed(2);
+                return `${dataItem.category} ${percent}%`;
+            }
+            return text;
+        });
+
+        
+        // Set data
+        series.data.setAll(data);
+        
+        series.appear(800, 80);
+        
+        legend.data.setAll(series.dataItems);
+
+        return () => {
+            root.dispose();
+        };
     }, [data]);
-
-    // Highcharts configuration
-    const options = useMemo(
-        () => ({
-            chart: {
-                type: "pie",
-                backgroundColor: "#ffffff",
-                borderRadius: 16,
-            },
-
-            title: { text: undefined },
-
-            tooltip: {
-                useHTML: true,
-                formatter: function () {
-                    const pct = Number(this.point.percentage).toFixed(2); // FIXED 2 decimal
-
-                    return `
-        <div style='padding:6px 8px;'>
-            <b>${this.point.name}</b><br/>
-            Count: ${this.y}<br/>
-            Percentage: ${pct}%
-        </div>`;
-                },
-            },
-
-            plotOptions: {
-                pie: {
-                    innerSize: "55%",
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function () {
-                            const pct = Number(this.point.percentage).toFixed(2); // FIXED 2 decimal
-                            return `${this.point.name}: ${pct}%`;
-                        },
-                        style: {
-                            fontWeight: "600",
-                            color: "#333",
-                            textOutline: "none",
-                        },
-                    },
-                },
-            },
-
-            colors: ["#3b82f6", "#ec4899", "#10b981"],
-
-            series: [
-                {
-                    name: "Gender Ratio",
-                    data: chartData,
-                },
-            ],
-
-            legend: {
-                layout: "horizontal",
-                align: "center",
-                verticalAlign: "bottom",
-                itemStyle: { fontWeight: "500", color: "#111" },
-            },
-
-            credits: { enabled: false },
-        }),
-        [chartData]
-    );
 
     return (
         <div className="w-full bg-white rounded-2xl shadow p-6 pt-1">
@@ -123,22 +131,16 @@ const GenderChart = ({ year = 2025 }) => {
             </CardHeader>
 
             {loading ? (
-                <div className="text-center py-10 text-gray-500">
-                    Loading gender stats...
-                </div>
+                <div className="text-center py-10 text-gray-500">Loading gender stats...</div>
             ) : (
                 <>
-                    <div className="w-full">
-                        <HighchartsReact highcharts={Highcharts} options={options} />
-                    </div>
-
+                    <div id="genderPieChart" style={{ width: "100%", height: "450px" }}></div>
+{/* 
                     <div className="mt-6 text-sm text-gray-600">
                         <b>Total Employees:</b> {total}
-                    </div>
+                    </div> */}
                 </>
             )}
         </div>
     );
-};
-
-export default GenderChart;
+}

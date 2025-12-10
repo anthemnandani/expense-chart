@@ -76,7 +76,7 @@ export default function EmployeeChart() {
         xRenderer.labels.template.setAll({
             paddingTop: 40,
             dy: 20,           // name ko neeche shift, image se overlap hat gayi
-            fontSize: 12,
+            fontSize: 11,
             textAlign: "center",
         });
 
@@ -260,7 +260,7 @@ export default function EmployeeChart() {
                 </CardTitle>
             </CardHeader>
 
-            <CardContent className="pt-2">
+            <CardContent className="pt-0">
                 <div id="chartdiv" className="w-full h-[500px]" />
             </CardContent>
         </Card>
