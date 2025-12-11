@@ -1,3 +1,147 @@
+      let data = [
+            {
+                month: "Jan",
+                total: 10,
+                resigned: 3,
+                joined: 1,
+                resignedEmployees: [
+                    { name: "David", date: "01-05-25" },
+                    { name: "Eve", date: "01-12-25" },
+                    { name: "Frank", date: "01-28-25" }
+                ],
+                joinedEmployees: [
+                    { name: "Alice", date: "01-15-25" }
+                ]
+            },
+            {
+                month: "Feb",
+                total: 10,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "Mar",
+                total: 12,
+                resigned: 0,
+                joined: 2,
+                resignedEmployees: [],
+                joinedEmployees: [
+                    { name: "Bob", date: "03-02-25" },
+                    { name: "Charlie", date: "03-18-25" }
+                ]
+            },
+            {
+                month: "Apr",
+                total: 12,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "May",
+                total: 10,
+                resigned: 2,
+                joined: 0,
+                resignedEmployees: [
+                    { name: "Grace", date: "05-10-25" },
+                    { name: "Heidi", date: "05-22-25" }
+                ],
+                joinedEmployees: []
+            },
+            {
+                month: "Jun",
+                total: 10,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "Jul",
+                total: 10,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "Aug",
+                total: 14,
+                resigned: 1,
+                joined: 5,
+                resignedEmployees: [
+                    { name: "Ivan", date: "08-07-25" }
+                ],
+                joinedEmployees: [
+                    { name: "Judy", date: "08-03-25" },
+                    { name: "Karl", date: "08-09-25" },
+                    { name: "Lisa", date: "08-15-25" },
+                    { name: "Mike", date: "08-20-25" },
+                    { name: "Nina", date: "08-25-25" }
+                ]
+            },
+            {
+                month: "Sep",
+                total: 14,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "Oct",
+                total: 14,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            },
+            {
+                month: "Nov",
+                total: 15,
+                resigned: 1,
+                joined: 2,
+                resignedEmployees: [
+                    { name: "Oscar", date: "11-14-25" }
+                ],
+                joinedEmployees: [
+                    { name: "Paul", date: "11-05-25" },
+                    { name: "Quinn", date: "11-21-25" }
+                ]
+            },
+            {
+                month: "Dec",
+                total: 15,
+                resigned: 0,
+                joined: 0,
+                resignedEmployees: [],
+                joinedEmployees: []
+            }
+        ];
+
+
+
+
+          <Card className="w-full shadow-md bg-white dark:bg-gray-900 transition-colors duration-300">
+            <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Employee Salary Chart
+                </CardTitle>
+            </CardHeader>
+
+            <CardContent className="pt-0">
+                <div ref={chartRef} style={{ width: "100%", height: "500px" }} />
+            </CardContent>
+        </Card>
+
+
+
+
+
+
 [tbl_EmployeeCheck] - realted to cheakin, cheakout time with msg
 [tbl_EmployeeGrade] - related to grade like 1 = good, 2 = very good
 [tbl_Employees] - employee data

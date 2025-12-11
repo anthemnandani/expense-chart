@@ -179,9 +179,9 @@ const AttendanceHeatmap = () => {
         <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Attendance Heatmap
         </CardTitle>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        {/* <p className="text-sm text-gray-500 dark:text-gray-400">
           Employee presence intensity based on 30-minute intervals
-        </p>
+        </p> */}
       </CardHeader>
       <CardContent className="pt-2">
         <HighchartsReact highcharts={Highcharts} options={options} />

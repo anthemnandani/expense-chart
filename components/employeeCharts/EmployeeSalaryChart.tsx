@@ -210,22 +210,24 @@ export default function EmployeeChart() {
         series.columns.template.events.on("pointerout", handleOut);
 
         // Heat rule
-        series.set("heatRules", [
-            {
-                target: series.columns.template,
-                key: "fill",
-                dataField: "valueY",
-                min: am5.color(0xe5dc36),
-                max: am5.color(0x5faa46),
-            },
-            {
-                target: circleTemplate,
-                key: "fill",
-                dataField: "valueY",
-                min: am5.color(0xe5dc36),
-                max: am5.color(0x5faa46),
-            },
-        ]);
+      // Heat rule (Blue gradient)
+series.set("heatRules", [
+    {
+        target: series.columns.template,
+        key: "fill",
+        dataField: "valueY",
+        min: am5.color(0x4a90e2), // Dark blue
+        max: am5.color(0x1982c4), // Light blue
+    },
+    {
+        target: circleTemplate,
+        key: "fill",
+        dataField: "valueY",
+        min: am5.color(0x4a90e2), // Dark blue
+        max: am5.color(0x1982c4), // Light blue
+    },
+]);
+
         series.data.setAll(chartData);
         xAxis.data.setAll(chartData);
 

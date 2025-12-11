@@ -6,17 +6,19 @@ import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { CardHeader, CardTitle } from "../ui/card";
 
-export default function GenderChart({ year = 2025 }) {
+export default function GenderChart({ years }) {
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
+      const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+      const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     // Fetch data
     useEffect(() => {
         const fetchGenderStats = async () => {
             try {
                 const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${year}`
+                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}`
                 );
 
                 const result = await res.json();
@@ -38,7 +40,7 @@ export default function GenderChart({ year = 2025 }) {
         };
 
         fetchGenderStats();
-    }, [year]);
+    }, [selectedMonth, selectedYear]);
 
     // Render chart
     useLayoutEffect(() => {
@@ -89,13 +91,13 @@ export default function GenderChart({ year = 2025 }) {
         // Legend with percentage
         const legend = chart.children.push(
             am5.Legend.new(root, {
-                 centerX: am5.percent(50),
-        x: am5.percent(50),
-        marginTop: 20,
-        marginBottom: 10,
-        layout: root.horizontalLayout,
-        y: am5.percent(100),    // 👈 Bottom me rakhta hai
-        centerY: am5.percent(100)
+                centerX: am5.percent(50),
+                x: am5.percent(50),
+                marginTop: 20,
+                marginBottom: 10,
+                layout: root.horizontalLayout,
+                y: am5.percent(100),    // 👈 Bottom me rakhta hai
+                centerY: am5.percent(100)
             })
         );
 
@@ -110,12 +112,12 @@ export default function GenderChart({ year = 2025 }) {
             return text;
         });
 
-        
+
         // Set data
         series.data.setAll(data);
-        
+
         series.appear(800, 80);
-        
+
         legend.data.setAll(series.dataItems);
 
         return () => {
@@ -124,19 +126,46 @@ export default function GenderChart({ year = 2025 }) {
     }, [data]);
 
     return (
-        <div className="w-full bg-white rounded-2xl shadow p-6 pt-1">
+        <div className="w-full bg-white rounded-lg shadow p-6 pt-1">
             <CardHeader className="pb-4 pl-0 pr-0 flex justify-between lg:flex-row flex-col">
                 <CardTitle className="text-gray-800 dark:text-white">
                     Employee Gender Distribution
                 </CardTitle>
+
+                {/* Month / Year dropdowns */}
+                <div className="flex gap-2">
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-1 py-1"
+                    >
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                            <option key={m} value={m}>
+                                {new Date(0, m - 1).toLocaleString("default", { month: "long" })}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(Number(e.target.value))}
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
+                    >
+                        {years.map((y) => (
+                            <option key={y} value={y}>
+                                {y}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </CardHeader>
 
             {loading ? (
                 <div className="text-center py-10 text-gray-500">Loading gender stats...</div>
             ) : (
                 <>
-                    <div id="genderPieChart" style={{ width: "100%", height: "450px" }}></div>
-{/* 
+                    <div id="genderPieChart" style={{ width: "100%", height: "410px" }}></div>
+                    {/* 
                     <div className="mt-6 text-sm text-gray-600">
                         <b>Total Employees:</b> {total}
                     </div> */}
