@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
       chkQuantityTracker: dbUser.ChkQuantityTracker,
       chkMarketing: dbUser.ChkMarketing,
       chkLocations: dbUser.ChkLocations,
+      token: accessToken || null,
     };
 
     // Optionally enhance with access token data

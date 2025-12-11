@@ -41,7 +41,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
     }
 
-    const token = jwt.sign({ email: user.emailId }, JWT_SECRET, { expiresIn: "7d" });
+    // const token = jwt.sign({ email: user.emailId }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+  {
+    userId: user.userId,
+    userName: user.userName,
+    email: user.emailId,
+    fullName: user.fullName,
+    userTypeId: user.userTypeId,
+    groupId: user.groupId
+  },
+  JWT_SECRET,
+  { expiresIn: "7d" }
+);
 
     const userData = {
       userId: user.userId,

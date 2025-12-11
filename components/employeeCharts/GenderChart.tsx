@@ -5,6 +5,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { CardHeader, CardTitle } from "../ui/card";
+import { useAuth } from "@/context/auth-context";
 
 export default function GenderChart({ years }) {
     const [data, setData] = useState([]);
@@ -12,13 +13,14 @@ export default function GenderChart({ years }) {
     const [loading, setLoading] = useState(true);
       const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
       const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const { user } = useAuth()
 
     // Fetch data
     useEffect(() => {
         const fetchGenderStats = async () => {
             try {
                 const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}`
+                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}?token=${encodeURIComponent(user?.token)}`
                 );
 
                 const result = await res.json();
@@ -127,7 +129,7 @@ export default function GenderChart({ years }) {
 
     return (
         <div className="w-full bg-white rounded-lg shadow p-6 pt-1">
-            <CardHeader className="pb-4 pl-0 pr-0 flex justify-between lg:flex-row flex-col">
+            <CardHeader className="flex justify-between lg:flex-row flex-col">
                 <CardTitle className="text-gray-800 dark:text-white">
                     Employee Gender Distribution
                 </CardTitle>

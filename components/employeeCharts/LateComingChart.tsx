@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { CardHeader, CardTitle } from "../ui/card";
+import { useAuth } from "@/context/auth-context";
 
 const monthNames = [
   "Jan","Feb","Mar","Apr","May","Jun",
@@ -15,14 +16,14 @@ export default function LateComingChart({ years }) {
   const [chartData, setChartData] = useState([]);
   const [monthName, setMonthName] = useState(monthNames[selectedMonth - 1]);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useAuth()
   // 🔥 Fetch data dynamically
   const fetchLateData = async () => {
     try {
       setLoading(true);
 
       const res = await fetch(
-        `https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=${selectedYear}&month=${selectedMonth}`
+        `https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=${selectedYear}&month=${selectedMonth}?token=${encodeURIComponent(user?.token)}`
       );
 
       const data = await res.json();

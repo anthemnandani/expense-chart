@@ -3,17 +3,19 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { useMemo, useState, useEffect } from "react";
 import { CardHeader, CardTitle } from "../ui/card";
+import { useAuth } from "@/context/auth-context";
 
 const LeaveChart = ({ years }) => {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-
+  const { user } = useAuth()
+  
     // Fetch data dynamically
     const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/leave-report/${selectedYear}`);
+            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/leave-report/${selectedYear}?token=${encodeURIComponent(user?.token)}`);
             const fetchedData = await res.json();
             setData(fetchedData);
         } catch (err) {

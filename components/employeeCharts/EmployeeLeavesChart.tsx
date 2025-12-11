@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { CardHeader, CardTitle } from "../ui/card";
+import { useAuth } from "@/context/auth-context";
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -76,12 +77,13 @@ export default function EmployeeLeavesChart({ years }) {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [employeeData, setEmployeeData] = useState<EmployeeData[]>([]);
     const [loading, setLoading] = useState(true);
+  const { user } = useAuth()
 
     // Fetch data dynamically
     const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/leaves-report/${selectedYear}`);
+            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/leaves-report/${selectedYear}?token=${encodeURIComponent(user?.token)}`);
             const apiData: ApiResponse = await res.json();
 
             // Process API data to match EmployeeData interface

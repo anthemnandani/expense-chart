@@ -3,12 +3,14 @@
 import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/context/auth-context";
 
 export const DepartmentTreeChart = () => {
     const [treeData, setTreeData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDark, setIsDark] = useState(false);
     const [roamEnabled, setRoamEnabled] = useState(false);
+  const { user } = useAuth()
 
     // WATCH TAILWIND DARK MODE
     useEffect(() => {
@@ -29,7 +31,7 @@ export const DepartmentTreeChart = () => {
             setLoading(true);
 
             const res = await fetch(
-                "https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/employee-tree"
+                `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/employee-tree?token=${encodeURIComponent(user?.token)}`
             );
             const fetchedData = await res.json();
 

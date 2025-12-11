@@ -5,19 +5,8 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Users } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
-
-const allowedEmployeeEmails = [
-  "nandani@antheminfotech.com",
-  "info@antheminfotech.com",
-];
-
 
 export default function MainDashboard() {
-  const { user } = useAuth();
-
-  const canAccessEmployees = allowedEmployeeEmails.includes(user?.email);
-
   return (
     <div className="min-h-screen px-6 py-10">
       <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
@@ -54,8 +43,6 @@ export default function MainDashboard() {
           </Card>
         </Link>
 
-        {/* Employees Card → Only Show If Allowed */}
-        {canAccessEmployees && (
           <Link href="/employees/dashboard">
             <Card className="relative overflow-hidden rounded-xl shadow-lg cursor-pointer group">
               <div className="relative w-full h-72">
@@ -83,7 +70,6 @@ export default function MainDashboard() {
               </div>
             </Card>
           </Link>
-        )}
       </div>
     </div>
   );

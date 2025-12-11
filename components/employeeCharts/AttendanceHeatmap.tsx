@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/context/auth-context";
 
 const HighchartsReact = dynamic(() => import("highcharts-react-official"), { ssr: false });
 
@@ -11,8 +12,10 @@ const AttendanceHeatmap = () => {
   const [days, setDays] = useState(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [timeSlots, setTimeSlots] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const { user } = useAuth()
+
   const API_URL =
-    "https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-heatmap?year=2025&month=12";
+    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-heatmap?year=2025&month=12?token=${encodeURIComponent(user?.token)}`;
 
   // -----------------------------
   // Load Highcharts modules

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Users, CheckCircle, AlertCircle, Clock } from "lucide-react"
+import { useAuth } from "@/context/auth-context";
 
 const ICON_MAP = {
   totalEmployees: Users,
@@ -40,11 +41,12 @@ const calculateChange = (current: number, previous: number) => {
 
 export default function EmployeeStatCards() {
   const [metrics, setMetrics] = useState<Metric[]>([])
+    const { user } = useAuth()
 
   useEffect(() => {
     async function loadStats() {
       try {
-        const res = await fetch("https://employee-dashboard-backend-api.vercel.app/api/employee-stats")
+        const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/employee-stats?token=${encodeURIComponent(user?.token)}`)
         const data = await res.json()
 
         const initialMetrics: Metric[] = [

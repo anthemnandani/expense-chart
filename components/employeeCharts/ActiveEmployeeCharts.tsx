@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
+import { useAuth } from "@/context/auth-context";
 
 const COLORS = [
     "#3b82f6", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#06b6d4", "#f97316", "#ec4899"
@@ -24,12 +25,13 @@ export const ActiveEmployeeCharts: React.FC = () => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [data, setData] = useState<ProcessedEmployeeData | null>(null)
     const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
 
     // Fetch data dynamically
     const fetchData = async () => {
         try {
             setLoading(true)
-            const res = await fetch("https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-summary")
+            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-summary?token=${encodeURIComponent(user?.token)}`)
             const fetchedData: FetchedEmployeeData = await res.json()
 
             // Process experience strings to years (decimal)

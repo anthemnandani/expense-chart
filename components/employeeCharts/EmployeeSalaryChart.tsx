@@ -5,16 +5,18 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/context/auth-context";
 
 export default function EmployeeChart() {
     const [chartData, setChartData] = useState([]);
+  const { user } = useAuth()
 
     // ✅ New dynamic data fetch (same format, same keys)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const res = await fetch(
-                    "https://employee-dashboard-backend-api.vercel.app/api/employees-dashboard-charts/salaries"
+                    `https://employee-dashboard-backend-api.vercel.app/api/employees-dashboard-charts/salaries?token=${encodeURIComponent(user?.token)}`
                 );
                 const json = await res.json();
 
