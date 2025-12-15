@@ -20,7 +20,7 @@ export default function GenderChart({ years }) {
         const fetchGenderStats = async () => {
             try {
                 const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}?token=${encodeURIComponent(user?.token)}`
+                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}&token=${encodeURIComponent(user?.token)}`
                 );
 
                 const result = await res.json();

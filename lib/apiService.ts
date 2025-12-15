@@ -33,7 +33,7 @@ export const apiService = {
     }
   },
 
-    // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
+  // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
   async getExpenseByMonth(
     groupId: string,
     year: number,
@@ -53,15 +53,15 @@ export const apiService = {
   },
 
   async getYearlyCreditDebit(groupId: string, year: number): Promise<{ credit: [number, number][], debit: [number, number][] }> {
-  try {
-    const res = await fetch(`/api/yearly-credit-debit?groupId=${groupId}&year=${year}`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch yearly credit debit");
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching yearly credit debit:", error);
-    return { credit: [], debit: [] };
-  }
-},
+    try {
+      const res = await fetch(`/api/yearly-credit-debit?groupId=${groupId}&year=${year}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch yearly credit debit");
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching yearly credit debit:", error);
+      return { credit: [], debit: [] };
+    }
+  },
 
   // Fetch category-wise expenses for HighLevelPieChart and GaugeMultipleKPIChart
   async getCurrency(groupId: string): Promise<{ currency: string }> {
@@ -235,9 +235,12 @@ export const apiService = {
   },
 
   // Fetch available years dynamically from backend
-  async getAvailableEmployeeYears() {
+  async getAvailableEmployeeYears(token: string): Promise<number[]> {
     try {
-      const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/employee/available-years`, { cache: "no-store" });
+      const res = await fetch(
+        `https://employee-dashboard-backend-api.vercel.app/api/employee/available-years?token=${encodeURIComponent(token)}`,
+        { cache: "no-store" }
+      );
       if (!res.ok) throw new Error("Failed to fetch available years");
       const data = await res.json();
       const availableYears = data.availableYears ?? [];

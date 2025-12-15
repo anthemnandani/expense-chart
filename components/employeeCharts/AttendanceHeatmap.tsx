@@ -15,7 +15,7 @@ const AttendanceHeatmap = () => {
   const { user } = useAuth()
 
   const API_URL =
-    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-heatmap?year=2025&month=12?token=${encodeURIComponent(user?.token)}`;
+    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-heatmap?year=2025&month=12&token=${encodeURIComponent(user?.token)}`;
 
   // -----------------------------
   // Load Highcharts modules

@@ -13,6 +13,7 @@ import AttendanceHeatmap from "@/components/employeeCharts/AttendanceHeatmap";
 import { DepartmentTreeChart } from "@/components/employeeCharts/DepartmentTreeChart";
 import EmployeeSalaryChart from "@/components/employeeCharts/EmployeeSalaryChart";
 import EmployeeYearlyJoiningResignedChart from "@/components/employeeCharts/EmployeeYearlyJoiningResignedChart";
+import UpcomingEventsTimeline from "@/components/employeeCharts/UpcomingEventsTimeline";
 
 export default function EmployeesDashboard() {
   const { user } = useAuth();
@@ -25,7 +26,7 @@ export default function EmployeesDashboard() {
     const fetchYears = async () => {
       try {
         console.log("Fetching years... groupId:", groupId); // Debug: Check if groupId exists
-        const response = await apiService.getAvailableEmployeeYears();
+        const response = await apiService.getAvailableEmployeeYears(user?.token);
         console.log("Raw API response:", response); // Debug: Log full response
         const fetchedYears = Array.isArray(response) ? response : (response.availableYears || response.years || []); // Flexible extraction
         console.log("Extracted years array:", fetchedYears); // Debug: Log extracted array
@@ -39,7 +40,7 @@ export default function EmployeesDashboard() {
       }
     };
     fetchYears();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     console.log("Dashboard years state updated:", years);
@@ -51,7 +52,17 @@ export default function EmployeesDashboard() {
 
       <h1 className="text-3xl font-bold">Employees Dashboard</h1>
 
-      <EmployeeStatCards years={years} />
+
+      <div className="grid grid-cols-5 gap-4">
+        <div className="col-span-3">
+          <EmployeeStatCards />
+        </div>
+
+        <div className="col-span-2">
+          <UpcomingEventsTimeline  />
+        </div>
+      </div>
+
 
       <ActiveEmployeeCharts years={years} />
 

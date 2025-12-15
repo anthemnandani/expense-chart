@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SignInPage() {
-  const { user, loading, setUser } = useAuth();
+  const { user, loading, checkAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -57,9 +57,15 @@ export default function SignInPage() {
       const data = await res.json();
 
       if (res.ok) {
+        // toast.success("Signed in successfully");
+        // setUser(data.user);
+        // router.push("/");
         toast.success("Signed in successfully");
-        setUser(data.user);
-        router.push("/");
+
+        // 🔥 IMPORTANT: force auth re-check
+        // await fetch("/api/user", { credentials: "include" });
+        await checkAuth();
+        router.replace("/"); // replace, not push
       } else {
         if (res.status === 404) {
           toast.warning("User not found! Redirecting to register page...");
@@ -109,8 +115,8 @@ export default function SignInPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
-              </div>
+              <img src="https://res.cloudinary.com/dmyq2ymj9/image/upload/v1753870586/anthem_infotech_pvt_ltd__logo-removebg-preview_qd1tk4.png" alt="" />
+            </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-200">Dashboards</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300">Stay organized and manage your operations seamlessly</p>

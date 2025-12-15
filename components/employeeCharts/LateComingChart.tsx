@@ -23,7 +23,7 @@ export default function LateComingChart({ years }) {
       setLoading(true);
 
       const res = await fetch(
-        `https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=${selectedYear}&month=${selectedMonth}?token=${encodeURIComponent(user?.token)}`
+        `https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=${selectedYear}&month=${selectedMonth}&token=${encodeURIComponent(user?.token)}`
       );
 
       const data = await res.json();
