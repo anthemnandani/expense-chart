@@ -125,7 +125,7 @@ export default function EmployeeStatCards() {
             key: "absentToday",
             title: "Late Today",
             value: 0,
-            final: data.notCheckedInToday,
+            final: data.lateToday,
             color: "from-red-300 to-red-700",
           },
           {
