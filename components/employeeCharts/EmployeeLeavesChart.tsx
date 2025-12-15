@@ -77,13 +77,25 @@ export default function EmployeeLeavesChart({ years }) {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [employeeData, setEmployeeData] = useState<EmployeeData[]>([]);
     const [loading, setLoading] = useState(true);
-  const { user } = useAuth()
+    const { user } = useAuth()
 
     // Fetch data dynamically
     const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/leaves-report/${selectedYear}?token=${encodeURIComponent(user?.token)}`);
+
+            const res = await fetch(
+                `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/leaves-report/${selectedYear}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user?.token}`,
+                    },
+                }
+            );
+
+            if (!res.ok) {
+                throw new Error("Unauthorized or failed to fetch leaves report");
+            }
             const apiData: ApiResponse = await res.json();
 
             // Process API data to match EmployeeData interface
@@ -130,11 +142,11 @@ export default function EmployeeLeavesChart({ years }) {
                             onChange={(e) => setSelectedYear(Number(e.target.value))}
                             className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
                         >
-                             {years.map((y) => (
-                        <option key={y} value={y}>
-                            {y}
-                        </option>
-                    ))}
+                            {years.map((y) => (
+                                <option key={y} value={y}>
+                                    {y}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </CardHeader>
