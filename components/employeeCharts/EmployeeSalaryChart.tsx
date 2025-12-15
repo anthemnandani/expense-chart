@@ -9,15 +9,25 @@ import { useAuth } from "@/context/auth-context";
 
 export default function EmployeeChart() {
     const [chartData, setChartData] = useState([]);
-  const { user } = useAuth()
+    const { user } = useAuth()
 
     // ✅ New dynamic data fetch (same format, same keys)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/employees-dashboard-charts/salaries?token=${encodeURIComponent(user?.token)}`
+                    "https://employee-dashboard-backend-api.vercel.app/api/employees-dashboard-charts/salaries",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`,
+                        },
+                    }
                 );
+
+                if (!res.ok) {
+                    console.error("Unauthorized or failed response");
+                    return;
+                }
                 const json = await res.json();
 
                 if (json.success) {
