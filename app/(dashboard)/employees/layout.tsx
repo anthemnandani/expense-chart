@@ -9,7 +9,7 @@ interface EmployeesLayoutProps {
   children: ReactNode;
 }
 
-const ALLOWED_EMAILS = ["info@antheminfotech.com"];
+const ALLOWED_EMAILS = ["info@antheminfotech.com", "nandani@antheminfotech.com"];
 
 export default function EmployeesLayout({ children }: EmployeesLayoutProps) {
   const { user, loading } = useAuth();
