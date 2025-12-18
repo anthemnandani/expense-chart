@@ -52,12 +52,11 @@ export default function EmployeeEXperienceChart() {
 
                 const formatted = json.activeEmployees.map((emp: any) => ({
                     name: emp.name,
-                    role: "Experience",          // optional label
-                    // steps: convertToYears(emp.experience), // 👈 Y axis value
+                    role: emp.role, // 👈 real role from API
                     steps: scaleExperience(convertToYears(emp.experience)),
                     actualYears: convertToYears(emp.experience),
                     pictureSettings: {
-                        src: "https://res.cloudinary.com/dpmengi5q/image/upload/v1750319849/pzjbv9j9zwibqp5wexpk.jpg",
+                        src: emp.profileImage, // 👈 real profile image
                     },
                 }));
 

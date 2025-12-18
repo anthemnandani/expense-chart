@@ -8,8 +8,8 @@ import {
   Clock,
   CalendarClock,
   TrendingUp,
-  TrendingDown,
   Folder,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
@@ -19,9 +19,9 @@ const ICON_MAP = {
   absentToday: AlertCircle,
   onLeave: Clock,
   pendingLeaves: CalendarClock,
-  hiring: TrendingUp,
-  resignations: TrendingDown,
+  hiringVsResignation: TrendingUp,
   totalProjects: Folder,
+  currentYearTotalProjects: Calendar,
 } as const;
 
 interface Metric {
@@ -30,6 +30,10 @@ interface Metric {
   value: number;
   final: number;
   color: string;
+  extra?: {
+    hiring?: number;
+    resigned?: number;
+  };
 }
 
 // Number animation helper
@@ -87,25 +91,26 @@ export default function EmployeeStatCards() {
       color: "from-orange-300 to-orange-700",
     },
     {
-      key: "hiring",
-      title: "Hiring This Year",
+      key: "hiringVsResignation",
+      title: "Hiring vs Resignation",
       value: 0,
       final: 0,
-      color: "from-teal-300 to-teal-700",
-    },
-    {
-      key: "resignations",
-      title: "Resignations This Year",
-      value: 0,
-      final: 0,
-      color: "from-rose-300 to-rose-700",
+      color: "from-indigo-300 to-indigo-700",
+      extra: { hiring: 0, resigned: 0 },
     },
     {
       key: "totalProjects",
       title: "Total Projects",
       value: 0,
       final: 0,
-      color: "from-indigo-300 to-indigo-700",
+      color: "from-teal-300 to-teal-700",
+    },
+    {
+      key: "currentYearTotalProjects",
+      title: "Current Year Total Projects",
+      value: 0,
+      final: 0,
+      color: "from-yellow-300 to-yellow-700",
     },
   ]);
 
@@ -156,25 +161,26 @@ export default function EmployeeStatCards() {
             color: "from-orange-300 to-orange-700",
           },
           {
-            key: "hiring",
-            title: "Hiring This Year",
+            key: "hiringVsResignation",
+            title: "Hiring vs Resignation",
             value: 0,
-            final: data.hiringThisYear,
-            color: "from-teal-300 to-teal-700",
-          },
-          {
-            key: "resignations",
-            title: "Resignations This Year",
-            value: 0,
-            final: data.resignedThisYear,
-            color: "from-rose-300 to-rose-700",
+            final: data.hiringThisYear - data.resignedThisYear,
+            color: "from-indigo-300 to-indigo-700",
+            extra: { hiring: data.hiringThisYear, resigned: data.resignedThisYear },
           },
           {
             key: "totalProjects",
             title: "Total Projects",
             value: 0,
             final: data.totalProjects,
-            color: "from-indigo-300 to-indigo-700",
+            color: "from-teal-300 to-teal-700",
+          },
+          {
+            key: "currentYearTotalProjects",
+            title: "Current Year Total Projects",
+            value: 0,
+            final: data.CurrentyeartotalProjects,
+            color: "from-yellow-300 to-yellow-700",
           },
         ];
 
@@ -183,7 +189,7 @@ export default function EmployeeStatCards() {
           animateValue(0, metric.final, 1000, (val) => {
             setMetrics((prev) => {
               const copy = [...prev];
-              copy[i] = { ...copy[i], value: val, final: metric.final };
+              copy[i] = { ...copy[i], value: val, final: metric.final, extra: metric.extra };
               return copy;
             });
           });
@@ -212,7 +218,9 @@ export default function EmployeeStatCards() {
             <div className="relative z-10">
               <div className="text-sm mb-1 uppercase font-semibold tracking-wider">{title}</div>
               <div className="text-lg font-semibold tracking-wider">
-                {value}
+                {key === "hiringVsResignation" && metric.extra
+                  ? `${metric.extra.hiring} / ${metric.extra.resigned}`
+                  : value}
               </div>
             </div>
           </div>

@@ -88,7 +88,7 @@ export default function EmployeesDashboard() {
 
       <LateComingChart years={years} />
       
-      <EmployeeYearlyJoiningResignedChart years={years} />
+      {/* <EmployeeYearlyJoiningResignedChart years={years} /> */}
 
       <EmployeeLeavesChart years={years} />
 

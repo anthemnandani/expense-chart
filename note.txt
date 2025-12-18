@@ -143,6 +143,32 @@ const chartData = [
 
 
 
+ <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-3">
+      {metrics.map((metric) => {
+        const { key, title, value, color } = metric;
+        const Icon = ICON_MAP[key];
+        return (
+          <div
+            key={key}
+            className={`group pl-5 pt-4 rounded-lg bg-gradient-to-br ${color} text-white shadow-xl hover:scale-[1.02] transition-transform relative overflow-hidden h-[80px]`}
+          >
+            <div className="absolute top-2 right-2 opacity-20 text-7xl rotate-12">
+              <Icon className="w-14 h-14" />
+            </div>
+            <div className="relative z-10">
+              <div className="text-sm mb-1 uppercase font-semibold tracking-wider">{title}</div>
+              <div className="text-lg font-semibold tracking-wider">
+                {value}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+
+
+
 
 
 

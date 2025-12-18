@@ -48,9 +48,10 @@ export default function LateComingLollipopChart({ years }) {
     fetchLateData();
   }, [selectedMonth, selectedYear]);
 
-  const names = chartData.map((e) => e.name);
-  const lateValues = chartData.map((e) => e.lateDays);
-
+  // const names = chartData.map((e) => e.name);
+  // const lateValues = chartData.map((e) => e.lateDays);
+  const names = chartData.map((e) => e.Name);
+  const lateValues = chartData.map((e) => e.LateDays);
 
   const option = {
     grid: {
