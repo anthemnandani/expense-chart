@@ -1,3 +1,156 @@
+backend pending/new work
+
+------------------ #1(issue) -------------------
+https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=2025&month=12
+
+shift bhi cheak ho pahle uske accoring late days mein count ho
+
+
+------------------ #2(issue&new) -------------------
+
+https://employee-dashboard-backend-api.vercel.app/api/employee-stats
+
+lateToday, Pending Leave data not coming correctly, new fields: total projects,
+
+
+------------------ #3(new) -------------------
+
+https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-summary
+
+{
+    "activeEmployees": [
+        {
+            "name": "Diljeet singh jamwal",
+            "experience": "12 years 7 months",
+            "profileImage": "https://employee-dashboard-backend-api.vercel.app/api/employee/image/29",
+            "role": "Senior Developer",
+        },
+        {
+            "name": "Hemant gupta",
+            "experience": "14 years 8 months",
+            "profileImage": "https://employee-dashboard-backend-api.vercel.app/api/employee/image/29",
+            "role": "Senior Developer",
+        },
+        {
+            "name": "Virender kumar",
+            "experience": "6 years 1 months",
+            "profileImage": "https://employee-dashboard-backend-api.vercel.app/api/employee/image/29",
+            "role": "Senior Developer",
+        },
+    ]
+}
+
+
+
+
+
+------------------ #4(new) -------------------
+https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/project-timeline
+
+const chartData = [
+  {
+    category: "2016",
+    value: 2,
+    subData: [
+      {
+        category: "Android Development",
+        value: 2,
+        projects: [
+          {
+            name: "Project Alpha",
+            startDate: "2016-01-15",
+            endDate: "2016-06-30",
+            url: "https://portfolio.com/projects/project-alpha",
+            image: "https://example.com/images/project-alpha.jpg",
+            smallDescription: "A mobile app for task management with offline support."
+          },
+          {
+            name: "Project Beta",
+            startDate: "2016-03-10",
+            endDate: "2016-09-20",
+            url: "https://portfolio.com/projects/project-beta",
+            image: "https://example.com/images/project-beta.jpg",
+            smallDescription: "An Android utility app for productivity tracking."
+          }
+        ]
+      }
+    ]
+  },
+ ...
+  {
+    category: "2025",
+    value: 4,
+    subData: [
+      {
+        category: "Android Development",
+        value: 1,
+        projects: [
+          {
+            name: "IoT App",
+            startDate: "2025-01-01",
+            endDate: "2025-06-30",
+            url: "https://portfolio.com/projects/iot-app",
+            image: "https://example.com/images/iot-app.jpg",
+            smallDescription: "IoT device control app with smart home integration."
+          }
+        ]
+      },
+      {
+        category: "Ecommerce Website",
+        value: 2,
+        projects: [
+          {
+            name: "Global Shop",
+            startDate: "2025-02-01",
+            endDate: "2025-07-01",
+            url: "https://portfolio.com/projects/global-shop",
+            image: "https://example.com/images/global-shop.jpg",
+            smallDescription: "International e-commerce site with multi-currency support."
+          },
+          {
+            name: "B2B Portal",
+            startDate: "2025-04-01",
+            endDate: "2025-09-01",
+            url: "https://portfolio.com/projects/b2b-portal",
+            image: "https://example.com/images/b2b-portal.jpg",
+            smallDescription: "B2B procurement portal."
+          }
+        ]
+      },
+      {
+        category: "Website (Mobile Compatible)",
+        value: 1,
+        projects: [
+          {
+            name: "AI Web",
+            startDate: "2025-03-01",
+            endDate: "2025-12-17",
+            url: "https://portfolio.com/projects/ai-web",
+            image: "https://example.com/images/ai-web.jpg",
+            smallDescription: "AI-driven web application for personalized experiences."
+          }
+        ]
+      }
+    ]
+  }
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       let data = [
             {
                 month: "Jan",

@@ -8,6 +8,8 @@ import {
   Clock,
   CalendarClock,
   TrendingUp,
+  TrendingDown,
+  Folder,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
@@ -17,7 +19,9 @@ const ICON_MAP = {
   absentToday: AlertCircle,
   onLeave: Clock,
   pendingLeaves: CalendarClock,
-  hiringVsResignation: TrendingUp,
+  hiring: TrendingUp,
+  resignations: TrendingDown,
+  totalProjects: Folder,
 } as const;
 
 interface Metric {
@@ -26,10 +30,6 @@ interface Metric {
   value: number;
   final: number;
   color: string;
-  extra?: {
-    hiring?: number;
-    resigned?: number;
-  };
 }
 
 // Number animation helper
@@ -87,12 +87,25 @@ export default function EmployeeStatCards() {
       color: "from-orange-300 to-orange-700",
     },
     {
-      key: "hiringVsResignation",
-      title: "Hiring vs Resignation",
+      key: "hiring",
+      title: "Hiring This Year",
+      value: 0,
+      final: 0,
+      color: "from-teal-300 to-teal-700",
+    },
+    {
+      key: "resignations",
+      title: "Resignations This Year",
+      value: 0,
+      final: 0,
+      color: "from-rose-300 to-rose-700",
+    },
+    {
+      key: "totalProjects",
+      title: "Total Projects",
       value: 0,
       final: 0,
       color: "from-indigo-300 to-indigo-700",
-      extra: { hiring: 0, resigned: 0 },
     },
   ]);
 
@@ -143,12 +156,25 @@ export default function EmployeeStatCards() {
             color: "from-orange-300 to-orange-700",
           },
           {
-            key: "hiringVsResignation",
-            title: "Hiring vs Resignation",
+            key: "hiring",
+            title: "Hiring This Year",
             value: 0,
-            final: data.hiringThisYear - data.resignedThisYear,
+            final: data.hiringThisYear,
+            color: "from-teal-300 to-teal-700",
+          },
+          {
+            key: "resignations",
+            title: "Resignations This Year",
+            value: 0,
+            final: data.resignedThisYear,
+            color: "from-rose-300 to-rose-700",
+          },
+          {
+            key: "totalProjects",
+            title: "Total Projects",
+            value: 0,
+            final: data.totalProjects,
             color: "from-indigo-300 to-indigo-700",
-            extra: { hiring: data.hiringThisYear, resigned: data.resignedThisYear },
           },
         ];
 
@@ -157,7 +183,7 @@ export default function EmployeeStatCards() {
           animateValue(0, metric.final, 1000, (val) => {
             setMetrics((prev) => {
               const copy = [...prev];
-              copy[i] = { ...copy[i], value: val, final: metric.final, extra: metric.extra };
+              copy[i] = { ...copy[i], value: val, final: metric.final };
               return copy;
             });
           });
@@ -171,24 +197,22 @@ export default function EmployeeStatCards() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-3">
       {metrics.map((metric) => {
         const { key, title, value, color } = metric;
         const Icon = ICON_MAP[key];
         return (
           <div
             key={key}
-            className={`group p-5 rounded-xl bg-gradient-to-br ${color} text-white shadow-xl hover:scale-[1.02] transition-transform relative overflow-hidden min-h-[100px]`}
+            className={`group pl-5 pt-4 rounded-lg bg-gradient-to-br ${color} text-white shadow-xl hover:scale-[1.02] transition-transform relative overflow-hidden h-[80px]`}
           >
-            <div className="absolute top-3 right-3 opacity-20 text-7xl rotate-12">
+            <div className="absolute top-2 right-2 opacity-20 text-7xl rotate-12">
               <Icon className="w-14 h-14" />
             </div>
             <div className="relative z-10">
-              <div className="text-md mb-2 uppercase font-semibold tracking-wider">{title}</div>
-              <div className="text-2xl font-semibold tracking-wider">
-                {key === "hiringVsResignation" && metric.extra
-                  ? `${metric.extra.hiring} / ${metric.extra.resigned}`
-                  : value}
+              <div className="text-sm mb-1 uppercase font-semibold tracking-wider">{title}</div>
+              <div className="text-lg font-semibold tracking-wider">
+                {value}
               </div>
             </div>
           </div>
