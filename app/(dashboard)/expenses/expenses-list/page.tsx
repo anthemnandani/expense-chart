@@ -46,6 +46,8 @@ export default function ExpensesPage() {
     GroupId: 0, // will be updated by useEffect
   });
 
+  const [showFilterModal, setShowFilterModal] = useState(false)
+
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -227,24 +229,19 @@ export default function ExpensesPage() {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4">
+        {/* <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Manage your income and expenses
-            </p>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              Expenses
+            </h1>
           </div>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setShowAddModal(false)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Expense
-          </Button>
-        </div>
+
+
+        </div> */}
+
         {/* Filters */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-lg">Filters</CardTitle>
           </CardHeader>
@@ -308,15 +305,39 @@ export default function ExpensesPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
         {/* Expenses Table */}
         <Card>
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>
-              Your latest income and expense transactions
-            </CardDescription>
-          </CardHeader>
+          <div className="flex justify-between px-6 pt-6 pb-4">
+            <div className="text-xl font-semibold">Expenses</div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleExportToPDF}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowFilterModal(true)}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+
+
+              {/* <Button variant="outline" onClick={handleSendEmailReport}>
+              <Download className="h-4 w-4 mr-2" />
+              Email Report
+            </Button> */}
+
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => setShowAddModal(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Expense
+              </Button>
+            </div>
+          </div>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -517,6 +538,102 @@ export default function ExpensesPage() {
                   </Button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {showFilterModal && (
+          <div className="fixed inset-0 top-[-30px] bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-md shadow-xl border dark:border-gray-700">
+
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Filters
+                </h2>
+                <button
+                  onClick={() => setShowFilterModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Filters */}
+              <div className="space-y-4">
+
+                {/* Category */}
+                <div>
+                  <Label>Category</Label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Type */}
+                <div>
+                  <Label>Type</Label>
+                  <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All types</SelectItem>
+                      <SelectItem value="Cr.">Credit</SelectItem>
+                      <SelectItem value="Dr.">Debit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Year */}
+                <div>
+                  <Label>Year</Label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All years" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All years</SelectItem>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedCategory("all")
+                    setSelectedType("all")
+                    setSelectedYear("all")
+                  }}
+                >
+                  Clear
+                </Button>
+
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setShowFilterModal(false)}
+                >
+                  Apply
+                </Button>
+              </div>
             </div>
           </div>
         )}

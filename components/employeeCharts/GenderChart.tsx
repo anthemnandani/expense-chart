@@ -6,24 +6,33 @@ import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { CardHeader, CardTitle } from "../ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 export default function GenderChart({ years }) {
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
-      const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-      const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const { user } = useAuth()
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const { user } = useAuth()
 
     // Fetch data
     useEffect(() => {
         const fetchGenderStats = async () => {
             try {
-                const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/gender-stats?year=${selectedYear}&month=${selectedMonth}&token=${encodeURIComponent(user?.token)}`
+                const result = await apiService.getGenderStats(
+                    selectedYear,
+                    selectedMonth,
+                    user.token
                 );
 
-                const result = await res.json();
+                if (result?.status) {
+                    setData(result.data.map(item => ({
+                        category: item.Gender,
+                        value: item.Count
+                    })));
+                    setTotal(result.totalEmployees);
+                }
 
                 if (result.status) {
                     const formatted = result.data.map((item) => ({
@@ -42,7 +51,7 @@ export default function GenderChart({ years }) {
         };
 
         fetchGenderStats();
-    }, [selectedMonth, selectedYear]);
+    }, [selectedMonth, selectedYear, user?.token]);
 
     // Render chart
     useLayoutEffect(() => {

@@ -6,6 +6,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 export default function EmployeeEXperienceChart() {
     const [chartData, setChartData] = useState([]);
@@ -20,16 +21,9 @@ export default function EmployeeEXperienceChart() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(
-                    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-summary?token=${encodeURIComponent(user.token)}`
-                );
 
-                if (!res.ok) {
-                    console.error("Failed to fetch experience data");
-                    return;
-                }
-
-                const json = await res.json();
+                const json = await apiService.getAttendanceSummary(user.token);
+                if (!json) return;
 
                 const convertToYears = (exp: string) => {
                     let years = 0;

@@ -11,6 +11,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 export default function ProjectShowcaseChart() {
   const { user } = useAuth();
@@ -20,12 +21,14 @@ export default function ProjectShowcaseChart() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch(
-          `https://employee-dashboard-backend-api.vercel.app/api/projects/chart?token=${encodeURIComponent(
-            user?.token
-          )}`
-        );
-        const response = await res.json();
+        const response = await apiService.getProjectChart(user.token);
+
+        if (response?.success) {
+          setChartData(response.data);
+          if (response.data.length > 0) {
+            setSelectedYear(response.data.at(-1).category);
+          }
+        }
         if (response.success) {
           setChartData(response.data);
           // Set initial selected year to the last one if data is available
@@ -44,7 +47,7 @@ export default function ProjectShowcaseChart() {
   }, [user?.token]);
 
   useLayoutEffect(() => {
-    if (chartData.length === 0) return () => {};
+    if (chartData.length === 0) return () => { };
 
     const root = am5.Root.new("chartdiv");
     root.setThemes([am5themes_Animated.new(root)]);

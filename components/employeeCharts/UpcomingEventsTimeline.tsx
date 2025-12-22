@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react/headless";
 import "tippy.js/dist/tippy.css";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 type EventItem = {
   id: number;
@@ -354,12 +355,11 @@ export default function UpcomingEventsTimeline() {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/events-calendar?year=${currentYear}&token=${encodeURIComponent(user?.token)}`,
-          { cache: "no-store" }
+        const data = await apiService.getEventsCalendar(
+          currentYear,
+          user.token
         );
-        if (!res.ok) throw new Error("Failed to load events");
-        const data = await res.json();
+
         setEvents(data?.events ?? []);
         setError("");
       } catch (err: any) {
@@ -369,7 +369,7 @@ export default function UpcomingEventsTimeline() {
       }
     };
     fetchEvents();
-  }, [currentYear]);
+  }, [currentYear, user?.token]);
 
   // Create map for quick lookup
   const eventMap = events.reduce<Record<string, EventItem[]>>((acc, ev) => {

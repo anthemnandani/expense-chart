@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const HighchartsReact = dynamic(() => import("highcharts-react-official"), { ssr: false });
 
@@ -13,10 +14,6 @@ const AttendanceHeatmap = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [chartData, setChartData] = useState([]);
   const { user } = useAuth()
-
-  const API_URL =
-    `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-heatmap?year=2025&month=12&token=${encodeURIComponent(user?.token)}`;
-
   // -----------------------------
   // Load Highcharts modules
   // -----------------------------
@@ -46,27 +43,42 @@ const AttendanceHeatmap = () => {
   useEffect(() => {
     const fetchHeatmap = async () => {
       try {
-        const res = await fetch(API_URL);
-        const json = await res.json();
+        if (!user?.token) return;
+
+        const json = await apiService.getAttendanceHeatmap(
+          user.token,
+          2025,
+          12
+        );
+
+        if (!json) return;
+
         setDays(json.days);
         setTimeSlots(json.timeSlots);
+
         // Sort by date DESC
         const sortedByDate = [...json.data].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );
-        const uniqueSortedDates = [...new Set(sortedByDate.map((item) => item.date))];
-        const dateToX = Object.fromEntries(uniqueSortedDates.map((d, idx) => [d, idx]));
+
+        const uniqueSortedDates = [...new Set(sortedByDate.map(item => item.date))];
+        const dateToX = Object.fromEntries(
+          uniqueSortedDates.map((d, idx) => [d, idx])
+        );
+
         const remapped = sortedByDate.map(item => ({
           ...item,
           x: dateToX[item.date],
         }));
+
         setChartData(remapped);
       } catch (err) {
         console.error("Heatmap Fetch Error:", err);
       }
     };
+
     fetchHeatmap();
-  }, []);
+  }, [user?.token]);
 
   const formatDateDMY = (dateStr: string) => {
     const d = new Date(dateStr);

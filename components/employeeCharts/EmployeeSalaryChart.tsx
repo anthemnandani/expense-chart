@@ -6,6 +6,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 export default function EmployeeChart() {
     const [chartData, setChartData] = useState([]);
@@ -15,20 +16,8 @@ export default function EmployeeChart() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(
-                    "https://employee-dashboard-backend-api.vercel.app/api/employees-dashboard-charts/salaries",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${user.token}`,
-                        },
-                    }
-                );
-
-                if (!res.ok) {
-                    console.error("Unauthorized or failed response");
-                    return;
-                }
-                const json = await res.json();
+                const json = await apiService.getEmployeeSalaries(user.token);
+                if (!json?.success) return;
 
                 if (json.success) {
                     const shortRole = (role: string) => {

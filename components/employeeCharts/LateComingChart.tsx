@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { CardHeader, CardTitle } from "../ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const monthNames = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -28,12 +29,14 @@ export default function LateComingLollipopChart({ years }) {
   const fetchLateData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `https://employee-dashboard-backend-api.vercel.app/api/attendance/late?year=${selectedYear}&month=${selectedMonth}&token=${encodeURIComponent(
-          user?.token
-        )}`
+      const data = await apiService.getLateEmployees(
+        selectedYear,
+        selectedMonth,
+        user.token
       );
-      const data = await res.json();
+
+      setChartData(data?.employees || []);
+      setMonthName(data?.monthName || monthNames[selectedMonth - 1]);
       setChartData(data.employees || []);
       setMonthName(data.monthName || monthNames[selectedMonth - 1]);
     } catch (err) {
@@ -46,7 +49,7 @@ export default function LateComingLollipopChart({ years }) {
 
   useEffect(() => {
     fetchLateData();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, user?.token]);
 
   // const names = chartData.map((e) => e.name);
   // const lateValues = chartData.map((e) => e.lateDays);

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const COLORS = [
     "#3b82f6", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#06b6d4", "#f97316", "#ec4899"
@@ -25,51 +26,59 @@ export const ActiveEmployeeCharts: React.FC = () => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [data, setData] = useState<ProcessedEmployeeData | null>(null)
     const [loading, setLoading] = useState(true)
-  const { user } = useAuth()
+    const { user } = useAuth()
 
     // Fetch data dynamically
     const fetchData = async () => {
         try {
-            setLoading(true)
-            const res = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/attendance-summary?token=${encodeURIComponent(user?.token)}`)
-            const fetchedData: FetchedEmployeeData = await res.json()
+            if (!user?.token) return;
+
+            setLoading(true);
+
+            const fetchedData = await apiService.getAttendanceSummary(user.token);
+
+            if (!fetchedData) {
+                setData(null);
+                return;
+            }
 
             // Process experience strings to years (decimal)
             const processedActiveEmployees = fetchedData.activeEmployees.map(emp => {
-                const match = emp.experience.match(/(\d+) years? (\d+) months?/)
-                let years = 0
-                if (match) {
-                    years = parseFloat(match[1]) + (parseFloat(match[2]) / 12)
-                } else {
-                    // Fallback for just months or years
-                    if (emp.experience.includes("months")) {
-                        const months = parseFloat(emp.experience.match(/(\d+) months?/)?.[1] || "0")
-                        years = months / 12
-                    } else {
-                        years = parseFloat(emp.experience.match(/(\d+) years?/)?.[1] || "0")
-                    }
-                }
-                return { name: emp.name, years: Number(years.toFixed(1)) } // ✅ 1 decimal
-            })
+                const match = emp.experience.match(/(\d+) years? (\d+) months?/);
+                let years = 0;
 
-            const processedData: ProcessedEmployeeData = {
+                if (match) {
+                    years = Number(match[1]) + Number(match[2]) / 12;
+                } else if (emp.experience.includes("months")) {
+                    const months = Number(emp.experience.match(/(\d+)/)?.[1] || 0);
+                    years = months / 12;
+                } else {
+                    years = Number(emp.experience.match(/(\d+)/)?.[1] || 0);
+                }
+
+                return {
+                    name: emp.name,
+                    years: Number(years.toFixed(1)), // ✅ 1 decimal
+                };
+            });
+
+            setData({
                 activeEmployees: processedActiveEmployees,
                 dailyReport: fetchedData.dailyReport,
-                previousDayReport: fetchedData.previousDayReport
-            }
-
-            setData(processedData)
+                previousDayReport: fetchedData.previousDayReport,
+            });
         } catch (err) {
-            console.error("Error fetching attendance summary:", err)
-            setData(null)
+            console.error("Error fetching attendance summary:", err);
+            setData(null);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
+
 
     useEffect(() => {
-        fetchData()
-    }, [])
+        fetchData();
+    }, [user?.token]);
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -116,7 +125,7 @@ export const ActiveEmployeeCharts: React.FC = () => {
             align: "center"
         },
         tooltip: {
-             headerFormat: "",
+            headerFormat: "",
             pointFormat: `<b>{point.name}</b><br/>Years: <b>{point.y}</b>`,
             backgroundColor: isDarkMode ? "#374151" : "#ffffff",
             borderColor: isDarkMode ? "#4b5563" : "#e5e7eb",
@@ -134,9 +143,9 @@ export const ActiveEmployeeCharts: React.FC = () => {
                 borderWidth: 1, // Thinner border for cleaner look
                 borderColor: isDarkMode ? "#1f2937" : "#f8fafc",
                 dataLabels: {
-                     enabled: true,
+                    enabled: true,
                     distance: -45, // Adjusted for better positioning with larger innerSize
-                    formatter: function(this: Highcharts.Point) {
+                    formatter: function (this: Highcharts.Point) {
                         if (this.y > 3) {
                             return '<br/><span style="font-size: 14px; color: #fff; font-weight: 700;">' + this.y + '</span>';
                         }
@@ -221,7 +230,7 @@ export const ActiveEmployeeCharts: React.FC = () => {
             align: "center"
         },
         tooltip: {
-             headerFormat: "",
+            headerFormat: "",
             pointFormat: `<b>{point.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}%)`,
             backgroundColor: isDarkMode ? "#374151" : "#ffffff",
             borderColor: isDarkMode ? "#4b5563" : "#e5e7eb",
@@ -306,7 +315,7 @@ export const ActiveEmployeeCharts: React.FC = () => {
             type: "pie",
             backgroundColor: "transparent",
             animation: true,
-             spacing: [1, 1, 10, 1], // Bottom spacing for legend
+            spacing: [1, 1, 10, 1], // Bottom spacing for legend
         },
         title: {
             text: undefined,
@@ -319,7 +328,7 @@ export const ActiveEmployeeCharts: React.FC = () => {
             align: "center"
         },
         tooltip: {
-             headerFormat: "",
+            headerFormat: "",
             pointFormat: `<b>{point.name}</b>: <b>{point.y}</b> ({point.percentage:.1f}%)`,
             backgroundColor: isDarkMode ? "#374151" : "#ffffff",
             borderColor: isDarkMode ? "#4b5563" : "#e5e7eb",

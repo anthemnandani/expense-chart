@@ -5,6 +5,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { CardHeader, CardTitle } from "../ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 export default function LeaveChart({ years }) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -19,10 +20,11 @@ export default function LeaveChart({ years }) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `https://employee-dashboard-backend-api.vercel.app/api/leave-report/${selectedYear}?token=${encodeURIComponent(user?.token)}`
+      const fetchedData = await apiService.getLeaveReport(
+        selectedYear,
+        user.token
       );
-      const fetchedData = await res.json();
+      setData(fetchedData);
       setData(fetchedData);
     } catch (err) {
       console.error("Error fetching leave data:", err);
@@ -34,7 +36,7 @@ export default function LeaveChart({ years }) {
 
   useEffect(() => {
     fetchData();
-  }, [selectedYear]);
+  }, [selectedYear, user?.token]);
 
   useEffect(() => {
     if (!data || !chartRef.current || !data.employees.length) return;

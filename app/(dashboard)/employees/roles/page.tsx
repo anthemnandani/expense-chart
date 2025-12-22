@@ -64,8 +64,8 @@ export default function EmployeesRoles() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Employee Designations</h1>
+    <div className="p-2 space-y-4">
+      <h1 className="text-xl font-bold text-gray-900">Employee Designations</h1>
 
       {/* Search */}
       <div className="max-w-sm">

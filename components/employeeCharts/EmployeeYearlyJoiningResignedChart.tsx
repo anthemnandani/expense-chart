@@ -5,6 +5,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 interface EmployeeData {
     month: string;
@@ -20,15 +21,16 @@ export default function EmployeeYearlyJoiningResignedChart({ years }) {
     const [data, setData] = useState<EmployeeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const { user } = useAuth()
+    const { user } = useAuth()
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/employees-monthly-summary?year=${selectedYear}&token=${encodeURIComponent(user?.token)}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch data");
-            }
-            const result = await response.json();
+            const result = await apiService.getEmployeeMonthlySummary(
+                user.token,
+                selectedYear
+            );
+
+            setData(result?.data || []);
             setData(result.data || []);
         } catch (error) {
             console.error("Error fetching employee data:", error);
@@ -40,7 +42,7 @@ export default function EmployeeYearlyJoiningResignedChart({ years }) {
 
     useEffect(() => {
         fetchData();
-    }, [selectedYear]);
+    }, [user?.token, selectedYear]);
 
     useLayoutEffect(() => {
         if (!chartRef.current || loading || data.length === 0) return;

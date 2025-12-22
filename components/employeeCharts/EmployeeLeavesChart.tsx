@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CardHeader, CardTitle } from "../ui/card";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -84,19 +85,8 @@ export default function EmployeeLeavesChart({ years }) {
         try {
             setLoading(true);
 
-            const res = await fetch(
-                `https://employee-dashboard-backend-api.vercel.app/api/dashboard-charts/leaves-report/${selectedYear}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user?.token}`,
-                    },
-                }
-            );
-
-            if (!res.ok) {
-                throw new Error("Unauthorized or failed to fetch leaves report");
-            }
-            const apiData: ApiResponse = await res.json();
+            const apiData = await apiService.getEmployeeLeaves(selectedYear, user.token);
+            if (!apiData) return;
 
             // Process API data to match EmployeeData interface
             const processedData: EmployeeData[] = apiData.employees.map(emp => ({

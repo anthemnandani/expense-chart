@@ -12,6 +12,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { apiService } from "@/lib/apiService";
 
 const ICON_MAP = {
   totalEmployees: Users,
@@ -117,12 +118,8 @@ export default function EmployeeStatCards() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const res = await fetch(
-          `https://employee-dashboard-backend-api.vercel.app/api/employee-stats?token=${encodeURIComponent(
-            user?.token
-          )}`
-        );
-        const data = await res.json();
+        const data = await apiService.getEmployeeStats(user.token);
+        if (!data) return;
 
         const updatedMetrics = [
           {

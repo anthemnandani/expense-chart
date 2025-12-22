@@ -13,6 +13,22 @@ interface HeatmapData {
   data: [number, number, number][];
 }
 
+interface AttendanceSummaryResponse {
+  activeEmployees: Array<{ name: string; experience: string }>;
+  dailyReport: { checkedIn: number; notCheckedIn: number };
+  previousDayReport: { date: string; checkedIn: number; notCheckedIn: number };
+}
+
+interface AttendanceHeatmapResponse {
+  days: string[];
+  timeSlots: string[];
+  data: Array<{
+    date: string;
+    y: number;
+    value: number;
+  }>;
+}
+
 export const apiService = {
   // Fetch daily expenses for DailyExpenseChart
   async getDailyExpenses(
@@ -238,7 +254,7 @@ export const apiService = {
   async getAvailableEmployeeYears(token: string): Promise<number[]> {
     try {
       const res = await fetch(
-        `https://employee-dashboard-backend-api.vercel.app/api/employee/available-years?token=${encodeURIComponent(token)}`,
+        `https://managementapinodejs.anthemwork.com/api/employee/available-years?token=${encodeURIComponent(token)}`,
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error("Failed to fetch available years");
@@ -252,4 +268,209 @@ export const apiService = {
       return [];
     }
   },
+
+  /* -------------------- ATTENDANCE SUMMARY -------------------- */
+  async getAttendanceSummary(token: string): Promise<AttendanceSummaryResponse | null> {
+    try {
+      const res = await fetch(
+        `https://managementapinodejs.anthemwork.com/api/dashboard-charts/attendance-summary?token=${encodeURIComponent(token)}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error("Failed to fetch attendance summary");
+      return await res.json();
+    } catch (error) {
+      console.error("Attendance summary error:", error);
+      return null;
+    }
+  },
+
+  /* -------------------- ATTENDANCE HEATMAP -------------------- */
+  async getAttendanceHeatmap(
+    token: string,
+    year: number,
+    month: number
+  ): Promise<AttendanceHeatmapResponse | null> {
+    try {
+      const res = await fetch(
+        `https://managementapinodejs.anthemwork.com/api/dashboard-charts/attendance-heatmap?year=${year}&month=${month}&token=${encodeURIComponent(token)}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error("Failed to fetch attendance heatmap");
+      return await res.json();
+    } catch (error) {
+      console.error("Attendance heatmap error:", error);
+      return null;
+    }
+  },
+
+  /* -------------------- EMPLOYEE TREE -------------------- */
+async getEmployeeTree(token: string) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/employee-tree?token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch employee tree");
+    return await res.json();
+  } catch (error) {
+    console.error("Employee tree error:", error);
+    return null;
+  }
+},
+
+/* -------------------- LEAVES REPORT -------------------- */
+async getEmployeeLeaves(year: number, token: string) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/leaves-report/${year}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error("Failed to fetch leaves report");
+    return await res.json();
+  } catch (error) {
+    console.error("Leaves report error:", error);
+    return null;
+  }
+},
+
+/* -------------------- EMPLOYEE SALARY -------------------- */
+async getEmployeeSalaries(token: string) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/employees-dashboard-charts/salaries`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error("Failed to fetch salaries");
+    return await res.json();
+  } catch (error) {
+    console.error("Salary fetch error:", error);
+    return null;
+  }
+},
+
+/* -------------------- JOINED / RESIGNED -------------------- */
+async getEmployeeMonthlySummary(token: string, year: number) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/employees-monthly-summary?year=${year}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch employee monthly summary");
+    return await res.json();
+  } catch (error) {
+    console.error("Employee monthly summary error:", error);
+    return null;
+  }
+},
+
+/* -------------------- GENDER STATS -------------------- */
+async getGenderStats(
+  year: number,
+  month: number,
+  token: string
+) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/gender-stats?year=${year}&month=${month}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch gender stats");
+    return await res.json();
+  } catch (err) {
+    console.error("Gender stats error:", err);
+    return null;
+  }
+},
+
+/* -------------------- LATE COMING -------------------- */
+async getLateEmployees(
+  year: number,
+  month: number,
+  token: string
+) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/attendance/late?year=${year}&month=${month}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch late employees");
+    return await res.json();
+  } catch (err) {
+    console.error("Late coming error:", err);
+    return null;
+  }
+},
+
+/* -------------------- LEAVE REPORT -------------------- */
+async getLeaveReport(
+  year: number,
+  token: string
+) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/leave-report/${year}?token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch leave report");
+    return await res.json();
+  } catch (err) {
+    console.error("Leave report error:", err);
+    return null;
+  }
+},
+
+/* -------------------- PROJECT SHOWCASE -------------------- */
+async getProjectChart(token: string) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/projects/chart?token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch project chart");
+    return await res.json();
+  } catch (err) {
+    console.error("Project chart error:", err);
+    return null;
+  }
+},
+
+/* -------------------- EVENTS CALENDAR -------------------- */
+async getEventsCalendar(
+  year: number,
+  token: string
+) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/events-calendar?year=${year}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch events calendar");
+    return await res.json();
+  } catch (err) {
+    console.error("Events calendar error:", err);
+    return null;
+  }
+},
+
+/* -------------------- EMPLOYEE STATS CARDS -------------------- */
+async getEmployeeStats(token: string) {
+  try {
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/employee-stats?token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch employee stats");
+    return await res.json();
+  } catch (err) {
+    console.error("Employee stats error:", err);
+    return null;
+  }
+},
+
 };
