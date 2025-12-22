@@ -68,6 +68,18 @@ const AttendanceHeatmap = () => {
     fetchHeatmap();
   }, []);
 
+  const formatDateDMY = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const uniqueDates = chartData.length
+    ? [...new Set(chartData.map(d => d.date))]
+    : [];
+
   // -----------------------------
   // Highcharts Options (Expenses-style UI)
   // -----------------------------
@@ -79,7 +91,8 @@ const AttendanceHeatmap = () => {
     },
     title: { text: "" },
     xAxis: {
-      categories: chartData.length ? [...new Set(chartData.map(d => d.date))] : [],
+      // categories: chartData.length ? [...new Set(chartData.map(d => d.date))] : [],
+      categories: uniqueDates.map(d => formatDateDMY(d)),
       title: "",
       lineColor: isDarkMode ? "#444" : "#e2e8f0",
       labels: {
@@ -127,13 +140,14 @@ const AttendanceHeatmap = () => {
       style: { color: isDarkMode ? "#f9fafb" : "#111827" },
       formatter: function () {
         const point = this.point;
-        const dates = [...new Set(chartData.map((d) => d.date))];
+        const dates = [...new Set(chartData.map(d => d.date))];
+
         return `
-          <div style="padding:6px 8px;">
-            <b>${dates[point.x]}</b><br/>
-            Time: ${timeSlots[point.y]}<br/>
-            Attendance Count: <b>${point.value}</b>
-          </div>`;
+    <div style="padding:6px 8px;">
+      <b>${formatDateDMY(dates[point.x])}</b><br/>
+      Time: ${timeSlots[point.y]}<br/>
+      Attendance Count: <b>${point.value}</b>
+    </div>`;
       },
     },
     series: [

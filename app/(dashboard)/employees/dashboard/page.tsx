@@ -50,9 +50,9 @@ export default function EmployeesDashboard() {
 
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-4 p-2">
 
-      <h1 className="text-3xl font-bold">Employees Dashboard</h1>
+      <h1 className="text-xl font-bold">Employees Dashboard</h1>
 
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

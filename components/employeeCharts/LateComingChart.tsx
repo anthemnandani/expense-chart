@@ -139,7 +139,6 @@ export default function LateComingLollipopChart({ years }) {
     ]
   };
 
-
   return (
     <div className="w-full p-5 rounded-2xl bg-white dark:bg-[#0b1220] shadow-xl">
       <CardHeader className="pb-3 flex justify-between lg:flex-row flex-col">

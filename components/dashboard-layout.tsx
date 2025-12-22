@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       children: [
         { title: "Employee List", href: "/employees/employees-list" },
         { title: "Roles", href: "/employees/roles" },
-        { title: "Departments", href: "/employees/departments" },
+        // { title: "Departments", href: "/employees/departments" },
       ],
     },
   ]

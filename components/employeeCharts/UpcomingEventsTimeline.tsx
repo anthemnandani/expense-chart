@@ -136,18 +136,29 @@ const getEventBadge = (events: EventItem[]) => {
   );
 };
 
+const getHolidayImage = (title: string) => {
+  const t = title.toLowerCase();
+
+  if (t.includes("christmas")) return "/images/2.jpg";
+  if (t.includes("diwali")) return "/images/1.jpg";
+  if (t.includes("holi")) return "/images/4.jpg";
+  if (t.includes("shivratri")) return "/images/5.jpg";
+
+  return "/images/3.jpg"; // default holiday
+};
+
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
 
-const YearlyModal = ({ 
-  isOpen, 
-  onClose, 
-  currentYear, 
-  setCurrentYear, 
-  eventMap, 
-  getEventBadge 
+const YearlyModal = ({
+  isOpen,
+  onClose,
+  currentYear,
+  setCurrentYear,
+  eventMap,
+  getEventBadge
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -232,20 +243,26 @@ const YearlyModal = ({
                           e.title.toLowerCase().includes("completed"));
                       return (
                         <div key={e.id}>
-                          {isPersonEvent && (
+                          {/* Image Section */}
+                          {isPersonEvent ? (
                             <img
                               src={e.employeeImage}
                               alt="Employee"
                               className="w-full h-44 object-cover rounded-xl"
                             />
-                          )}
+                          ) : e.type === "Holiday" ? (
+                            <img
+                              src={getHolidayImage(e.title)}
+                              alt={e.title}
+                              className="w-full h-44 object-cover rounded-xl"
+                            />
+                          ) : null}
                           <div className="p-3">
                             <span
-                              className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                e.type === "Event"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : "bg-green-100 text-green-700"
-                              }`}
+                              className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${e.type === "Event"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                                }`}
                             >
                               {e.type}
                             </span>
@@ -514,20 +531,25 @@ export default function UpcomingEventsTimeline() {
                           e.title.toLowerCase().includes("completed"));
                       return (
                         <div key={e.id}>
-                          {isPersonEvent && (
+                          {isPersonEvent ? (
                             <img
                               src={e.employeeImage}
                               alt="Employee"
                               className="w-full h-44 object-cover rounded-xl"
                             />
-                          )}
+                          ) : e.type === "Holiday" ? (
+                            <img
+                              src={getHolidayImage(e.title)}
+                              alt={e.title}
+                              className="w-full h-44 object-cover rounded-xl"
+                            />
+                          ) : null}
                           <div className="p-3">
                             <span
-                              className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                e.type === "Event"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : "bg-green-100 text-green-700"
-                              }`}
+                              className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${e.type === "Event"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-green-100 text-green-700"
+                                }`}
                             >
                               {e.type}
                             </span>
