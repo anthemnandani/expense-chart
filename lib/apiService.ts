@@ -415,7 +415,7 @@ async getYealyLateEmployees(
 ) {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/attendance/employee-yearly-late-summary?year=${year}&token=${encodeURIComponent(token)}`,
+      `https://managementapinodejs.anthemwork.com/api/attendance/employee-yearly-late-summary?year=${year}&token=${encodeURIComponent(token)}`,
       { cache: "no-store" }
     );
     if (!res.ok) throw new Error("Failed to fetch late employees");
@@ -466,7 +466,7 @@ async getEventsCalendar(
 ) {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/dashboard-charts/events-calendar?year=${year}&token=${encodeURIComponent(token)}`,
+      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/events-calendar?year=${year}&token=${encodeURIComponent(token)}`,
       { cache: "no-store" }
     );
     if (!res.ok) throw new Error("Failed to fetch events calendar");
