@@ -375,7 +375,7 @@ export default function UpcomingEventsTimeline() {
         setLoading(true);
         const data = await apiService.getEventsCalendar(
           currentYear,
-          user.token
+          user?.token
         );
 
         setEvents(data?.events ?? []);

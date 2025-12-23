@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql, config } from "@/lib/db";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET || "antheminfotech";
 
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;

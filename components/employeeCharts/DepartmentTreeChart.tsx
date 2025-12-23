@@ -13,6 +13,15 @@ export const DepartmentTreeChart = () => {
     const [roamEnabled, setRoamEnabled] = useState(false);
     const { user } = useAuth()
 
+    const toTitleCase = (name: string) => {
+        return name
+            .toLowerCase()
+            .split(" ")
+            .filter(Boolean)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    };
+
     // WATCH TAILWIND DARK MODE
     useEffect(() => {
         const obs = new MutationObserver(() => {
@@ -88,7 +97,7 @@ export const DepartmentTreeChart = () => {
                 symbolSize: 14,
                 itemStyle: { color: isDark ? "#48cae4" : "#0077b6" },
                 children: desig.employees.map((emp: string) => ({
-                    name: emp,
+                    name: toTitleCase(emp),
                     symbol: "circle",
                     symbolSize: 10,
                     itemStyle: { color: isDark ? "#a7c957" : "#6a994e" },

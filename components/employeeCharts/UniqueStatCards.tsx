@@ -93,7 +93,7 @@ export default function EmployeeStatCards() {
     },
     {
       key: "hiringVsResignation",
-      title: "Hiring vs Resignation",
+      title: "Hiring vs Exited",
       value: 0,
       final: 0,
       color: "from-indigo-300 to-indigo-700",
@@ -159,7 +159,7 @@ export default function EmployeeStatCards() {
           },
           {
             key: "hiringVsResignation",
-            title: "Hiring vs Resignation",
+            title: "Hiring vs Exited",
             value: 0,
             final: data.hiringThisYear - data.resignedThisYear,
             color: "from-indigo-300 to-indigo-700",

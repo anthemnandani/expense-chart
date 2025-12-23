@@ -13,7 +13,6 @@ const monthNames = [
 
 export default function LateComingLollipopChart({ years }) {
   const { user } = useAuth();
-
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().getMonth() + 1
   );
@@ -25,6 +24,15 @@ export default function LateComingLollipopChart({ years }) {
     monthNames[selectedMonth - 1]
   );
   const [loading, setLoading] = useState(true);
+
+  const toTitleCase = (name: string) => {
+    return name
+      .toLowerCase()
+      .split(" ")
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   const fetchLateData = async () => {
     try {
@@ -53,7 +61,7 @@ export default function LateComingLollipopChart({ years }) {
 
   // const names = chartData.map((e) => e.name);
   // const lateValues = chartData.map((e) => e.lateDays);
-  const names = chartData.map((e) => e.Name);
+  const names = chartData.map((e) => toTitleCase(e.Name));
   const lateValues = chartData.map((e) => e.LateDays);
 
   const option = {
@@ -66,34 +74,38 @@ export default function LateComingLollipopChart({ years }) {
     },
 
     tooltip: {
-      trigger: "axis",
-      axisPointer: {
-        type: "line", // changed from "shadow" to "line"
-        lineStyle: {
-          color: "#777",
-          width: 0.8,
-          type: "dashed" // optional: makes it dashed like a guide line
-        }
-      },
-      backgroundColor: "#ffffff",
-      // borderColor: "#6EC1F5",
-      borderWidth: 1,
-      padding: 10,
-      textStyle: { color: "#111827", fontWeight: "bold" },
-      formatter: function (params) {
-        if (params.length === 0) return "";
-        const dataIndex = params[0].dataIndex;
-        const name = names[dataIndex];
-        const value = lateValues[dataIndex];
-        return `
-      <div style="min-width:120px">
-        <div style="font-weight:bold; margin-bottom:4px;">${name}</div>
-        <div style="color:#6EC1F5; font-weight:normal;">Late Days: ${value}</div>
-      </div>
-    `;
-      },
-      extraCssText: "box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px;"
+      show: false
     },
+
+    // tooltip: {
+    //   trigger: "axis",
+    //   axisPointer: {
+    //     type: "line", // changed from "shadow" to "line"
+    //     lineStyle: {
+    //       color: "#777",
+    //       width: 0.8,
+    //       type: "dashed" // optional: makes it dashed like a guide line
+    //     }
+    //   },
+    //   backgroundColor: "#ffffff",
+    //   // borderColor: "#cf2e2e",
+    //   borderWidth: 1,
+    //   padding: 10,
+    //   textStyle: { color: "#111827", fontWeight: "bold" },
+    //   formatter: function (params) {
+    //     if (params.length === 0) return "";
+    //     const dataIndex = params[0].dataIndex;
+    //     const name = names[dataIndex];
+    //     const value = lateValues[dataIndex];
+    //     return `
+    //   <div style="min-width:120px">
+    //     <div style="font-weight:bold; margin-bottom:4px;">${name}</div>
+    //     <div style="color:#cf2e2e; font-weight:normal;">Late Days: ${value}</div>
+    //   </div>
+    // `;
+    //   },
+    //   extraCssText: "box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px;"
+    // },
 
     xAxis: {
       type: "category",
@@ -124,7 +136,7 @@ export default function LateComingLollipopChart({ years }) {
         data: lateValues,
         barWidth: 2,
         itemStyle: {
-          color: "#6EC1F5"
+          color: "#cf2e2e"
         },
         z: 1
       },
@@ -135,9 +147,34 @@ export default function LateComingLollipopChart({ years }) {
         data: lateValues,
         symbolSize: 10,
         itemStyle: {
-          color: "#6EC1F5"
+          color: "#cf2e2e"
         },
-        z: 2
+
+        label: {
+          show: true,
+          position: "top",
+          formatter: (v) => (v.value > 0 ? v.value : "0"),
+          padding: [4, 8],
+          borderRadius: 6,
+          borderWidth: 1,
+          borderColor: "#cf2e2e", // blue border
+          color: "#cf2e2e",       // blue text
+          backgroundColor: "#ffffff",
+          fontSize: 11,
+          fontWeight: 600
+        },
+
+        emphasis: {
+          scale: false,
+          label: {
+            show: true,
+            backgroundColor: "#cf2e2e", // 🔥 hover bg blue
+            color: "#ffffff",          // white text
+            borderColor: "#cf2e2e"
+          }
+        },
+
+        z: 3
       }
     ]
   };

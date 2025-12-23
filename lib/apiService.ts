@@ -407,6 +407,25 @@ async getLateEmployees(
   }
 },
 
+/* -------------------- LATE COMING -------------------- */
+async getYealyLateEmployees(
+  year: number,
+  month: number,
+  token: string
+) {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/attendance/employee-yearly-late-summary?year=${year}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Failed to fetch late employees");
+    return await res.json();
+  } catch (err) {
+    console.error("Late coming error:", err);
+    return null;
+  }
+},
+
 /* -------------------- LEAVE REPORT -------------------- */
 async getLeaveReport(
   year: number,
@@ -447,7 +466,7 @@ async getEventsCalendar(
 ) {
   try {
     const res = await fetch(
-      `https://managementapinodejs.anthemwork.com/api/dashboard-charts/events-calendar?year=${year}&token=${encodeURIComponent(token)}`,
+      `http://localhost:5000/api/dashboard-charts/events-calendar?year=${year}&token=${encodeURIComponent(token)}`,
       { cache: "no-store" }
     );
     if (!res.ok) throw new Error("Failed to fetch events calendar");

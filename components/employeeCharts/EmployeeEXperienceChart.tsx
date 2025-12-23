@@ -17,6 +17,15 @@ export default function EmployeeEXperienceChart() {
         return 3 + (years - 3) / 4; // Compress >3 years
     };
 
+    const toTitleCase = (name: string) => {
+        return name
+            .toLowerCase()
+            .split(" ")
+            .filter(Boolean)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    };
+
     // ✅ New dynamic data fetch (same format, same keys)
     useEffect(() => {
         const fetchData = async () => {
@@ -97,7 +106,7 @@ export default function EmployeeEXperienceChart() {
         xRenderer.labels.template.adapters.add("text", (text, target) => {
             const d = target.dataItem?.dataContext;
             if (d?.role) {
-                return `${d.name}\n(${d.role})`;  // 2 lines
+                return `${toTitleCase(d.name)}\n(${d.role})`;  // 2 lines
                 // return `${d.name} (${d.role})`;
             }
             return text;

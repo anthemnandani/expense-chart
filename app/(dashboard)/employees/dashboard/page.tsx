@@ -16,6 +16,7 @@ import EmployeeYearlyJoiningResignedChart from "@/components/employeeCharts/Empl
 import UpcomingEventsTimeline from "@/components/employeeCharts/UpcomingEventsTimeline";
 import EmployeeEXperienceChart from "@/components/employeeCharts/EmployeeEXperienceChart";
 import ProjectShowcaseChart from "@/components/employeeCharts/ProjectShowcaseChart ";
+import YearlyLateMatrixChart from "@/components/employeeCharts/YearlyLateMatrixChart";
 
 export default function EmployeesDashboard() {
   const { user } = useAuth();
@@ -65,6 +66,7 @@ export default function EmployeesDashboard() {
         </div>
       </div>
 
+
       <div className="grid grid-cols-5 gap-4">
         <div className="col-span-3">
           <AttendanceHeatmap years={years} />
@@ -85,6 +87,8 @@ export default function EmployeesDashboard() {
       {/* <EmployeeSalaryChart years={years} /> */}
 
       <LeaveChart years={years} />
+
+      <YearlyLateMatrixChart years={years} />
 
       <LateComingChart years={years} />
       

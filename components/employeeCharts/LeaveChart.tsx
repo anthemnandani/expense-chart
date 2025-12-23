@@ -16,6 +16,15 @@ export default function LeaveChart({ years }) {
 
   const { user } = useAuth();
 
+    const toTitleCase = (name: string) => {
+        return name
+            .toLowerCase()
+            .split(" ")
+            .filter(Boolean)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    };
+
   // Fetch data dynamically
   const fetchData = async () => {
     try {
@@ -106,7 +115,7 @@ export default function LeaveChart({ years }) {
 
     // Prepare data
     let chartData = data.employees.map((emp) => ({
-      category: emp.name,
+      category: toTitleCase(emp.name),
       fullLeaves: Math.min(emp.fullLeaves, emp.allowedLeaves),
       exceededLeaves: emp.fullLeaves > emp.allowedLeaves ? emp.fullLeaves - emp.allowedLeaves : 0,
       shortLeaves: emp.shortLeaves,

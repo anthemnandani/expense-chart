@@ -80,6 +80,15 @@ export default function EmployeeLeavesChart({ years }) {
     const [loading, setLoading] = useState(true);
     const { user } = useAuth()
 
+    const toTitleCase = (name: string) => {
+        return name
+            .toLowerCase()
+            .split(" ")
+            .filter(Boolean)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    };
+
     // Fetch data dynamically
     const fetchData = async () => {
         try {
@@ -171,7 +180,7 @@ export default function EmployeeLeavesChart({ years }) {
                                 {employeeData.map((emp, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
                                         <td className="border font-medium px-2">
-                                            {emp.name}
+                                            {toTitleCase(emp.name)}
                                         </td>
 
                                         {months.map((month) => (
