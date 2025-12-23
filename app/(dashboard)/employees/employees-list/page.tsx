@@ -46,7 +46,7 @@ export default function EmployeesList() {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:5000/api/employees-table?token=${encodeURIComponent(user?.token || "")}`
+          `https://managementapinodejs.anthemwork.com/api/employees-table?token=${encodeURIComponent(user?.token || "")}`
         );
         const data = await res.json();
         setEmployees(data.data || []);

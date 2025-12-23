@@ -34,7 +34,7 @@ export default function EmployeesRoles() {
   useEffect(() => {
     const fetchDesignations = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/designations");
+        const res = await fetch("https://managementapinodejs.anthemwork.com/api/designations");
         const data = await res.json();
         if (data.success) setDesignations(data.data);
       } catch (err) {
@@ -47,21 +47,6 @@ export default function EmployeesRoles() {
   const filteredDesignations = designations.filter((d) =>
     d.Designation.toLowerCase().includes(search.toLowerCase())
   );
-
-  const handleViewEmployees = async (designation: string) => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/designations?designation=${designation}`
-      );
-      const data = await res.json();
-      if (data.success) {
-        setEmployees(data.data);
-        setSelectedDesignation(designation);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   return (
     <div className="p-2 space-y-4">

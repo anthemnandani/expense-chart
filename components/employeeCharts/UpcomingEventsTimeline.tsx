@@ -140,10 +140,28 @@ const getEventBadge = (events: EventItem[]) => {
 const getHolidayImage = (title: string) => {
   const t = title.toLowerCase();
 
-  if (t.includes("christmas")) return "/images/2.jpg";
   if (t.includes("diwali")) return "/images/1.jpg";
+  if (t.includes("christmas")) return "/images/2.jpg";
   if (t.includes("holi")) return "/images/4.jpg";
   if (t.includes("shivratri")) return "/images/5.jpg";
+  if (t.includes("shivaratri")) return "/images/5.jpg";
+  if (t.includes("shiv ratri")) return "/images/5.jpg";
+  if (t.includes("lohri")) return "/images/9.jpeg";
+  if (t.includes("good friday")) return "/images/8.jpg";
+  if (t.includes("dussehra")) return "/images/6.png";
+  if (t.includes("vijaya dashami")) return "/images/16.png";
+  if (t.includes("independence day")) return "/images/7.jpg";
+  if (t.includes("raksha bandhan")) return "/images/22.jpg";
+  if (t.includes("vasant panchami")) return "/images/18.jpg";
+  if (t.includes("new year")) return "/images/10.jpg";
+  if (t.includes("guru nanak")) return "/images/11.jpg";
+  if (t.includes("ram navmi")) return "/images/12.jpg";
+  if (t.includes("republic day")) return "/images/13.jpg";
+  if (t.includes("vaisakhi")) return "/images/14.jpg";
+  if (t.includes("gandhi jayanti")) return "/images/15.jpg";
+  if (t.includes("vishavkarma")) return "/images/19.jpg";
+  if (t.includes("krishna janamashtmi")) return "/images/20.jpg";
+  if (t.includes("id ul fitr")) return "/images/17.jpg";
 
   return "/images/3.jpg"; // default holiday
 };
