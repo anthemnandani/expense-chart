@@ -137,31 +137,66 @@ const getEventBadge = (events: EventItem[]) => {
   );
 };
 
-const getHolidayImage = (title: string) => {
+const HOLIDAY_IMAGES: { keywords: string[]; image: string }[] = [
+  { keywords: ["diwali"], image: "/images/1.jpg" },
+
+  { keywords: ["vasant panchami", "basant panchami"], image: "/images/18.jpg" },
+
+  { keywords: ["holi"], image: "/images/4.jpg" },
+
+  { keywords: ["shivratri", "shivaratri", "shiv ratri"], image: "/images/5.jpg" },
+
+  { keywords: ["lohri"], image: "/images/9.jpeg" },
+
+  { keywords: ["good friday"], image: "/images/8.jpg" },
+
+  { keywords: ["dussehra", "vijaya dashami"], image: "/images/6.png" },
+
+  { keywords: ["independence day"], image: "/images/7.jpg" },
+
+  { keywords: ["raksha bandhan"], image: "/images/22.jpg" },
+
+  { keywords: ["christmas"], image: "/images/2.jpg" },
+
+  { keywords: ["new year"], image: "/images/10.jpg" },
+
+  { keywords: ["ram navmi", "ram navami"], image: "/images/12.jpg" },
+
+  { keywords: ["republic day"], image: "/images/13.jpg" },
+
+  { keywords: ["kabir jayanti"], image: "/images/24.jpg" },
+
+  { keywords: ["guru nanak"], image: "/images/11.jpg" },
+
+  { keywords: ["gobind singh"], image: "/images/25.jpg" },
+
+  { keywords: ["arjun dev"], image: "/images/23.jpg" },
+
+  { keywords: ["vaisakhi"], image: "/images/14.jpg" },
+
+  {
+    keywords: ["vishavkarma", "vishawkarma", "vishav karma"],
+    image: "/images/19.jpg"
+  },
+
+  {
+    keywords: ["krishna janamashtmi", "janamashtami", "janmashtami"],
+    image: "/images/20.jpg"
+  },
+
+  { keywords: ["id ul fitr"], image: "/images/17.jpg" },
+
+  { keywords: ["gandhi jayanti"], image: "/images/15.jpg" }
+];
+
+export const getHolidayImage = (title: string) => {
   const t = title.toLowerCase();
 
-  if (t.includes("diwali")) return "/images/1.jpg";
-  if (t.includes("christmas")) return "/images/2.jpg";
-  if (t.includes("holi")) return "/images/4.jpg";
-  if (t.includes("shivratri")) return "/images/5.jpg";
-  if (t.includes("shivaratri")) return "/images/5.jpg";
-  if (t.includes("shiv ratri")) return "/images/5.jpg";
-  if (t.includes("lohri")) return "/images/9.jpeg";
-  if (t.includes("good friday")) return "/images/8.jpg";
-  if (t.includes("dussehra")) return "/images/6.png";
-  if (t.includes("vijaya dashami")) return "/images/16.png";
-  if (t.includes("independence day")) return "/images/7.jpg";
-  if (t.includes("raksha bandhan")) return "/images/22.jpg";
-  if (t.includes("vasant panchami")) return "/images/18.jpg";
-  if (t.includes("new year")) return "/images/10.jpg";
-  if (t.includes("guru nanak")) return "/images/11.jpg";
-  if (t.includes("ram navmi")) return "/images/12.jpg";
-  if (t.includes("republic day")) return "/images/13.jpg";
-  if (t.includes("vaisakhi")) return "/images/14.jpg";
-  if (t.includes("gandhi jayanti")) return "/images/15.jpg";
-  if (t.includes("vishavkarma")) return "/images/19.jpg";
-  if (t.includes("krishna janamashtmi")) return "/images/20.jpg";
-  if (t.includes("id ul fitr")) return "/images/17.jpg";
+  for (const holiday of HOLIDAY_IMAGES) {
+    if (holiday.keywords.some(k => t.includes(k))) {
+      return holiday.image;
+    }
+  }
 
   return "/images/3.jpg"; // default holiday
 };
@@ -247,7 +282,7 @@ const YearlyModal = ({
                 render={() => (
                   <div
                     className="
-                      w-64 rounded-xl overflow-hidden
+                      w-52 rounded-xl overflow-hidden
                       bg-white dark:bg-gray-900
                       border border-gray-200 dark:border-gray-700
                       shadow-2xl text-xs
