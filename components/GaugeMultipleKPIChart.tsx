@@ -119,7 +119,7 @@ export default function GaugeMultipleKPIChart() {
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-6">
       <CardHeader className="pb-2 flex justify-between flex-col lg:flex-row">
         <div>
-          <CardTitle className="text-gray-800 dark:text-white">Monthly Expenses by Category</CardTitle>
+          <CardTitle className="text-gray-800 dark:text-white text-md font-semibold">Monthly Expenses by Category</CardTitle>
           {/* <CardDescription className="text-gray-500 dark:text-gray-400">Analyze trends</CardDescription> */}
         </div>
         <div className="flex gap-2 items-center">

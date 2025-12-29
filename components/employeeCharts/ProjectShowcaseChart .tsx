@@ -116,7 +116,7 @@ export default function ProjectShowcaseChart() {
           paddingLeft: 10,
           paddingRight: 10,
           paddingTop: 8,
-          paddingBottom: 8,
+          paddingBottom: 0,
         }),
       })
     );
@@ -252,7 +252,7 @@ export default function ProjectShowcaseChart() {
   return (
     <Card className="w-full bg-white dark:bg-gray-900 shadow-xl border-0">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between text-xl font-bold">
+        <CardTitle className="flex items-center justify-between text-md text-gray-800 dark:text-white font-bold">
           <span>Projects by Year</span>
           <span className="text-sm text-muted-foreground">
             Selected: {selectedYear || "Loading..."}

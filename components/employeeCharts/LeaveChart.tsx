@@ -16,14 +16,14 @@ export default function LeaveChart({ years }) {
 
   const { user } = useAuth();
 
-    const toTitleCase = (name: string) => {
-        return name
-            .toLowerCase()
-            .split(" ")
-            .filter(Boolean)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ");
-    };
+  const toTitleCase = (name: string) => {
+    return name
+      .toLowerCase()
+      .split(" ")
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   // Fetch data dynamically
   const fetchData = async () => {
@@ -84,7 +84,7 @@ export default function LeaveChart({ years }) {
     });
 
     xRenderer.labels.template.setAll({
-      rotation: -40,
+      rotation: -30,
       fontSize: 11,
       fontWeight: "500",
       fill: am5.color("#333"),
@@ -112,6 +112,13 @@ export default function LeaveChart({ years }) {
         title: am5.Label.new(root, { text: "Leaves Count" }),
       })
     );
+
+    // 👇 ADD THIS
+    yAxis.get("renderer").labels.template.setAll({
+      fontSize: 11,
+      fontWeight: "500",
+      fill: am5.color("#111"), // gray-700 (optional)
+    });
 
     // Prepare data
     let chartData = data.employees.map((emp) => ({
@@ -212,12 +219,12 @@ export default function LeaveChart({ years }) {
       am5.Legend.new(root, {
         centerX: am5.percent(50),
         x: am5.percent(50),
-        marginTop: 20,
+        marginTop: 5,
       })
     );
 
     legend.data.setAll([seriesFull, seriesExceeded, seriesShort]);
-    legend.labels.template.setAll({ fontWeight: "500", fill: am5.color("#111") });
+    legend.labels.template.setAll({ fontWeight: "500", fontSize: 13, fill: am5.color("#333") });
 
     // Animate
     chart.appear(1000, 100);
@@ -248,13 +255,13 @@ export default function LeaveChart({ years }) {
   }
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow p-6">
+    <div className="w-full bg-white rounded-2xl shadow p-0">
       <CardHeader className="flex justify-between lg:flex-row flex-col">
-        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white text-md">
           Employees Yearly Leave Data (Allowed Leaves: {data.totalAllowedLeaves})
         </CardTitle>
         <select
-          className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+          className="bg-gray-100 dark:bg-gray-700 px-2 py-1 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md"
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
         >
@@ -265,7 +272,9 @@ export default function LeaveChart({ years }) {
           ))}
         </select>
       </CardHeader>
-      <div ref={chartRef} style={{ width: "100%", height: "500px" }}></div>
+      <div className="p-10 pt-0 pb-2">
+        <div ref={chartRef} style={{ width: "100%", height: "500px" }}></div>
+      </div>
     </div>
   );
 }

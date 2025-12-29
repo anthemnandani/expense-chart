@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { apiService } from "@/lib/apiService";
 import { useAuth } from "@/context/auth-context";
-import { CardHeader, CardTitle } from "../ui/card";
 import { ArrowBigDown } from "lucide-react";
 import AttendanceTimelineLineChart from "./AttendanceTimelineLineChart";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -81,10 +80,10 @@ export default function YearlyLateMatrixChart({ years }) {
   /* ---------------- CHART OPTION ---------------- */
   const option = {
     grid: {
-      top: 80,
-      left: 30,
-      right: 30,
-      bottom: 20,
+      top: 70,
+      left: 20,
+      right: 20,
+      bottom: 15,
       containLabel: true
     },
     xAxis: {
@@ -93,8 +92,8 @@ export default function YearlyLateMatrixChart({ years }) {
       splitLine: { show: true },
       axisLabel: {
         fontSize: 11,
-        rotate: 30,
-        color: "#94a3b8"
+        rotate: 0,
+        color: "#111"
       },
       axisTick: { show: false },
       axisLine: { show: false }
@@ -104,8 +103,8 @@ export default function YearlyLateMatrixChart({ years }) {
       data: employees,
       splitLine: { show: true },
       axisLabel: {
-        fontSize: 12,
-        color: "#94a3b8"
+        fontSize: 11,
+        color: "#111"
       },
       axisTick: { show: false },
       axisLine: { show: false }
@@ -115,9 +114,17 @@ export default function YearlyLateMatrixChart({ years }) {
       borderWidth: 0,
       textStyle: { color: "#222" },
       formatter: (p: any) => `
-      <b>${p.value[1]}</b><br/>
-      ${p.value[0]}<br/>
-      Late Days: <b>${p.value[2]}</b>
+        <div style="padding: 0px 5px">
+      <div style="font-size:12px; font-weight:600;">
+        ${p.value[1]}
+      </div>
+      <div style="font-size:11px;">
+        ${p.value[0]}
+      </div>
+      <div style="font-size:11px;">
+        Late Days: <b>${p.value[2]}
+      </div>
+    </div>
     `
     },
     visualMap: {
@@ -176,7 +183,7 @@ export default function YearlyLateMatrixChart({ years }) {
   return <>
     <div className="w-full p-5 rounded-xl bg-white dark:bg-[#0b1220] shadow-md">
       <div className="pl-2 pt-1 flex justify-between lg:flex-row flex-col">
-        <div className="text-gray-800 text-lg font-semibold dark:text-white">
+        <div className="text-gray-800 text-md font-semibold dark:text-white">
           Employees Yearly Late Coming Summary
         </div>
         <div className="flex gap-2">
@@ -196,9 +203,9 @@ export default function YearlyLateMatrixChart({ years }) {
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
         </div>
       ) : (
-        <ReactECharts 
-          option={option} 
-          style={{ height: 550 }} 
+        <ReactECharts
+          option={option}
+          style={{ height: 550 }}
           onEvents={{ click: handleChartClick }}
         />
       )}
@@ -207,11 +214,11 @@ export default function YearlyLateMatrixChart({ years }) {
           <div className="flex justify-center py-4">
             <ArrowBigDown className="h-6 w-6 text-gray-500" />
           </div>
-          <AttendanceTimelineLineChart 
-            years={years} 
-            employeeId={timelineParams.employeeId} 
-            selectedYear={timelineParams.year} 
-            selectedMonth={timelineParams.month} 
+          <AttendanceTimelineLineChart
+            years={years}
+            employeeId={timelineParams.employeeId}
+            selectedYear={timelineParams.year}
+            selectedMonth={timelineParams.month}
             onClose={() => setShowTimeline(false)}
           />
         </>

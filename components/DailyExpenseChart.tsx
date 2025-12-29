@@ -46,7 +46,7 @@ export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years, currency}
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-12">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
-                    <CardTitle className="flex items-center gap-2">Daily Expenses ({monthsList[selectedMonth - 1]} {selectedYear})</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-md font-semibold">Daily Expenses ({monthsList[selectedMonth - 1]} {selectedYear})</CardTitle>
                 </div>
                 <div className="flex gap-2">
                     <select

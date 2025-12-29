@@ -129,7 +129,7 @@ export default function EmployeeLeavesChart({ years }) {
             <div className="">
                 <CardHeader className="pb-4 pl-0 pr-0 flex justify-between lg:flex-row flex-col">
                     <div>
-                        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+                        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white text-md">
                             Employees Leaves Report{" "}
                             <span className="text-blue-600">(Leaves</span>/
                             <span className="text-green-600">Short Leaves)</span>

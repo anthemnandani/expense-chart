@@ -285,7 +285,7 @@ export default function EmployeeYearlyJoiningResignedChart({ years }) {
     return <>
         <Card className="w-full shadow-md bg-white dark:bg-gray-900 transition-colors duration-300">
             <CardHeader className="flex justify-between lg:flex-row flex-col">
-                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white text-md">
                     Hiring vs Resignation Overview
                 </CardTitle>
                 <select

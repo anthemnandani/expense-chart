@@ -129,7 +129,7 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-8 col-span-1">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
                 <div>
-                    <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
+                    <CardTitle className="text-md font-semibold text-gray-800 dark:text-white">
                         Category-wise Monthly Expenses
                     </CardTitle>
                 </div>

@@ -134,6 +134,14 @@ export default function EmployeeEXperienceChart() {
             })
         );
 
+
+        // 👇 ADD THIS
+        yAxis.get("renderer").labels.template.setAll({
+            fontSize: 11,
+            fontWeight: "500",
+            fill: am5.color("#111"), // gray-700 (optional)
+        });
+
         yRenderer.labels.template.adapters.add("text", (text) => {
             const value = Number(text);
             if (value <= 3) {
@@ -294,7 +302,7 @@ export default function EmployeeEXperienceChart() {
     return (
         <Card className="w-full shadow-md bg-white dark:bg-gray-900 transition-colors duration-300">
             <div>
-                <div className="pt-4 pl-5 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <div className="pt-5 pl-5 text-md font-semibold text-gray-900 dark:text-gray-100">
                     Employee Experience Chart
                 </div>
             </div>

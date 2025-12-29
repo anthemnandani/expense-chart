@@ -191,7 +191,7 @@ export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years, currency})
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-3">
             <CardHeader className="flex justify-between lg:flex-row flex-col items-center gap-3">
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <CardTitle className="text-md font-semibold text-gray-900 dark:text-gray-100">
                     Yearly Credit & Debit Overview
                 </CardTitle>
 

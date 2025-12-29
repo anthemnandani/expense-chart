@@ -222,35 +222,35 @@ export default function AttendanceTimelineLineChart({ years, employeeId, selecte
 
     return (
         <Card>
-           <CardHeader className="pb-4 px-5 flex justify-between lg:flex-row flex-col gap-2">
-  <div>
-    <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
-      {employeeName ? `${employeeName}'s ` : ""}Employee Check-In / Check-Out Timeline
-    </CardTitle>
+            <CardHeader className="pb-4 px-5 flex justify-between lg:flex-row flex-col gap-2">
+                <div>
+                    <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white text-md">
+                        {employeeName ? `${employeeName}'s ` : ""}Employee Check-In / Check-Out Timeline
+                    </CardTitle>
 
-    {/* LEGEND */}
-    <div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-gray-400">
-      <div className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded-full bg-blue-600"></span>
-        <span>Check-In</span>
-      </div>
+                    {/* LEGEND */}
+                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1">
+                            <span className="w-3 h-3 rounded-full bg-blue-600"></span>
+                            <span>Check-In</span>
+                        </div>
 
-      <div className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded-full bg-orange-500"></span>
-        <span>Check-Out</span>
-      </div>
-    </div>
-  </div>
+                        <div className="flex items-center gap-1">
+                            <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                            <span>Check-Out</span>
+                        </div>
+                    </div>
+                </div>
 
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={onClose}
-    className="h-6 w-6 p-0 self-start"
-  >
-    <X className="h-4 w-4" />
-  </Button>
-</CardHeader>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="h-6 w-6 p-0 self-start"
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+            </CardHeader>
 
             <CardContent>
                 <div id="lineTimelineChart" className="h-[400px] w-full" />

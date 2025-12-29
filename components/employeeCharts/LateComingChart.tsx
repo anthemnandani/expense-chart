@@ -180,9 +180,9 @@ export default function LateComingLollipopChart({ years }) {
   };
 
   return (
-    <div className="w-full p-5 rounded-2xl bg-white dark:bg-[#0b1220] shadow-xl">
+    <div className="w-full p-0 rounded-2xl bg-white dark:bg-[#0b1220] shadow-xl">
       <CardHeader className="pb-3 flex justify-between lg:flex-row flex-col">
-        <CardTitle className="text-gray-800 dark:text-white">
+        <CardTitle className="text-gray-800 dark:text-white text-md">
           Employees Monthly Late Coming
         </CardTitle>
 
@@ -211,13 +211,15 @@ export default function LateComingLollipopChart({ years }) {
         </div>
       </CardHeader>
 
-      {loading ? (
+     <div className="pb-4">
+       {loading ? (
         <div className="h-[350px] flex items-center justify-center">
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
         </div>
       ) : (
         <ReactECharts option={option} style={{ height: 400 }} />
       )}
+     </div>
     </div>
   );
 }

@@ -126,10 +126,11 @@ export default function GenderChart({ years }) {
 
         // Set data
         series.data.setAll(data);
-
+        
         series.appear(800, 80);
-
+        
         legend.data.setAll(series.dataItems);
+        // legend.labels.template.setAll({ fontWeight: "500", fontSize: 13, fill: am5.color("#333") });
 
         return () => {
             root.dispose();
@@ -137,9 +138,9 @@ export default function GenderChart({ years }) {
     }, [data]);
 
     return (
-        <div className="w-full bg-white rounded-lg shadow p-6 pt-1">
-            <CardHeader className="flex justify-between lg:flex-row flex-col">
-                <CardTitle className="text-gray-800 dark:text-white">
+        <div className="w-full bg-white rounded-lg shadow p-0 pt-0">
+            <CardHeader className="flex justify-between items-center lg:flex-row flex-col">
+                <CardTitle className="text-gray-800 dark:text-white text-md">
                     Employee Gender Distribution
                 </CardTitle>
 
@@ -171,17 +172,19 @@ export default function GenderChart({ years }) {
                 </div>
             </CardHeader>
 
-            {loading ? (
-                <div className="text-center py-10 text-gray-500">Loading gender stats...</div>
-            ) : (
-                <>
-                    <div id="genderPieChart" style={{ width: "100%", height: "410px" }}></div>
-                    {/* 
+            <div className="px-4 pb-4">
+                {loading ? (
+                    <div className="text-center py-10 text-gray-500">Loading gender stats...</div>
+                ) : (
+                    <>
+                        <div id="genderPieChart" style={{ width: "100%", height: "410px" }}></div>
+                        {/* 
                     <div className="mt-6 text-sm text-gray-600">
                         <b>Total Employees:</b> {total}
                     </div> */}
-                </>
-            )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }

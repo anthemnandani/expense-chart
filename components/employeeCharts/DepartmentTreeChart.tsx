@@ -163,7 +163,7 @@ export const DepartmentTreeChart = () => {
     return (
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow p-6 pt-2 pl-2">
             <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <CardTitle className="text-md font-semibold text-gray-900 dark:text-gray-100">
                     Designation-wise Employee Tree
                 </CardTitle>
             </CardHeader>

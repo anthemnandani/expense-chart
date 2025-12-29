@@ -203,7 +203,7 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) =>
   return (
     <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between flex-col lg:flex-row'>
-        <CardTitle className="text-lg text-gray-800 dark:text-white">
+        <CardTitle className="text-md text-gray-800 dark:text-white">
           Net Balance ({currency}) - Week-wise ({selectedYear})
         </CardTitle>
         <div className="flex gap-2 items-center">

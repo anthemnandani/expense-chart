@@ -176,7 +176,7 @@ export const YearlyCreditDebitChart = ({
   return (
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className="flex justify-between flex-col lg:flex-row">
-        <CardTitle className="text-gray-800 dark:text-white">
+        <CardTitle className="text-gray-800 dark:text-white text-md">
           Yearly Credit vs Debit ({selectedYear})
         </CardTitle>
         <div className="flex gap-2 items-center">

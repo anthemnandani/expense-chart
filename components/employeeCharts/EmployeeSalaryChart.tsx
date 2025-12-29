@@ -259,7 +259,7 @@ export default function EmployeeChart() {
     return (
         <Card className="w-full shadow-md bg-white dark:bg-gray-900 transition-colors duration-300">
             <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <CardTitle className="text-md font-semibold text-gray-900 dark:text-gray-100">
                     Employee Salary Chart
                 </CardTitle>
             </CardHeader>
