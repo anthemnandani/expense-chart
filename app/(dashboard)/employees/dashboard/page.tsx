@@ -62,7 +62,7 @@ export default function EmployeesDashboard() {
         </div>
 
         <div className="md:col-span-2">
-          <UpcomingEventsTimeline />
+          <UpcomingEventsTimeline years={years}/>
         </div>
       </div>
 

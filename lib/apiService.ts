@@ -29,6 +29,23 @@ interface AttendanceHeatmapResponse {
   }>;
 }
 
+interface EmployeeMonthlyAttendanceResponse {
+  employeeId: number;
+  employeeName: string;
+  year: number;
+  month: number;
+  monthName: string;
+  attendance: Array<{
+    AttendanceDate: string;
+    CheckInTime: string | null;
+    CheckOutTime: string | null;
+    WorkReport: string | null;
+    IsLeave: number;
+    Reason: string | null;
+  }>;
+}
+
+
 export const apiService = {
   // Fetch daily expenses for DailyExpenseChart
   async getDailyExpenses(
@@ -488,6 +505,32 @@ async getEmployeeStats(token: string) {
     return await res.json();
   } catch (err) {
     console.error("Employee stats error:", err);
+    return null;
+  }
+},
+
+/* -------------------- EMPLOYEE MONTHLY ATTENDANCE -------------------- */
+async getEmployeeMonthlyAttendance(
+  token: string,
+  params: {
+    employeeId: number;
+    year: number;
+    month: number;
+  }
+): Promise<EmployeeMonthlyAttendanceResponse | null> {
+  try {
+    const { employeeId, year, month } = params;
+
+    const res = await fetch(
+      `https://managementapinodejs.anthemwork.com/api/employee-monthly?employeeId=${employeeId}&year=${year}&month=${month}&token=${encodeURIComponent(token)}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch employee monthly attendance");
+
+    return await res.json();
+  } catch (error) {
+    console.error("Employee monthly attendance error:", error);
     return null;
   }
 },

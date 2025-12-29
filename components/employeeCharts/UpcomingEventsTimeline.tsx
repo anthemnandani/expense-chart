@@ -212,7 +212,8 @@ const YearlyModal = ({
   currentYear,
   setCurrentYear,
   eventMap,
-  getEventBadge
+  getEventBadge,
+  years
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -220,7 +221,44 @@ const YearlyModal = ({
   setCurrentYear: (year: number) => void;
   eventMap: Record<string, EventItem[]>;
   getEventBadge: (events: EventItem[]) => JSX.Element;
+    years: number[];
 }) => {
+  // Helper to check if a year is available
+  const isAvailableYear = (year: number) => years.includes(year);
+
+  // Helper to get next/prev available year
+  const getPrevYear = (year: number) => {
+    const sortedYears = [...years].sort((a, b) => a - b);
+    const currentIndex = sortedYears.indexOf(year);
+    if (currentIndex > 0) {
+      return sortedYears[currentIndex - 1];
+    }
+    return null;
+  };
+
+  const getNextYear = (year: number) => {
+    const sortedYears = [...years].sort((a, b) => a - b);
+    const currentIndex = sortedYears.indexOf(year);
+    if (currentIndex < sortedYears.length - 1) {
+      return sortedYears[currentIndex + 1];
+    }
+    return null;
+  };
+
+  const handlePrevYear = () => {
+    const prevYear = getPrevYear(currentYear);
+    if (prevYear !== null) {
+      setCurrentYear(prevYear);
+    }
+  };
+
+  const handleNextYear = () => {
+    const nextYear = getNextYear(currentYear);
+    if (nextYear !== null) {
+      setCurrentYear(nextYear);
+    }
+  };
+
   if (!isOpen) return null;
 
   const renderMonthCalendar = (month: number, isYearly: boolean) => {
@@ -355,8 +393,9 @@ const YearlyModal = ({
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex justify-between items-center">
             <button
-              onClick={() => setCurrentYear(currentYear - 1)}
-              className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm shadow-sm transition"
+              onClick={handlePrevYear}
+              disabled={!getPrevYear(currentYear)}
+              className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ‹
             </button>
@@ -364,8 +403,9 @@ const YearlyModal = ({
               {currentYear} Events Calendar
             </h3>
             <button
-              onClick={() => setCurrentYear(currentYear + 1)}
-              className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm shadow-sm transition"
+              onClick={handleNextYear}
+              disabled={!getNextYear(currentYear)}
+              className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ›
             </button>
@@ -391,7 +431,7 @@ const YearlyModal = ({
   );
 };
 
-export default function UpcomingEventsTimeline() {
+export default function UpcomingEventsTimeline({ years }: { years: number[] }) {
   const [currentMonth, setCurrentMonth] = useState(11);
   const [currentYear, setCurrentYear] = useState(2025);
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -403,9 +443,32 @@ export default function UpcomingEventsTimeline() {
   const monthDays = getMonthDays(currentYear, currentMonth);
   const { user } = useAuth();
 
+  // Helper to check if a year is available
+  const isAvailableYear = (year: number) => years.includes(year);
+
+  // Helper to get next/prev available year
+  const getPrevYear = (year: number) => {
+    const sortedYears = [...years].sort((a, b) => a - b);
+    const currentIndex = sortedYears.indexOf(year);
+    if (currentIndex > 0) {
+      return sortedYears[currentIndex - 1];
+    }
+    return null;
+  };
+
+  const getNextYear = (year: number) => {
+    const sortedYears = [...years].sort((a, b) => a - b);
+    const currentIndex = sortedYears.indexOf(year);
+    if (currentIndex < sortedYears.length - 1) {
+      return sortedYears[currentIndex + 1];
+    }
+    return null;
+  };
+
   // ✅ Fetch events dynamically from API whenever year changes
   useEffect(() => {
     const fetchEvents = async () => {
+      if (!isAvailableYear(currentYear)) return; // Don't fetch if year not available
       try {
         setLoading(true);
         const data = await apiService.getEventsCalendar(
@@ -432,17 +495,29 @@ export default function UpcomingEventsTimeline() {
   }, {});
 
   const handlePrevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else setCurrentMonth(currentMonth - 1);
+    if (currentMonth > 0) {
+      setCurrentMonth(currentMonth - 1);
+    } else {
+      const prevYear = getPrevYear(currentYear);
+      if (prevYear !== null) {
+        setCurrentYear(prevYear);
+        setCurrentMonth(11);
+      }
+      // If no prev year, do nothing (stay on current month/year)
+    }
   };
 
   const handleNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else setCurrentMonth(currentMonth + 1);
+    if (currentMonth < 11) {
+      setCurrentMonth(currentMonth + 1);
+    } else {
+      const nextYear = getNextYear(currentYear);
+      if (nextYear !== null) {
+        setCurrentYear(nextYear);
+        setCurrentMonth(0);
+      }
+      // If no next year, do nothing (stay on current month/year)
+    }
   };
 
   const isToday = (day: number) =>
@@ -467,10 +542,11 @@ export default function UpcomingEventsTimeline() {
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={handlePrevMonth}
+            disabled={!getPrevYear(currentYear) && currentMonth === 0}
             className="
               p-1.5 rounded-full bg-gray-100 dark:bg-gray-800
               hover:bg-gray-200 dark:hover:bg-gray-700
-              text-sm shadow-sm transition
+              text-sm shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
             ‹
@@ -492,10 +568,11 @@ export default function UpcomingEventsTimeline() {
             </button>
             <button
               onClick={handleNextMonth}
+              disabled={!getNextYear(currentYear) && currentMonth === 11}
               className="
                 p-1.5 rounded-full bg-gray-100 dark:bg-gray-800
                 hover:bg-gray-200 dark:hover:bg-gray-700
-                text-sm shadow-sm transition
+                text-sm shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed
               "
             >
               ›
@@ -631,6 +708,7 @@ export default function UpcomingEventsTimeline() {
         setCurrentYear={setCurrentYear}
         eventMap={eventMap}
         getEventBadge={getEventBadge}
+        years={years}
       />
     </>
   );
