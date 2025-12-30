@@ -68,7 +68,7 @@ export default function EmployeesRoles() {
         <table className="min-w-full text-sm text-left">
           <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
             <tr>
-              <th className="px-5 py-3">ID</th>
+              {/* <th className="px-5 py-3">ID</th> */}
               <th className="px-5 py-3">Designation</th>
               <th className="px-5 py-3 text-center">Active Employees</th>
               <th className="px-5 py-3 text-center">Action</th>
@@ -83,9 +83,9 @@ export default function EmployeesRoles() {
                   className="hover:bg-gray-50 transition"
                 >
                   {/* ID - subtle */}
-                  <td className="px-5 py-3 text-gray-500">
+                  {/* <td className="px-5 py-3 text-gray-500">
                     #{des.Designationid}
-                  </td>
+                  </td> */}
 
                   {/* Designation - primary */}
                   <td className="px-5 py-3">

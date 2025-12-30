@@ -111,9 +111,9 @@ export const ExpenseTreeChart: React.FC<ExpenseTreeChart> = ({ years, currency }
                 data: treeData,
                 layout: "orthogonal",
                 orient: "LR",
-                top: "5%",
+                top: "1%",
                 left: "15%",
-                bottom: "5%",
+                bottom: "1%",
                 right: "20%",
                 symbolSize: 14,
                 label: {
@@ -226,7 +226,7 @@ export const ExpenseTreeChart: React.FC<ExpenseTreeChart> = ({ years, currency }
             <CardContent>
                 <ReactECharts
                     option={option}
-                    style={{ height: "650px", width: "100%" }}
+                    style={{ height: "700px", width: "100%" }}
                     onChartReady={onChartReady}
                 />
             </CardContent>

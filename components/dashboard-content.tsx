@@ -130,7 +130,7 @@ export default function DashboardContent() {
           <StackedBarCategoryChart years={years} currency={currency} />
         <div className="grid grid-cols-1 lg:grid-cols-11 gap-6">
           <CategoryCumulativeChart years={years} currency={currency} />
-          <AdvancedPolarChart years={years} currency={currency} />
+          {/* <AdvancedPolarChart years={years} currency={currency} /> */}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <DailyExpenseChart years={years} currency={currency} />

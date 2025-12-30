@@ -10,8 +10,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Expense Tracking System",
-  description: "Track your expenses easily and efficiently.",
+  title: "Dashboards",
+  description: "Stay organized and manage your operations seamlessly",
   generator: "Next.js",
   icons: {
     icon: "https://res.cloudinary.com/dmyq2ymj9/image/upload/v1748410755/eujses1ippo5ybahpr8k.png",
