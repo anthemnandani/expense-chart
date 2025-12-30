@@ -19,6 +19,7 @@ export const YearlyCreditDebitChart = ({
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [data, setData] = useState<{ credit: [number, number][], debit: [number, number][] }>({ credit: [], debit: [] });
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Detect dark mode
   useEffect(() => {
@@ -41,7 +42,21 @@ export const YearlyCreditDebitChart = ({
   // Fetch data
   useEffect(() => {
     if (!groupId) return;
-    apiService.getYearlyCreditDebit(groupId, selectedYear).then(setData);
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await apiService.getYearlyCreditDebit(groupId, selectedYear);
+        setData(res);
+      } catch (err) {
+        console.error(err);
+        setData({ credit: [], debit: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [selectedYear, groupId]);
 
   const latestTimestamp = Math.max(
@@ -82,9 +97,17 @@ export const YearlyCreditDebitChart = ({
     yAxis: {
       opposite: false,
       title: { text: `Amount(${currency})` },
+      // labels: {
+      //   formatter() {
+      //     return `${currency}${this.value}`;
+      //   },
+      //   style: {
+      //     color: isDarkMode ? "#d1d5db" : "#374151",
+      //   },
+      // },
       labels: {
         formatter() {
-          return `${currency}${this.value}`;
+          return `${currency}${Highcharts.numberFormat(this.value as number, 0, '.', ',')}`;
         },
         style: {
           color: isDarkMode ? "#d1d5db" : "#374151",
@@ -95,7 +118,11 @@ export const YearlyCreditDebitChart = ({
     tooltip: {
       shared: true,
       pointFormatter() {
-        return `<span style="color:${this.color}">\u25CF</span> <b>${this.series.name}: ${currency}${this.y}</b><br/>`;
+        return `<span style="color:${this.color}">\u25CF</span> <b>
+  ${this.series.name}: 
+  ${currency}${Highcharts.numberFormat(this.y as number, 0, '.', ',')}
+</b><br/>
+<br/>`;
       },
       backgroundColor: isDarkMode ? "#111827" : "#ffffff",
       borderColor: isDarkMode ? "#374151" : "#d1d5db",
@@ -194,22 +221,32 @@ export const YearlyCreditDebitChart = ({
         </div>
       </CardHeader>
       <CardContent>
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType="stockChart"
-          options={options}
-        />
-        {/* Color legend at bottom */}
-        <div className="flex justify-center gap-4 mt-4 text-sm">
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-            Credit
+        {loading ? (
+          // 🔹 Selection-style loading UI (chart ki jagah)
+          <div className="h-[450px] flex flex-col items-center justify-center">
+            <div className="w-full h-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-            Debit
-          </div>
-        </div>
+        ) : (
+          <>
+            <HighchartsReact
+              highcharts={Highcharts}
+              constructorType="stockChart"
+              options={options}
+            />
+
+            {/* Legend */}
+            <div className="flex justify-center gap-4 mt-4 text-sm">
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                Credit
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                Debit
+              </div>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

@@ -19,7 +19,7 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([]);
-  const [categoryData, setCategoryData] = useState<any[]>([]);
+  // const [categoryData, setCategoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true); // track loading
   const { user } = useAuth();
   const groupId = user?.groupId;
@@ -47,57 +47,33 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
       if (!groupId) {
         setLoading(false);
         setMonthlyExpenseData([]);
-        setCategoryData([]);
         return;
       }
+
       setLoading(true);
       try {
         const data = await apiService.getYearlyExpense(groupId, selectedYear);
-        const categoryExpenses = await apiService.getCategoryExpenses(groupId, selectedYear);
 
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-        // Transform monthly expense data
         const transformed = months.map((m, idx) => {
-          const found = data.find((item: any) => parseInt(item.month, 10) - 1 === idx);
+          const found = data.find(
+            (item: any) => parseInt(item.month, 10) - 1 === idx
+          );
+
           return {
             month: m,
             totalDebit: found?.totalDebit || 0,
             totalCredit: found?.totalCredit || 0,
-            netBalance: (found?.totalCredit || 0) - (found?.totalDebit || 0),
+            netBalance: found?.balance || 0,
+            categories: found?.categories || {},   // ✅ DIRECT FROM API
           };
         });
 
-        // Optimized category mapping: Group by month once
-        const groupedByMonth: Record<number, Record<string, number>> = categoryExpenses.reduce((acc, e: any) => {
-          const monthIdx = parseInt(e.month, 10) - 1;
-          if (!acc[monthIdx]) acc[monthIdx] = {};
-          if (!acc[monthIdx][e.expenseDescType]) acc[monthIdx][e.expenseDescType] = 0;
-          acc[monthIdx][e.expenseDescType] += e.totalExpenses;
-          return acc;
-        }, {} as Record<number, Record<string, number>>);
-
-        const uniqueCategories = Array.from(
-          new Set(categoryExpenses.map((e: any) => e.expenseDescType).filter(Boolean))
-        );
-
-        const categoryMap = months.map((month, idx) => {
-          const monthCats = groupedByMonth[idx] || {};
-          return uniqueCategories.reduce(
-            (acc, cat) => ({
-              ...acc,
-              [cat]: monthCats[cat] || 0,
-            }),
-            { month }
-          );
-        });
-
         setMonthlyExpenseData(transformed);
-        setCategoryData(categoryMap);
       } catch (err) {
         console.error("Error fetching yearly expense data:", err);
         setMonthlyExpenseData([]);
-        setCategoryData([]);
       } finally {
         setLoading(false);
       }
@@ -109,27 +85,39 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
   // Memoize the formatter function to avoid recreating it on every render
   const tooltipFormatter = useMemo(() => {
     return (params: any) => {
-      if (!params || !params.length) return "";
-      const monthIndex = params[0]?.dataIndex ?? 0;
-      if (!monthlyExpenseData[monthIndex]) return "";
+      if (!params?.length) return "";
 
-      const catInfo = categoryData[monthIndex]
-        ? Object.entries(categoryData[monthIndex])
-            .filter(([key]) => key !== "month")
-            .map(([cat, val]) => `<div style="color:${isDarkMode ? "#d1d5db" : "#666"};">${cat}: ${currency}${val}</div>`)
-            .join("")
-        : "";
+      const monthIndex = params[0].dataIndex;
+      const data = monthlyExpenseData[monthIndex];
+      if (!data) return "";
 
-      const seriesInfo = params
+      const categoryHtml = Object.entries(data.categories || {})
         .map(
-          (p: any) =>
-            `<div><span style="color:${p.color};font-weight:600;">●</span> ${p.seriesName}: ${currency}${p.value}</div>`
+          ([cat, val]) =>
+            `<div style="color:${isDarkMode ? "#d1d5db" : "#666"};">
+            ${cat}: ${currency}${val}
+          </div>`
         )
         .join("");
 
-      return `<strong>${monthlyExpenseData[monthIndex].month}</strong><br/>${seriesInfo}<hr/>${catInfo}`;
+      const seriesHtml = params
+        .map(
+          (p: any) =>
+            `<div>
+            <span style="color:${p.color};font-weight:600;">●</span>
+            ${p.seriesName}: ${currency}${p.value}
+          </div>`
+        )
+        .join("");
+
+      return `
+      <strong>${data.month}</strong><br/>
+      ${seriesHtml}
+      <hr/>
+      ${categoryHtml}
+    `;
     };
-  }, [monthlyExpenseData, categoryData, isDarkMode, currency]);
+  }, [monthlyExpenseData, isDarkMode, currency]);
 
   // Memoize series data to avoid recomputing on every render
   const expensesData = useMemo(() => monthlyExpenseData.map((d) => d.totalDebit), [monthlyExpenseData]);
@@ -223,8 +211,39 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="h-[400px] flex items-center justify-center text-gray-500 dark:text-gray-400">
-            Loading chart...
+          <div className="h-[400px] p-4 animate-pulse">
+            {/* Y-axis lines */}
+            <div className="flex h-full gap-4">
+              <div className="flex flex-col justify-between w-8">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-3 bg-gray-200 dark:bg-gray-700 rounded"
+                  />
+                ))}
+              </div>
+
+              {/* Chart bars/lines placeholder */}
+              <div className="flex-1 flex items-end gap-2">
+                {[...Array(12)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-t"
+                    style={{ height: `${30 + (i % 5) * 10}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* X-axis */}
+            <div className="mt-4 flex gap-2">
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded"
+                />
+              ))}
+            </div>
           </div>
         ) : monthlyExpenseData.length === 0 ? (
           <div className="h-[400px] flex items-center justify-center text-gray-500 dark:text-gray-400">

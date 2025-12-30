@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from 'react';
 import Highcharts from 'highcharts';
 import { apiService } from '@/lib/apiService';
@@ -14,7 +13,7 @@ interface StackedBarCategoryChartProps {
 
 export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = ({
   years,
-  height = 600,
+  height = 450,
   currency
 }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -26,18 +25,14 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
   useEffect(() => {
     const checkDarkMode = () =>
       document.documentElement.classList.contains("dark")
-
     setIsDarkMode(checkDarkMode())
-
     const observer = new MutationObserver(() => {
       setIsDarkMode(checkDarkMode())
     })
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"]
     })
-
     return () => observer.disconnect()
   }, [])
 
@@ -46,8 +41,8 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
     const fetchDataAndRenderChart = async () => {
       try {
         const { data, categories } = await apiService.getYearlyCategoryExpenses(groupId, years);
-
-        // Calculate total expense per category across all years
+        data.sort((a, b) => b.year - a.year); // Sort data by year descending, like in JS
+        // Calculate total expense per category across all years (but sort by latest year, like in JS)
         const categoryTotals: { [key: string]: number } = {};
         console.log("data: ", data);
         categories.forEach(category => {
@@ -55,39 +50,39 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
           data.forEach(yearData => {
             const val = yearData[category];
             if (val && val !== 0) {
-              categoryTotals[category] += val;
+              categoryTotals[category] += Number(val);
             }
           });
         });
-
-        // Sort categories descending by total expense
+        // Sort categories descending by latest year's expense (like in JS)
+        const latestYearIndex = data.length - 1;
         const sortedCategories = categories
           .filter(category => categoryTotals[category] > 0)
-          .sort((a, b) => categoryTotals[b] - categoryTotals[a]);
-
+          .sort((a, b) => {
+            const valA = data[latestYearIndex][a] ? Number(data[latestYearIndex][a]) : 0;
+            const valB = data[latestYearIndex][b] ? Number(data[latestYearIndex][b]) : 0;
+            return valB - valA;
+          });
         // Map to series in sorted order
         const series = sortedCategories.map(category => {
           const values = data.map(yearData => {
             const val = yearData[category];
-            return val && val !== 0 ? val : null;
+            return val && val !== 0 ? Number(val) : null;
           });
           return {
             name: category,
             data: values,
           };
         });
-
-        // year labels as before
+        // Year labels as before (but now xAxis will be categories, yAxis values for horizontal)
         const yearLabels = data.map(item => item.year);
-
         if (chartContainerRef.current) {
           if (chartRef.current) {
             chartRef.current.destroy();
           }
-
           chartRef.current = Highcharts.chart(chartContainerRef.current, {
             chart: {
-              type: 'column',
+              type: 'bar', // Changed to 'bar' for horizontal (row-wise) stacked bars
               height: height,
               backgroundColor: "transparent",
             },
@@ -105,14 +100,18 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
               },
               labels: {
                 formatter: function () {
-                  return currency + Highcharts.numberFormat(this.value, 0, '.', ',');
+                  const value = this.value;
+                  if (value >= 1000000) return currency + (value / 1000000).toFixed(1) + 'M';
+                  if (value >= 1000) return currency + (value / 1000).toFixed(0) + 'k';
+                  return currency + Highcharts.numberFormat(value, 0, '.', ',');
                 }
               }
             },
             tooltip: {
               shared: true,
               formatter: function () {
-                let tooltipHtml = `<b>${this.x}</b><br/>`;
+                const year = this.points?.[0]?.key; // Use actual year from x
+                let tooltipHtml = `<b>${year}</b><br/>`;
                 this.points?.forEach(point => {
                   const formattedValue = Number(point.y).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -131,24 +130,29 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             },
             legend: {
               itemStyle: {
-                color: isDarkMode ? "#f3f4f6" : "#111827", 
+                color: isDarkMode ? "#f3f4f6" : "#111827",
                 fontSize: '12px',
               },
               itemHoverStyle: {
-                color: isDarkMode ? "#e5e7eb" : "#000000", 
+                color: isDarkMode ? "#e5e7eb" : "#000000",
               },
             },
             plotOptions: {
-              column: {
+              bar: { // Changed from 'column' to 'bar'
                 stacking: 'normal',
+                minPointLength: 35, // Added like in JS for better visibility
                 dataLabels: {
                   enabled: true,
                   formatter: function () {
-                    return currency + Number(this.y).toLocaleString();
+                    const val = this.y;
+                    if (val >= 1000000) return currency + (val / 1000000).toFixed(2) + 'M';
+                    if (val >= 1000) return currency + (val / 1000).toFixed(2) + 'k';
+                    return currency + Number(val).toLocaleString();
                   },
                   color: isDarkMode ? '#f3f4f6' : '#111827',
                   style: {
                     textOutline: 'none',
+                    fontSize: '10px', // Added like in JS
                   },
                 },
               },
@@ -157,15 +161,16 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             credits: {
               enabled: false,
             },
-            colors: [
-              '#2563eb',
-              '#22c55e',
-              '#51291e',
-              '#028090',
-              '#ff6700',
-              '#0e9594',
-              '#7e2a0b',
-              'red',
+            colors: [ // Updated colors to match JS file
+              "#ffc107",
+              "#95c623",
+              "#20c997",
+              "#d00000",
+              "#9d4edd",
+              "#f77f00",
+              "#4c9bfd",
+              "#0dcaf0",
+              "#ff4d6d",
             ],
           });
         }
@@ -180,11 +185,8 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
         }
       }
     };
-
-
     fetchDataAndRenderChart();
-
-  }, [groupId, years, height]);
+  }, [groupId, years, height, isDarkMode, currency]); // Added dependencies like in JS
 
   return (
     <Card className="shadow-lg border-0 bg-white col-span-6 dark:bg-gray-800 lg:col-span-6">

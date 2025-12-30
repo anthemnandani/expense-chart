@@ -10,6 +10,7 @@ import { DailyExpenseChart } from "./DailyExpenseChart";
 import UniqueStatCards from "./UniqueStatCards";
 import { FinancialInsight } from "@/lib/types";
 import { StackedBarCategoryChart } from "./StackedBarCategoryChart";
+import CategoryCumulativeChart from "./CategoryCumulativeChart";
 
 const YearlyCreditDebitChart = dynamic(() => import("./YearlyCreditDebitChart"), { ssr: false });
 const AreaYearlyExpenseChart = dynamic(() => import("./AreaYearlyExpenseChart"), { ssr: false });
@@ -126,8 +127,9 @@ export default function DashboardContent() {
         <div className="grid grid-cols-1 gap-6">
           <AnnualCategoryTrendsChart years={years} currency={currency} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <StackedBarCategoryChart years={years} currency={currency} />
+        <div className="grid grid-cols-1 lg:grid-cols-11 gap-6">
+          <CategoryCumulativeChart years={years} currency={currency} />
           <AdvancedPolarChart years={years} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">

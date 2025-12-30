@@ -12,7 +12,7 @@ interface ExpenseTreeChart {
     currency: string;
 }
 
-export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years, currency}) => {
+export const ExpenseTreeChart: React.FC<ExpenseTreeChart> = ({ years, currency }) => {
     const [treeData, setTreeData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const chartRef = useRef<any>(null)
@@ -36,9 +36,9 @@ export const ExpenseTreeChart : React.FC<ExpenseTreeChart> = ({years, currency})
 
     useEffect(() => {
         async function fetchData() {
-             if (!groupId || years.length === 0) return;
+            if (!groupId || years.length === 0) return;
             try {
-                 const data = await apiService.getTreeGraphData(groupId, years, currency)
+                const data = await apiService.getTreeGraphData(groupId, years, currency)
                 const nested = buildTree(data)
                 setTreeData(nested)
             } catch (err) {

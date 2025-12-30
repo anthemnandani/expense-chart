@@ -158,9 +158,14 @@ export const HighLevelPieChart: React.FC<HighLevelPieChart> = ({ years, currency
 
             <CardContent>
                 <div className="h-[300px] flex items-center justify-center">
-                    {loading || categoryData.length === 0 ? (
+                    {loading ? (
+                        // 🔹 Chart loading placeholder (selection UI already upar visible hai)
+                        <div className="w-full h-full flex items-center justify-center">
+                            <div className="animate-pulse w-48 h-48 rounded-full bg-gray-200 dark:bg-gray-700" />
+                        </div>
+                    ) : categoryData.length === 0 ? (
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Loading chart...
+                            No data available
                         </div>
                     ) : (
                         <HighchartsReact highcharts={Highcharts} options={options} />

@@ -8,11 +8,11 @@ import { useAuth } from '@/context/auth-context'
 import { apiService } from '@/lib/apiService'
 
 interface NetBalanceChart {
-    years: number[];
-    currency: string;
+  years: number[];
+  currency: string;
 }
 
-export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) => {
+export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const { user } = useAuth()
@@ -112,12 +112,83 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) =>
     },
     tooltip: {
       shared: true,
-      xDateFormat: '%A, %b %e, %Y',
-      valuePrefix: `${currency}`,
-      valueDecimals: 0,
+      useHTML: true,
       backgroundColor: isDarkMode ? '#111827' : '#ffffff',
+      borderRadius: 8,
+      shadow: true,
       style: {
-        color: textColor
+        color: textColor,
+        fontSize: '12px',
+      },
+      formatter: function () {
+        const p = this.points ? this.points[0] : this.point;
+        const opts = p.point.options;
+
+        let html = `
+      <div style="min-width:220px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">
+          ${Highcharts.dateFormat('%A, %b %e, %Y', p.x)}
+        </div>
+
+        <div style="margin-bottom:8px">
+          <span style="opacity:0.7">Net Balance</span><br/>
+          <span style="font-size:14px;font-weight:600">
+            ${currency} ${Highcharts.numberFormat(p.y, 0, '.', ',')}
+          </span>
+        </div>
+    `;
+
+        if (opts.transaction) {
+          const t = opts.transaction;
+          const isCredit = t.type === 'credit';
+
+          html += `
+        <div style="
+          border-top:1px solid ${isDarkMode ? '#374151' : '#e5e7eb'};
+          padding-top:6px;
+        ">
+          <span style="
+            display:inline-block;
+            padding:2px 8px;
+            border-radius:999px;
+            font-size:10px;
+            font-weight:600;
+            background:${isCredit ? '#dcfce7' : '#fee2e2'};
+            color:${isCredit ? '#166534' : '#991b1b'};
+            margin-bottom:4px;
+          ">
+            ${isCredit ? 'CREDIT' : 'DEBIT'}
+          </span>
+
+          <div style="margin-top:4px;font-weight:600">
+            ${currency} ${Highcharts.numberFormat(t.amount, 0, '.', ',')}
+          </div>
+
+          ${t.description
+              ? `<div style="opacity:0.75;margin-top:2px">
+                  ${t.description}
+                </div>`
+              : ''
+            }
+
+          <div style="opacity:0.6;font-size:10px;margin-top:2px">
+            ${Highcharts.dateFormat(
+              '%b %d, %Y • %H:%M',
+              new Date(t.date).getTime()
+            )}
+          </div>
+        </div>
+      `;
+        } else {
+          html += `
+        <div style="opacity:0.6">
+          No transactions
+        </div>
+      `;
+        }
+
+        html += `</div>`;
+        return html;
       }
     },
     rangeSelector: {
@@ -204,7 +275,7 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({years, currency}) =>
     <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between flex-col lg:flex-row'>
         <CardTitle className="text-md text-gray-800 dark:text-white">
-          Net Balance ({currency}) - Week-wise ({selectedYear})
+          Net Balance ({currency})
         </CardTitle>
         <div className="flex gap-2 items-center">
           <select

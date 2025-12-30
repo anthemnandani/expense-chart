@@ -28,6 +28,7 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [chartData, setChartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
   const groupId = user?.groupId
 
@@ -51,40 +52,46 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
 
   useEffect(() => {
     if (!groupId) return
+
     const fetchData = async () => {
       try {
-        const data = await apiService.getYearlyExpense(groupId, selectedYear);
+        setLoading(true)
+
+        const data = await apiService.getYearlyExpense(groupId, selectedYear)
+
         const months = [
           "Jan", "Feb", "Mar", "Apr", "May", "Jun",
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
+        ]
 
-        const monthlyMap: Record<string, { income: number; expenses: number }> = {};
+        const monthlyMap: Record<string, { income: number; expenses: number }> = {}
         months.forEach((m) => {
-          monthlyMap[m] = { income: 0, expenses: 0 };
-        });
+          monthlyMap[m] = { income: 0, expenses: 0 }
+        })
 
         data.forEach((item) => {
-          const monthName = months[parseInt(item.month) - 1];
-          monthlyMap[monthName].income += Number(item.totalCredit || 0);
-          monthlyMap[monthName].expenses += Number(item.totalDebit || 0);
-        });
-
+          const monthName = months[parseInt(item.month) - 1]
+          monthlyMap[monthName].income += Number(item.totalCredit || 0)
+          monthlyMap[monthName].expenses += Number(item.totalDebit || 0)
+        })
 
         const transformedData = months.map((month) => ({
           month,
           income: monthlyMap[month].income,
           expenses: monthlyMap[month].expenses,
-        }));
+        }))
 
-        setChartData(transformedData);
+        setChartData(transformedData)
       } catch (err) {
-        console.error("Error loading radar chart data:", err);
+        console.error("Error loading radar chart data:", err)
+        setChartData([])
+      } finally {
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, [selectedYear, groupId]);
+    fetchData()
+  }, [selectedYear, groupId])
 
   return (
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-4 col-span-1">
@@ -110,49 +117,50 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
       </CardHeader>
 
       <CardContent className="h-[450px] p-6">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart
-            cx="50%"
-            cy="50%"
-            outerRadius="75%"
-            data={chartData}
-          >
-            <PolarGrid strokeDasharray="4 4" />
-            <PolarAngleAxis dataKey="month" tick={{ fill: "#6b7280", fontSize: 12 }} />
-            <PolarRadiusAxis angle={30} domain={[0, 11000]} tick={{ fill: "#9ca3af", fontSize: 11 }} />
-            <Tooltip
-              wrapperStyle={{
-                backgroundColor: isDarkMode ? "#1f2937" : "#fff",
-                borderRadius: 8,
-                color: isDarkMode ? "#f9fafb" : "#111827"
-              }}
-              contentStyle={{
-                fontSize: 12,
-                backgroundColor: isDarkMode ? "#1f2937" : "#fff",
-                border: "none"
-              }}
-            />
-            <Legend verticalAlign="bottom" iconType="circle" height={36} formatter={(value) => (
-              <span style={{ color: isDarkMode ? "#f9fafb" : "#111827" }}>
-                {value}
-              </span>
-            )} />
-            <Radar
-              name="Credit"
-              dataKey="income"
-              stroke="#60d394"
-              fill="#60d394"
-              fillOpacity={0.4}
-            />
-            <Radar
-              name="Debit"
-              dataKey="expenses"
-              stroke="#3b82f6"
-              fill="#3b82f6"
-              fillOpacity={0.4}
-            />
-          </RadarChart>
-        </ResponsiveContainer>
+        {loading ? (
+          // 🔹 Loading Selection UI
+          <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+            <div className="animate-pulse w-64 h-64 rounded-full bg-gray-200 dark:bg-gray-700" />
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart
+              cx="50%"
+              cy="50%"
+              outerRadius="75%"
+              data={chartData}
+            >
+              <PolarGrid strokeDasharray="4 4" />
+              <PolarAngleAxis
+                dataKey="month"
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+              />
+              <PolarRadiusAxis
+                angle={30}
+                domain={[0, 11000]}
+                tick={{ fill: "#9ca3af", fontSize: 11 }}
+              />
+              <Tooltip
+                formatter={(value: number) => value.toLocaleString()}
+              />
+              <Legend verticalAlign="bottom" iconType="circle" height={36} />
+              <Radar
+                name="Credit"
+                dataKey="income"
+                stroke="#60d394"
+                fill="#60d394"
+                fillOpacity={0.4}
+              />
+              <Radar
+                name="Debit"
+                dataKey="expenses"
+                stroke="#3b82f6"
+                fill="#3b82f6"
+                fillOpacity={0.4}
+              />
+            </RadarChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   )

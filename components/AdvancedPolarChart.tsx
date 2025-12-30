@@ -507,7 +507,7 @@ const AdvancedPolarChart = () => {
     }, [isDarkMode, monthlyData, selectedMonth, selectedYear]);
 
     return (
-        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-6">
+        <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 col-span-5">
             <CardHeader className="pb-2 flex justify-between lg:flex-row flex-col">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white text-md font-semibold">

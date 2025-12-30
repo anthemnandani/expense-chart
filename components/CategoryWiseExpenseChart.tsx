@@ -8,8 +8,8 @@ import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
 
 interface CategoryWiseExpenseChart {
-  years: number[];
-  currency: string;
+    years: number[];
+    currency: string;
 }
 
 const dashStyles = [
@@ -21,10 +21,11 @@ const monthLabels = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({years, currency}) => {
+export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ years, currency }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
+    const [loading, setLoading] = useState(true);
     const { user } = useAuth()
     const groupId = user?.groupId
 
@@ -43,12 +44,15 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
         const fetchData = async () => {
             if (!groupId) return
             try {
-                 const data = await apiService.getCategoryExpenses(groupId, selectedYear)
+                setLoading(true);
+                const data = await apiService.getCategoryExpenses(groupId, selectedYear);
+
                 const categories = [...new Set(
                     data
                         .map((d) => d.expenseDescType.trim())
-                        .filter((name) => name !== "") // remove empty categories
+                        .filter((name) => name !== "")
                 )];
+
                 const seriesData = categories.map((category, index) => {
                     const monthlyData: (number | null)[] = new Array(12).fill(null);
                     data.forEach((entry) => {
@@ -67,6 +71,9 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
                 setChartSeries(seriesData as Highcharts.SeriesOptionsType[]);
             } catch (err) {
                 console.error("Error loading category-wise expenses:", err);
+                setChartSeries([]);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -146,8 +153,19 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ye
                 </div>
             </CardHeader>
             <CardContent>
-                <HighchartsReact highcharts={Highcharts} options={options} />
+                {loading ? (
+                    <div className="h-[350px] flex items-center justify-center">
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                            <div className="w-2/3 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                            <div className="w-3/4 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                            <div className="w-1/2 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                        </div>
+                    </div>
+                ) : (
+                    <HighchartsReact highcharts={Highcharts} options={options} />
+                )}
             </CardContent>
+
         </Card>
     );
 }

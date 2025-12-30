@@ -485,7 +485,7 @@ export default function UpcomingEventsTimeline({ years }: { years: number[] }) {
       }
     };
     fetchEvents();
-  }, [currentYear, user?.token]);
+  }, [currentYear, years, user?.token]);
 
   // Create map for quick lookup
   const eventMap = events.reduce<Record<string, EventItem[]>>((acc, ev) => {
