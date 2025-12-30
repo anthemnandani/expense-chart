@@ -29,6 +29,7 @@
     "dayjs": "^1.11.13",
     "echarts": "latest",
     "echarts-for-react": "latest",
+    "framer-motion": "^12.23.26",
     "highcharts": "^11.4.3",
     "highcharts-3d": "^0.1.7",
     "highcharts-react-official": "^3.2.2",
