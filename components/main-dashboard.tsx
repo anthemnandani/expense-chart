@@ -91,21 +91,21 @@ export default function MainDashboard() {
 
               <div className="grid grid-cols-3 gap-3 mt-3 text-sm">
                 <div>
-                  <p className="opacity-80">Debit</p>
+                  <p className="opacity-80">Total Debit</p>
                   <p className="font-semibold">
                     ₹{expenseValues.debit.toLocaleString()}
                   </p>
                 </div>
 
                 <div>
-                  <p className="opacity-80">Credit</p>
+                  <p className="opacity-80">Total Credit</p>
                   <p className="font-semibold">
                     ₹{expenseValues.credit.toLocaleString()}
                   </p>
                 </div>
 
                 <div>
-                  <p className="opacity-80">Net</p>
+                  <p className="opacity-80">Balance</p>
                   <p
                     className={`font-semibold ${
                       expenseValues.net >= 0
