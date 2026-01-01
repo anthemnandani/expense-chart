@@ -226,7 +226,7 @@ export const ExpenseTreeChart: React.FC<ExpenseTreeChart> = ({ years, currency }
             <CardContent>
                 <ReactECharts
                     option={option}
-                    style={{ height: "700px", width: "100%" }}
+                    style={{ height: "850px", width: "100%" }}
                     onChartReady={onChartReady}
                 />
             </CardContent>

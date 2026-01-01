@@ -1,38 +1,36 @@
 'use client'
-
 import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/context/auth-context'
 import { apiService } from '@/lib/apiService'
-
 interface NetBalanceChart {
   years: number[];
   currency: string;
 }
-
 export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth()
   const groupId = user?.groupId
   const [isDarkMode, setIsDarkMode] = useState(false)
-
   useEffect(() => {
     if (!groupId) return
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         const data = await apiService.getNetBalance(groupId, selectedYear);
         setChartData(data);
       } catch (err) {
         console.error("Error fetching net balance:", err);
+      } finally {
+        setIsLoading(false)
       }
     };
     fetchData();
   }, [selectedYear, groupId]);
-
-
   useEffect(() => {
     const checkDarkMode = () =>
       document.documentElement.classList.contains('dark')
@@ -46,7 +44,6 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
     })
     return () => observer.disconnect()
   }, [])
-
   const textColor = isDarkMode ? '#ffffff' : '#1f2937'
   const borderColor = isDarkMode ? '#4B5563' : '#E5E7EB'
   const backgroundColor = isDarkMode ? '#1F2937' : '#ffffff'
@@ -56,7 +53,6 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
   const now = new Date();
   const firstDayOfYear = new Date(selectedYear, 0, 1).getTime();
   const lastDayOfCurrentMonth = new Date(selectedYear, now.getMonth() + 1, 0).getTime();
-
   const options: Highcharts.Options = {
     chart: {
       type: 'areaspline',
@@ -123,13 +119,11 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
       formatter: function () {
         const p = this.points ? this.points[0] : this.point;
         const opts = p.point.options;
-
         let html = `
       <div style="min-width:220px">
         <div style="font-weight:600;font-size:13px;margin-bottom:6px">
           ${Highcharts.dateFormat('%A, %b %e, %Y', p.x)}
         </div>
-
         <div style="margin-bottom:8px">
           <span style="opacity:0.7">Net Balance</span><br/>
           <span style="font-size:14px;font-weight:600">
@@ -137,11 +131,9 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
           </span>
         </div>
     `;
-
         if (opts.transaction) {
           const t = opts.transaction;
           const isCredit = t.type === 'credit';
-
           html += `
         <div style="
           border-top:1px solid ${isDarkMode ? '#374151' : '#e5e7eb'};
@@ -159,18 +151,15 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
           ">
             ${isCredit ? 'CREDIT' : 'DEBIT'}
           </span>
-
           <div style="margin-top:4px;font-weight:600">
             ${currency} ${Highcharts.numberFormat(t.amount, 0, '.', ',')}
           </div>
-
           ${t.description
               ? `<div style="opacity:0.75;margin-top:2px">
                   ${t.description}
                 </div>`
               : ''
             }
-
           <div style="opacity:0.6;font-size:10px;margin-top:2px">
             ${Highcharts.dateFormat(
               '%b %d, %Y • %H:%M',
@@ -186,7 +175,6 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
         </div>
       `;
         }
-
         html += `</div>`;
         return html;
       }
@@ -270,7 +258,6 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
       enabled: false,
     },
   }
-
   return (
     <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
       <CardHeader className='flex justify-between flex-col lg:flex-row'>
@@ -289,20 +276,22 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
           </select>
         </div>
       </CardHeader>
-      <CardContent className="h-[500px]">
-        {chartData.length > 0 ? (
+      <CardContent className="h-[500px] flex items-center justify-center">
+        {isLoading ? (
+          <div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md" />
+        ) : chartData.length > 0 ? (
           <HighchartsReact
             highcharts={Highcharts}
             constructorType="stockChart"
             options={options}
           />
         ) : (
-          <div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md" />
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            No data available for selected year
+          </div>
         )}
       </CardContent>
-
     </Card>
   )
 }
-
 export default NetBalanceChart
