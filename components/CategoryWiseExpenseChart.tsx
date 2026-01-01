@@ -1,26 +1,21 @@
 "use client";
-
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/auth-context";
 import { apiService } from "@/lib/apiService";
-
 interface CategoryWiseExpenseChart {
     years: number[];
     currency: string;
 }
-
 const dashStyles = [
     "Solid"
 ];
-
 const monthLabels = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
-
 export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ years, currency }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
@@ -28,7 +23,6 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
     const [loading, setLoading] = useState(true);
     const { user } = useAuth()
     const groupId = user?.groupId
-
     // Dark mode listener
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -38,7 +32,6 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
         setIsDarkMode(document.documentElement.classList.contains("dark"));
         return () => observer.disconnect();
     }, []);
-
     // Fetch API Data
     useEffect(() => {
         const fetchData = async () => {
@@ -46,13 +39,11 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
             try {
                 setLoading(true);
                 const data = await apiService.getCategoryExpenses(groupId, selectedYear);
-
                 const categories = [...new Set(
                     data
                         .map((d) => d.expenseDescType.trim())
                         .filter((name) => name !== "")
                 )];
-
                 const seriesData = categories.map((category, index) => {
                     const monthlyData: (number | null)[] = new Array(12).fill(null);
                     data.forEach((entry) => {
@@ -67,7 +58,6 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
                         dashStyle: dashStyles[index % dashStyles.length],
                     };
                 });
-
                 setChartSeries(seriesData as Highcharts.SeriesOptionsType[]);
             } catch (err) {
                 console.error("Error loading category-wise expenses:", err);
@@ -76,10 +66,8 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [selectedYear, groupId]);
-
     // Chart Options
     const options: Highcharts.Options = {
         accessibility: { enabled: false },
@@ -131,7 +119,6 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
         series: chartSeries,
         credits: { enabled: false },
     };
-
     return (
         <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-8 col-span-1">
             <CardHeader className="flex justify-between flex-col lg:flex-row">
@@ -152,22 +139,26 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
                     </select>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="h-[350px]">
                 {loading ? (
-                    <div className="h-[350px] flex items-center justify-center">
+                    <div className="h-full flex items-center justify-center">
                         <div className="w-full h-full flex flex-col items-center justify-center gap-4">
                             <div className="w-2/3 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
                             <div className="w-3/4 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
                             <div className="w-1/2 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
                         </div>
                     </div>
-                ) : (
+                ) : chartSeries.length > 0 ? (
                     <HighchartsReact highcharts={Highcharts} options={options} />
+                ) : (
+                    <div className="h-full flex items-center justify-center">
+                        <div className="text-center text-gray-500 dark:text-gray-400">
+                            No data available for selected year
+                        </div>
+                    </div>
                 )}
             </CardContent>
-
         </Card>
     );
 }
-
 export default CategoryWiseExpenseChart;

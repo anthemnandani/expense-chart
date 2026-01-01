@@ -432,8 +432,8 @@ const YearlyModal = ({
 };
 
 export default function UpcomingEventsTimeline({ years }: { years: number[] }) {
-  const [currentMonth, setCurrentMonth] = useState(11);
-  const [currentYear, setCurrentYear] = useState(2025);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
