@@ -109,23 +109,50 @@ export const StackedBarCategoryChart: React.FC<StackedBarCategoryChartProps> = (
             },
             tooltip: {
               shared: true,
-              formatter: function () {
-                const year = this.points?.[0]?.key; // Use actual year from x
-                let tooltipHtml = `<b>${year}</b><br/>`;
-                this.points?.forEach(point => {
-                  const formattedValue = Number(point.y).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  });
-                  tooltipHtml += `<span style="color:${point.color}">●</span> ${point.series.name}: <b>${currency}${formattedValue}</b><br/>`;
-                });
-                return tooltipHtml;
-              },
+              useHTML: true,
               backgroundColor: isDarkMode ? "#111827" : "#ffffff",
               style: {
                 color: isDarkMode ? "#f3f4f6" : "#111827",
                 padding: "10px",
                 fontSize: "13px",
+              },
+              formatter: function () {
+                const year = this.points?.[0]?.key;
+                let total = 0;
+
+                let html = `<b>${year}</b><br/>`;
+
+                this.points?.forEach(point => {
+                  const value = Number(point.y || 0);
+                  total += value;
+
+                  const formattedValue = value.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  });
+
+                  html += `
+        <span style="color:${point.color}">●</span>
+        ${point.series.name}: 
+        <b>${currency}${formattedValue}</b><br/>
+      `;
+                });
+
+                const totalFormatted = total.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                });
+
+                html += `
+      <hr style="
+        border:none;
+        border-top:1px solid ${isDarkMode ? "#374151" : "#e5e7eb"};
+        margin:6px 0;
+      "/>
+      <b>Total: ${currency}${totalFormatted}</b>
+    `;
+
+                return html;
               },
             },
             legend: {

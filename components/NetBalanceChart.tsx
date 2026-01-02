@@ -259,26 +259,60 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
     },
   }
   return (
-    <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
-      <CardHeader className='flex justify-between flex-col lg:flex-row'>
-        <CardTitle className="text-md text-gray-800 dark:text-white">
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 col-span-full">
+      <div className="flex justify-between items-center mb-2 flex-col lg:flex-row">
+        <h2 className="text-lg text-gray-800 dark:text-white font-semibold">
           Net Balance ({currency})
-        </CardTitle>
-        <div className="flex gap-2 items-center">
-          <select
-            className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-          >
-            {years.map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
-      </CardHeader>
-      <CardContent className="h-[500px] flex items-center justify-center">
+        </h2>
+        <select
+          className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-3 py-2 mt-2 lg:mt-0"
+          style={{ minWidth: "80px", border: "solid #ddd 1px" }}
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="h-[500px]">
         {isLoading ? (
-          <div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md" />
+          <div className="h-full py-10 px-8 animate-pulse">
+            {/* Y-axis lines */}
+            <div className="flex h-full gap-4">
+              <div className="flex flex-col justify-between w-8">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-3 bg-gray-200 dark:bg-gray-700 rounded"
+                  />
+                ))}
+              </div>
+
+              {/* Chart bars/lines placeholder */}
+              <div className="flex-1 flex items-end gap-2">
+                {[...Array(18)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-t"
+                    style={{ height: `${30 + (i % 5) * 10}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* X-axis */}
+            <div className="mt-4 flex gap-2">
+              {[...Array(18)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded"
+                />
+              ))}
+            </div>
+          </div>
         ) : chartData.length > 0 ? (
           <HighchartsReact
             highcharts={Highcharts}
@@ -290,8 +324,41 @@ export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) 
             No data available for selected year
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
+    // <Card className="col-span-full shadow-lg border-0 bg-white dark:bg-gray-800">
+    //   <CardHeader className='flex justify-between flex-col lg:flex-row'>
+    //     <CardTitle className="text-md text-gray-800 dark:text-white">
+    //       Net Balance ({currency})
+    //     </CardTitle>
+    //     <div className="flex gap-2 items-center">
+    //       <select
+    //         className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
+    //         value={selectedYear}
+    //         onChange={(e) => setSelectedYear(Number(e.target.value))}
+    //       >
+    //         {years.map((year) => (
+    //           <option key={year} value={year}>{year}</option>
+    //         ))}
+    //       </select>
+    //     </div>
+    //   </CardHeader>
+    //   <CardContent className="h-[500px] flex items-center justify-center">
+    //     {isLoading ? (
+    //       <div className="w-full h-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md" />
+    //     ) : chartData.length > 0 ? (
+    //       <HighchartsReact
+    //         highcharts={Highcharts}
+    //         constructorType="stockChart"
+    //         options={options}
+    //       />
+    //     ) : (
+    //       <div className="text-center text-gray-500 dark:text-gray-400">
+    //         No data available for selected year
+    //       </div>
+    //     )}
+    //   </CardContent>
+    // </Card>
   )
 }
 export default NetBalanceChart

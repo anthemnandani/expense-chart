@@ -82,7 +82,7 @@ export default function DashboardContent() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-           <h1 className="text-xl font-bold">Expenses Dashboard</h1>
+          <h1 className="text-xl font-bold">Expenses Dashboard</h1>
           {/* <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
             Expenses Dashboard
           </h1> */}
@@ -114,12 +114,6 @@ export default function DashboardContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <NetBalanceChart years={years} currency={currency} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <TreeGraphChart years={years} currency={currency} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <YearlyCreditDebitChart years={years} currency={currency} />
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <MonthlyRadarChart years={years} currency={currency} />
           <CategoryWiseExpenseChart years={years} currency={currency} />
@@ -127,16 +121,22 @@ export default function DashboardContent() {
         <div className="grid grid-cols-1 gap-6">
           <AnnualCategoryTrendsChart years={years} currency={currency} />
         </div>
-          <StackedBarCategoryChart years={years} currency={currency} />
+        <StackedBarCategoryChart years={years} currency={currency} />
         <div className="grid grid-cols-1 lg:grid-cols-11 gap-6">
           <CategoryCumulativeChart years={years} currency={currency} />
           <AdvancedPolarChart years={years} currency={currency} />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+          <YearlyCreditDebitChart years={years} currency={currency} />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <DailyExpenseChart years={years} currency={currency} />
         </div>
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+          <TreeGraphChart years={years} currency={currency} />
+        </div>
 
-             {/* Financial Insights */}
+        {/* Financial Insights */}
         <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-800 dark:to-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Financial Insights & Recommendations</CardTitle>

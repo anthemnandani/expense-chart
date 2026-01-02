@@ -223,8 +223,39 @@ export const YearlyCreditDebitChart = ({
       <CardContent>
         {loading ? (
           // 🔹 Selection-style loading UI (chart ki jagah)
-          <div className="h-[450px] flex flex-col items-center justify-center">
-            <div className="w-full h-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="h-[400px] p-4 animate-pulse">
+            {/* Y-axis lines */}
+            <div className="flex h-full gap-4">
+              <div className="flex flex-col justify-between w-8">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-3 bg-gray-200 dark:bg-gray-700 rounded"
+                  />
+                ))}
+              </div>
+
+              {/* Chart bars/lines placeholder */}
+              <div className="flex-1 flex items-end gap-2">
+                {[...Array(18)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-t"
+                    style={{ height: `${30 + (i % 5) * 10}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* X-axis */}
+            <div className="mt-4 flex gap-2">
+              {[...Array(18)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded"
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <>

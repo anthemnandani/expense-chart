@@ -93,6 +93,39 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
     fetchData()
   }, [selectedYear, groupId])
 
+  const RadarCustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload || payload.length === 0) return null;
+
+    const credit = payload.find((p: any) => p.name === "Credit")?.value || 0;
+    const debit = payload.find((p: any) => p.name === "Debit")?.value || 0;
+
+    return (
+      <div
+        style={{
+          background: "#fff",
+          color: "#111",
+          padding: "10px 12px",
+          borderRadius: "8px",
+          fontSize: "12px",
+          minWidth: "120px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+        }}
+      >
+        <div style={{ fontWeight: 600, marginBottom: 6 }}>{label}</div>
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ color: "#60d394" }}>Credit: </span>
+          <b>₹{credit.toLocaleString()}</b>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ color: "#ef4444" }}>Debit: </span>
+          <b>₹{debit.toLocaleString()}</b>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 lg:col-span-4 col-span-1">
       <CardHeader className="pb-2 flex flex-col lg:flex-row justify-between gap-2">
@@ -140,9 +173,7 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
                 domain={[0, 11000]}
                 tick={{ fill: "#9ca3af", fontSize: 11 }}
               />
-              <Tooltip
-                formatter={(value: number) => value.toLocaleString()}
-              />
+              <Tooltip content={<RadarCustomTooltip />} />
               <Legend verticalAlign="bottom" iconType="circle" height={36} />
               <Radar
                 name="Credit"
@@ -154,8 +185,8 @@ export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
               <Radar
                 name="Debit"
                 dataKey="expenses"
-                stroke="#3b82f6"
-                fill="#3b82f6"
+                stroke="#ef4444"
+                fill="#ef4444"
                 fillOpacity={0.4}
               />
             </RadarChart>

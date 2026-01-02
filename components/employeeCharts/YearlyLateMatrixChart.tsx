@@ -217,20 +217,7 @@ export default function YearlyLateMatrixChart({ years }) {
       {/* Modal for Timeline Chart */}
       {showTimeline && timelineParams.employeeId && (
         <div className="fixed inset-0 z-50 top-[-20px] flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white dark:bg-[#0b1220] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
-            {/* Close Button */}
-            {/* <button
-              onClick={() => setShowTimeline(false)}
-              className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <X className="h-6 w-6" />
-            </button> */}
-
-            {/* Header with Arrow */}
-            {/* <div className="flex justify-center py-4 border-b border-gray-200 dark:border-gray-700">
-              <ArrowBigDown className="h-6 w-6 text-gray-500" />
-            </div> */}
-
+          <div className="bg-white dark:bg-[#0b1220] rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto relative">
             {/* Timeline Chart */}
             <div className="">
               <AttendanceTimelineLineChart
