@@ -149,18 +149,39 @@ const AttendanceHeatmap = () => {
       useHTML: true,
       backgroundColor: isDarkMode ? "#1f2937" : "#fff",
       borderColor: isDarkMode ? "#4b5563" : "#ccc",
-      style: { color: isDarkMode ? "#f9fafb" : "#111827" },
+      style: { color: isDarkMode ? "#f9fafb" : "#111827", fontSize: "12px" },
       formatter: function () {
         const point = this.point;
-        const dates = [...new Set(chartData.map(d => d.date))];
+        const slotTime = timeSlots[point.y];
+
+        // Sort employees by time ascending
+        const sortedEmployees = point.employees && point.employees.length
+          ? [...point.employees].sort((a, b) => a.time.localeCompare(b.time))
+          : [];
+
+        const employeeList = sortedEmployees.length
+          ? sortedEmployees.map(e => `${e.name} (${e.time})`).join("<br/>")
+          : "No check-ins";
+
+        const dateStr = uniqueDates[point.x];
+        const d = new Date(dateStr);
+        const formattedDate = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
 
         return `
-    <div style="padding:6px 8px;">
-      <b>${formatDateDMY(dates[point.x])}</b><br/>
-      Time: ${timeSlots[point.y]}<br/>
-      Attendance Count: <b>${point.value}</b>
-    </div>`;
-      },
+      <div style="padding:8px; max-width:300px;">
+        <div style="margin-bottom:4px;"><b>${formattedDate}</b></div>
+        <div style="margin-bottom:4px;"><b>Time Slot:</b> ${slotTime}</div>
+        <div style="margin-bottom:4px;"><b>Attendance Count:</b> ${point.value}</div>
+
+        <div style="display:flex;">
+          <div style=""><b>Employees:</b></div>
+          <div style="flex: 1; padding-left:6px; line-height:1.4;">
+            ${employeeList}
+          </div>
+        </div>
+      </div>
+    `;
+      }
     },
     series: [
       {

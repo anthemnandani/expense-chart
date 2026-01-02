@@ -23,6 +23,11 @@ export default function CategoryCumulativeChart({ years }: CategoryCumulativeCha
     const { user } = useAuth();
     const groupId = user?.groupId;
 
+    const currentMonthIndex =
+        selectedYear === new Date().getFullYear()
+            ? new Date().getMonth() // 0-based
+            : 11; // past year → full year allowed
+
     const formatNumber = (value: number) =>
         value.toLocaleString("en-IN"); // 1,000 | 10,000 | 1,00,000
 
@@ -54,14 +59,23 @@ export default function CategoryCumulativeChart({ years }: CategoryCumulativeCha
                     let runningTotal = 0;
 
                     for (let m = 1; m <= 12; m++) {
+                        // 🚫 Future months (for current year)
+                        if (m - 1 > currentMonthIndex) {
+                            monthly[m - 1] = null;
+                            continue;
+                        }
+
                         const entries = data.filter(
-                            (d: any) => d.expenseDescType.trim() === cat && parseInt(d.month) === m
+                            (d) => d.expenseDescType.trim() === cat && parseInt(d.month) === m
                         );
 
-                        const monthTotal = entries.reduce((sum: number, e: any) => sum + e.totalExpenses, 0);
+                        const monthTotal = entries.reduce(
+                            (sum, e) => sum + e.totalExpenses,
+                            0
+                        );
 
                         runningTotal += monthTotal;
-                        monthly[m - 1] = runningTotal; // cumulative sum
+                        monthly[m - 1] = runningTotal;
                     }
 
                     cumulative[cat] = monthly;
