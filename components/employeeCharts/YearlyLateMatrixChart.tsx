@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import { apiService } from "@/lib/apiService";
 import { useAuth } from "@/context/auth-context";
-import { ArrowBigDown } from "lucide-react";
+import { ArrowBigDown, X } from "lucide-react";
 import AttendanceTimelineLineChart from "./AttendanceTimelineLineChart";
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export default function YearlyLateMatrixChart({ years }) {
   const { user } = useAuth();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -180,49 +182,68 @@ export default function YearlyLateMatrixChart({ years }) {
     return <div className="h-[550px] flex items-center justify-center">Loading...</div>;
   }
 
-  return <>
-    <div className="w-full p-5 rounded-xl bg-white dark:bg-[#0b1220] shadow-md">
-      <div className="pl-2 pt-1 flex justify-between lg:flex-row flex-col">
-        <div className="text-gray-800 text-md font-semibold dark:text-white">
-          Employees Yearly Late Coming Summary
-        </div>
-        <div className="flex gap-2">
-          <select
-            value={selectedYear}
-            onChange={e => setSelectedYear(Number(e.target.value))}
-            className="bg-gray-100 dark:bg-gray-800 text-xs rounded-md px-2 py-1"
-          >
-            {years.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      {loading ? (
-        <div className="h-[350px] flex items-center justify-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-        </div>
-      ) : (
-        <ReactECharts
-          option={option}
-          style={{ height: 550 }}
-          onEvents={{ click: handleChartClick }}
-        />
-      )}
-      {showTimeline && timelineParams.employeeId && (
-        <>
-          <div className="flex justify-center py-4">
-            <ArrowBigDown className="h-6 w-6 text-gray-500" />
+  return (
+    <>
+      <div className="w-full p-5 rounded-xl bg-white dark:bg-[#0b1220] shadow-md">
+        <div className="pl-2 pt-1 flex justify-between lg:flex-row flex-col">
+          <div className="text-gray-800 text-md font-semibold dark:text-white">
+            Employees Yearly Late Coming Summary
           </div>
-          <AttendanceTimelineLineChart
-            years={years}
-            employeeId={timelineParams.employeeId}
-            selectedYear={timelineParams.year}
-            selectedMonth={timelineParams.month}
-            onClose={() => setShowTimeline(false)}
+          <div className="flex gap-2">
+            <select
+              value={selectedYear}
+              onChange={e => setSelectedYear(Number(e.target.value))}
+              className="bg-gray-100 dark:bg-gray-800 text-xs rounded-md px-2 py-1"
+            >
+              {years.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {loading ? (
+          <div className="h-[350px] flex items-center justify-center">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        ) : (
+          <ReactECharts
+            option={option}
+            style={{ height: 550 }}
+            onEvents={{ click: handleChartClick }}
           />
-        </>
+        )}
+      </div>
+
+      {/* Modal for Timeline Chart */}
+      {showTimeline && timelineParams.employeeId && (
+        <div className="fixed inset-0 z-50 top-[-20px] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-[#0b1220] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+            {/* Close Button */}
+            {/* <button
+              onClick={() => setShowTimeline(false)}
+              className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <X className="h-6 w-6" />
+            </button> */}
+
+            {/* Header with Arrow */}
+            {/* <div className="flex justify-center py-4 border-b border-gray-200 dark:border-gray-700">
+              <ArrowBigDown className="h-6 w-6 text-gray-500" />
+            </div> */}
+
+            {/* Timeline Chart */}
+            <div className="">
+              <AttendanceTimelineLineChart
+                years={years}
+                employeeId={timelineParams.employeeId}
+                selectedYear={timelineParams.year}
+                selectedMonth={timelineParams.month}
+                onClose={() => setShowTimeline(false)}
+              />
+            </div>
+          </div>
+        </div>
       )}
-    </div>
-  </>;
+    </>
+  );
 }
