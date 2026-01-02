@@ -62,7 +62,10 @@ export default function LateComingLollipopChart({ years }) {
   // const names = chartData.map((e) => e.name);
   // const lateValues = chartData.map((e) => e.lateDays);
   const names = chartData.map((e) => toTitleCase(e.Name));
-  const lateValues = chartData.map((e) => e.LateDays);
+
+  const lateValues = chartData.map(
+    (e) => e.monthlyLateDays?.[monthName] ?? 0
+  );
 
   const option = {
     grid: {
@@ -211,15 +214,15 @@ export default function LateComingLollipopChart({ years }) {
         </div>
       </CardHeader>
 
-     <div className="pb-4">
-       {loading ? (
-        <div className="h-[350px] flex items-center justify-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-        </div>
-      ) : (
-        <ReactECharts option={option} style={{ height: 400 }} />
-      )}
-     </div>
+      <div className="pb-4">
+        {loading ? (
+          <div className="h-[350px] flex items-center justify-center">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        ) : (
+          <ReactECharts option={option} style={{ height: 400 }} />
+        )}
+      </div>
     </div>
   );
 }
