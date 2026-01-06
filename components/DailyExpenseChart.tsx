@@ -11,12 +11,13 @@ import { apiService } from "@/lib/apiService"
 interface DailyExpenseChart {
     years: number[];
     currency: string;
+    selectedGlobalYear: number;
 }
 
-export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years, currency}) => {
+export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years, currency, selectedGlobalYear}) => {
     const [data, setData] = useState<ExpenseRecord[]>([])
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1) // current month
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
     const [loading, setLoading] = useState(false)
     const { user } = useAuth()
     const groupId = user?.groupId
@@ -25,6 +26,11 @@ export const DailyExpenseChart: React.FC<DailyExpenseChart> = ({years, currency}
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
+
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
+
     useEffect(() => {
         if (!groupId) return
         const fetchData = async () => {

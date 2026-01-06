@@ -8,6 +8,7 @@ import { apiService } from "@/lib/apiService";
 interface CategoryWiseExpenseChart {
     years: number[];
     currency: string;
+    selectedGlobalYear: number;
 }
 const dashStyles = [
     "Solid"
@@ -16,13 +17,18 @@ const monthLabels = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
-export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ years, currency }) => {
+export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ years, currency, selectedGlobalYear }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
     const [chartSeries, setChartSeries] = useState<Highcharts.SeriesOptionsType[]>([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth()
     const groupId = user?.groupId
+
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
+
     // Dark mode listener
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -32,6 +38,7 @@ export const CategoryWiseExpenseChart: React.FC<CategoryWiseExpenseChart> = ({ y
         setIsDarkMode(document.documentElement.classList.contains("dark"));
         return () => observer.disconnect();
     }, []);
+    
     // Fetch API Data
     useEffect(() => {
         const fetchData = async () => {

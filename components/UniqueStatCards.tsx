@@ -24,7 +24,7 @@ function animateValue(start: number, end: number, duration: number, onUpdate: (v
   requestAnimationFrame(step)
 }
 
-export default function UniqueStatCards({ selectedYear, currency }: { selectedYear: number, currency: string }) {
+export default function UniqueStatCards({ selectedGlobalYear, currency }: { selectedGlobalYear: number, currency: string }) {
   const { user } = useAuth()
   const groupId = user?.groupId
 
@@ -44,10 +44,10 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
 
   useEffect(() => {
     const fetchStats = async () => {
-      if (!groupId || !selectedYear) return
+      if (!groupId || !selectedGlobalYear) return
 
       try {
-        const res = await fetch(`/api/stats?groupId=${groupId}&year=${selectedYear}`)
+        const res = await fetch(`/api/stats?groupId=${groupId}&year=${selectedGlobalYear}`)
         const data = await res.json()
 
         if (!data || !data.curr) return
@@ -94,7 +94,7 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
     }
 
     fetchStats()
-  }, [groupId, selectedYear])
+  }, [groupId, selectedGlobalYear])
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -106,17 +106,17 @@ export default function UniqueStatCards({ selectedYear, currency }: { selectedYe
         return (
           <div
             key={key}
-            className={`group p-5 rounded-xl bg-gradient-to-br ${color} text-white shadow-xl hover:scale-[1.01] transition-transform relative overflow-hidden`}
+            className={`group p-4 rounded-lg bg-gradient-to-br ${color} text-white shadow-xl hover:scale-[1.01] transition-transform relative overflow-hidden`}
           >
             <div className="absolute top-3 right-3 opacity-20 text-6xl rotate-12">
               <Icon className="w-12 h-12" />
             </div>
             <div className="z-10 relative">
               <div className="text-sm uppercase font-semibold tracking-wider">{title}</div>
-              <div className="text-3xl font-bold mt-2">{displayVal}</div>
+              <div className="text-2xl font-bold mt-2">{displayVal}</div>
 
               {/* Change value only if available */}
-              {change && <div className="text-xs mt-1 opacity-80">{change}</div>}
+              {/* {change && <div className="text-xs mt-1 opacity-80">{change}</div>} */}
             </div>
           </div>
         )

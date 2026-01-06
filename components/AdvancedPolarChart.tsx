@@ -18,11 +18,16 @@ type MonthlyRecord = {
     debit: number;
 };
 
-const AdvancedPolarChart = () => {
+interface AdvancedPolarChart {
+    years: number[];
+    selectedGlobalYear: number;
+}
+
+const AdvancedPolarChart: React.FC<AdvancedPolarChart> = ({ years, selectedGlobalYear }) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [monthlyData, setMonthlyData] = useState<MonthlyRecord[]>([]);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth()
     const groupId = user?.groupId
@@ -41,6 +46,9 @@ const AdvancedPolarChart = () => {
         Highcharts.color(c)
     );
 
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
 
     useEffect(() => {
         const checkDarkMode = () =>
@@ -85,29 +93,29 @@ const AdvancedPolarChart = () => {
     }, [groupId, selectedMonth, selectedYear]);
 
     useEffect(() => {
-          if (monthlyData.length === 0) return;
+        if (monthlyData.length === 0) return;
 
-  const maxCredit = Math.max(...monthlyData.map((d) => d.credit || 0)) || 1;
-  const maxDebit = Math.max(...monthlyData.map((d) => d.debit || 0)) || 1;
+        const maxCredit = Math.max(...monthlyData.map((d) => d.credit || 0)) || 1;
+        const maxDebit = Math.max(...monthlyData.map((d) => d.debit || 0)) || 1;
 
-  // Normalize z values (so even large 20k values appear in correct proportion)
-  const normalize = (value: number, maxValue: number) => {
-    // clamp between 0 and 100 (you can tune this)
-    return Math.sqrt(value / maxValue) * 100;
-  };
+        // Normalize z values (so even large 20k values appear in correct proportion)
+        const normalize = (value: number, maxValue: number) => {
+            // clamp between 0 and 100 (you can tune this)
+            return Math.sqrt(value / maxValue) * 100;
+        };
 
-  const creditSeries = monthlyData.map((entry, i) => [
-    i + 1,
-    1,
-    normalize(entry.credit, maxCredit),
-  ]);
-  const debitSeries = monthlyData.map((entry, i) => [
-    i + 1,
-    2,
-    normalize(entry.debit, maxDebit),
-  ]);
+        const creditSeries = monthlyData.map((entry, i) => [
+            i + 1,
+            1,
+            normalize(entry.credit, maxCredit),
+        ]);
+        const debitSeries = monthlyData.map((entry, i) => [
+            i + 1,
+            2,
+            normalize(entry.debit, maxDebit),
+        ]);
 
-  const totalDays = monthlyData.length;
+        const totalDays = monthlyData.length;
         if (monthlyData.length === 0) return;
 
         // const creditSeries = monthlyData.map((entry, i) => [i + 1, 1, entry.credit]);
@@ -528,14 +536,13 @@ const AdvancedPolarChart = () => {
                         ))}
                     </select>
                     <select
+                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs text-gray-800 dark:text-white rounded-md px-2 py-1"
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
-                        className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
-                        disabled={isLoading}
                     >
-                        {[2023, 2024, 2025].map((y) => (
-                            <option key={y} value={y}>
-                                {y}
+                        {years.map((year) => (
+                            <option key={year} value={year}>
+                                {year}
                             </option>
                         ))}
                     </select>

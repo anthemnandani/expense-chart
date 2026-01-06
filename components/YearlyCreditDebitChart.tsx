@@ -1,5 +1,4 @@
 "use client";
-
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import { useEffect, useState } from "react";
@@ -10,39 +9,41 @@ import { apiService } from "@/lib/apiService";
 export const YearlyCreditDebitChart = ({
   years,
   currency,
+  selectedGlobalYear
 }: {
   years: number[];
   currency: string;
+  selectedGlobalYear: number;
 }) => {
   const { user } = useAuth();
   const groupId = user?.groupId;
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear());
   const [data, setData] = useState<{ credit: [number, number][], debit: [number, number][] }>({ credit: [], debit: [] });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+  }, [selectedGlobalYear]);
 
   // Detect dark mode
   useEffect(() => {
     const checkDarkMode = () =>
       document.documentElement.classList.contains("dark");
     setIsDarkMode(checkDarkMode());
-
     const observer = new MutationObserver(() => {
       setIsDarkMode(checkDarkMode());
     });
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
-
     return () => observer.disconnect();
   }, []);
 
   // Fetch data
   useEffect(() => {
     if (!groupId) return;
-
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -55,24 +56,35 @@ export const YearlyCreditDebitChart = ({
         setLoading(false);
       }
     };
-
     fetchData();
   }, [selectedYear, groupId]);
 
-  const latestTimestamp = Math.max(
-    ...(data.credit.map((d) => d[0])),
-    ...(data.debit.map((d) => d[0]))
-  );
+  // Determine chart range based on current date and selected year
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth(); // 0-11
+  const isCurrentYear = selectedYear === currentYear;
+  let minTime: number, maxTime: number;
+  if (!isCurrentYear) {
+    // SHOW FULL YEAR FOR PAST / FUTURE YEARS
+    minTime = new Date(selectedYear, 0, 1).getTime(); // Jan 1
+    maxTime = new Date(selectedYear, 11, 31).getTime(); // Dec 31
+  } else {
+    // CURRENT YEAR LOGIC
+    if (currentMonth < 3) {
+      // Jan–Mar → current + next 3 months
+      minTime = new Date(selectedYear, currentMonth, 1).getTime();
+      maxTime = new Date(selectedYear, currentMonth + 4, 0).getTime();
+    } else {
+      // Apr–Dec → previous 3 + current month
+      minTime = new Date(selectedYear, currentMonth - 3, 1).getTime();
+      maxTime = new Date(selectedYear, currentMonth + 1, 0).getTime();
+    }
+  }
 
-  const baseDate =
-    latestTimestamp > 0
-      ? new Date(latestTimestamp)
-      : new Date(selectedYear, 11, 1);
-  const threeMonthsAgo = new Date(
-    baseDate.getFullYear(),
-    baseDate.getMonth() - 2,
-    1
-  ).getTime();
+  // Filter data to only include points within the range
+  const filteredCredit = data.credit.filter(([x]) => x >= minTime && x <= maxTime);
+  const filteredDebit = data.debit.filter(([x]) => x >= minTime && x <= maxTime);
 
   const options: Highcharts.Options = {
     chart: {
@@ -85,7 +97,9 @@ export const YearlyCreditDebitChart = ({
     title: { text: undefined },
     xAxis: {
       type: "datetime",
-      min: threeMonthsAgo,
+      min: minTime,
+      max: maxTime,
+      endOnTick: false,
       labels: {
         style: {
           color: isDarkMode ? "#d1d5db" : "#374151",
@@ -97,14 +111,6 @@ export const YearlyCreditDebitChart = ({
     yAxis: {
       opposite: false,
       title: { text: `Amount(${currency})` },
-      // labels: {
-      //   formatter() {
-      //     return `${currency}${this.value}`;
-      //   },
-      //   style: {
-      //     color: isDarkMode ? "#d1d5db" : "#374151",
-      //   },
-      // },
       labels: {
         formatter() {
           return `${currency}${Highcharts.numberFormat(this.value as number, 0, '.', ',')}`;
@@ -119,7 +125,7 @@ export const YearlyCreditDebitChart = ({
       shared: true,
       pointFormatter() {
         return `<span style="color:${this.color}">\u25CF</span> <b>
-  ${this.series.name}: 
+  ${this.series.name}:
   ${currency}${Highcharts.numberFormat(this.y as number, 0, '.', ',')}
 </b><br/>
 <br/>`;
@@ -164,7 +170,7 @@ export const YearlyCreditDebitChart = ({
     series: [
       {
         name: "Credit",
-        data: data.credit.map(([x, y]) => ({
+        data: filteredCredit.map(([x, y]) => ({
           x,
           y,
           marker: { enabled: y > 0 },
@@ -175,7 +181,7 @@ export const YearlyCreditDebitChart = ({
       },
       {
         name: "Debit",
-        data: data.debit.map(([x, y]) => ({
+        data: filteredDebit.map(([x, y]) => ({
           x,
           y,
           marker: { enabled: y > 0 },
@@ -234,7 +240,6 @@ export const YearlyCreditDebitChart = ({
                   />
                 ))}
               </div>
-
               {/* Chart bars/lines placeholder */}
               <div className="flex-1 flex items-end gap-2">
                 {[...Array(18)].map((_, i) => (
@@ -246,7 +251,6 @@ export const YearlyCreditDebitChart = ({
                 ))}
               </div>
             </div>
-
             {/* X-axis */}
             <div className="mt-4 flex gap-2">
               {[...Array(18)].map((_, i) => (
@@ -264,7 +268,6 @@ export const YearlyCreditDebitChart = ({
               constructorType="stockChart"
               options={options}
             />
-
             {/* Legend */}
             <div className="flex justify-center gap-4 mt-4 text-sm">
               <div className="flex items-center gap-1">
@@ -282,5 +285,4 @@ export const YearlyCreditDebitChart = ({
     </Card>
   );
 };
-
 export default YearlyCreditDebitChart;

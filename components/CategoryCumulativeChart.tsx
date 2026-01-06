@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 interface CategoryCumulativeChartProps {
     years: number[];
+    selectedGlobalYear: number;
 }
 
 const monthLabels = [
@@ -15,13 +16,17 @@ const monthLabels = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ] as const;
 
-export default function CategoryCumulativeChart({ years }: CategoryCumulativeChartProps) {
-    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+export default function CategoryCumulativeChart({ years, selectedGlobalYear }: CategoryCumulativeChartProps) {
+    const [selectedYear, setSelectedYear] = useState<number>(selectedGlobalYear || new Date().getFullYear());
     const [chartData, setChartData] = useState<{ [key: string]: number[] }>({});
     const [loading, setLoading] = useState(true);
 
     const { user } = useAuth();
     const groupId = user?.groupId;
+
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
 
     const currentMonthIndex =
         selectedYear === new Date().getFullYear()

@@ -22,15 +22,20 @@ import { apiService } from "@/lib/apiService";
 
 interface MonthlyRadarChart {
   years: number[];
+  selectedGlobalYear: number;
 }
 
-export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years }) => {
+export const MonthlyRadarChart: React.FC<MonthlyRadarChart> = ({ years, selectedGlobalYear }) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
   const groupId = user?.groupId
+
+  useEffect(() => {
+    setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+  }, [selectedGlobalYear]);
 
   useEffect(() => {
     const checkDarkMode = () =>

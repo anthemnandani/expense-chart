@@ -8,14 +8,20 @@ import { apiService } from '@/lib/apiService'
 interface NetBalanceChart {
   years: number[];
   currency: string;
+  selectedGlobalYear: number;
 }
-export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency }) => {
+export const NetBalanceChart: React.FC<NetBalanceChart> = ({ years, currency, selectedGlobalYear }) => {
   const [chartData, setChartData] = useState<[number, number][]>([])
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth()
   const groupId = user?.groupId
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+    useEffect(() => {
+    setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+  }, [selectedGlobalYear]);
+
   useEffect(() => {
     if (!groupId) return
     const fetchData = async () => {

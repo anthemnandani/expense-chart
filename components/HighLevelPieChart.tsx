@@ -11,20 +11,25 @@ import { apiService } from "@/lib/apiService"
 interface HighLevelPieChart {
     years: number[];
     currency: string;
+    selectedGlobalYear: number;
 }
 
 const COLORS = [
     "#3b82f6", "#00b4d8", "#22c55e", "#60d394", "#f59e0b", "#f4a261"
 ]
 
-export const HighLevelPieChart: React.FC<HighLevelPieChart> = ({ years, currency }) => {
+export const HighLevelPieChart: React.FC<HighLevelPieChart> = ({ years, currency, selectedGlobalYear }) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+    const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
     const [categoryData, setCategoryData] = useState<ExpenseCategory[]>([])
     const [loading, setLoading] = useState(true)
     const { user } = useAuth()
     const groupId = user?.groupId
+
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
 
     useEffect(() => {
         const observer = new MutationObserver(() => {

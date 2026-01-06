@@ -15,19 +15,26 @@ const months = [
 interface AnnualCategoryTrendsChart {
   years: number[];
   currency: string;
+  selectedGlobalYear: number;
 }
 
 export const AnnualCategoryTrendsChart: React.FC<AnnualCategoryTrendsChart> = ({
   years,
-  currency
+  currency,
+  selectedGlobalYear
 }) => {
   const [Highcharts, setHighcharts] = useState<any>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
   const [categories, setCategories] = useState<string[]>([]);
   const [heatmapData, setHeatmapData] = useState<[number, number, number][]>([]);
   const { user } = useAuth()
   const groupId = user?.groupId
+
+    useEffect(() => {
+        setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+    }, [selectedGlobalYear]);
+
   // Load Highcharts modules
   useEffect(() => {
     (async () => {

@@ -24,13 +24,18 @@ const AdvancedPolarChart = dynamic(() => import("./AdvancedPolarChart"), { ssr: 
 export default function DashboardContent() {
   const { user } = useAuth();
   const groupId = user?.groupId;
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const [financialInsights, setFinancialInsights] = useState<FinancialInsight | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [years, setYears] = useState<number[]>([]);
   const [currency, setCurrency] = useState<string>("");
+  const [selectedGlobalYear, setSelectedGlobalYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || new Date().getFullYear())
+
+  useEffect(() => {
+    setSelectedYear(selectedGlobalYear); // Sync with global year when it changes
+  }, [selectedGlobalYear]);
 
   useEffect(() => {
     if (!groupId) {
@@ -91,13 +96,15 @@ export default function DashboardContent() {
         <div className="flex gap-2 items-center">
 
           <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 text-xs rounded-md px-2 py-1"
+            value={selectedGlobalYear}
+            onChange={(e) => setSelectedGlobalYear(e.target.value)}
+            className="rounded-md px-3 py-2"
+            style={{ width: "100px", border: "1px solid #ddd" }}
           >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
+            {/* <option value="All">All Years</option> */}
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
               </option>
             ))}
           </select>
@@ -106,34 +113,34 @@ export default function DashboardContent() {
 
       {/* Comprehensive Dashboard */}
       <div className="space-y-6">
-        <UniqueStatCards selectedYear={selectedYear} currency={currency} />
+        <UniqueStatCards selectedGlobalYear={selectedGlobalYear} currency={currency} />
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <AreaYearlyExpenseChart years={years} currency={currency} />
-          <HighLevelPieChart years={years} currency={currency} />
+          <AreaYearlyExpenseChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
+          <HighLevelPieChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <NetBalanceChart years={years} currency={currency} />
+          <NetBalanceChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <MonthlyRadarChart years={years} currency={currency} />
-          <CategoryWiseExpenseChart years={years} currency={currency} />
+          <MonthlyRadarChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
+          <CategoryWiseExpenseChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <AnnualCategoryTrendsChart years={years} currency={currency} />
+          <AnnualCategoryTrendsChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
-        <StackedBarCategoryChart years={years} currency={currency} />
+        <StackedBarCategoryChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         <div className="grid grid-cols-1 lg:grid-cols-11 gap-6">
-          <CategoryCumulativeChart years={years} currency={currency} />
-          <AdvancedPolarChart years={years} currency={currency} />
+          <CategoryCumulativeChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
+          <AdvancedPolarChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <YearlyCreditDebitChart years={years} currency={currency} />
+          <YearlyCreditDebitChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <DailyExpenseChart years={years} currency={currency} />
+          <DailyExpenseChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <TreeGraphChart years={years} currency={currency} />
+          <TreeGraphChart years={years} selectedGlobalYear={selectedGlobalYear} currency={currency} />
         </div>
 
         {/* Financial Insights */}

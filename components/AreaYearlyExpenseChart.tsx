@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState, useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -10,35 +9,38 @@ import { ExpenseData } from "@/lib/types";
 interface AreaYearlyExpenseChart {
   years: number[];
   currency: string;
+  selectedGlobalYear: number;
 }
 
 export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
   years,
-  currency
+  currency,
+  selectedGlobalYear
 }) => {
+  const currentYear = new Date().getFullYear();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(selectedGlobalYear || currentYear);
   const [monthlyExpenseData, setMonthlyExpenseData] = useState<ExpenseData[]>([]);
-  // const [categoryData, setCategoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true); // track loading
   const { user } = useAuth();
   const groupId = user?.groupId;
 
   useEffect(() => {
+    const clampedYear = Math.min(selectedGlobalYear, currentYear);
+    setSelectedYear(clampedYear); // Sync with global year when it changes, but clamp to current year
+  }, [selectedGlobalYear]);
+
+  useEffect(() => {
     const checkDarkMode = () =>
       document.documentElement.classList.contains("dark");
-
     setIsDarkMode(checkDarkMode());
-
     const observer = new MutationObserver(() => {
       setIsDarkMode(checkDarkMode());
     });
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"]
     });
-
     return () => observer.disconnect();
   }, []);
 
@@ -49,27 +51,44 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
         setMonthlyExpenseData([]);
         return;
       }
-
       setLoading(true);
       try {
         const data = await apiService.getYearlyExpense(groupId, selectedYear);
-
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        const transformed = months.map((m, idx) => {
+        const allMonths = [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ];
+        let visibleMonths = allMonths;
+        if (selectedYear === currentYear) {
+          // find last month which has any data
+          const lastDataMonthIndex = data.reduce((lastIdx: number, item: any) => {
+            const idx = parseInt(item.month, 10) - 1;
+            if (
+              item.totalDebit > 0 ||
+              item.totalCredit > 0 ||
+              item.balance !== 0
+            ) {
+              return Math.max(lastIdx, idx);
+            }
+            return lastIdx;
+          }, -1);
+          visibleMonths =
+            lastDataMonthIndex >= 0
+              ? allMonths.slice(0, lastDataMonthIndex + 1)
+              : [];
+        }
+        const transformed = visibleMonths.map((m, idx) => {
           const found = data.find(
             (item: any) => parseInt(item.month, 10) - 1 === idx
           );
-
           return {
             month: m,
             totalDebit: found?.totalDebit || 0,
             totalCredit: found?.totalCredit || 0,
             netBalance: found?.balance || 0,
-            categories: found?.categories || {},   // ✅ DIRECT FROM API
+            categories: found?.categories || {}, // ✅ DIRECT FROM API
           };
         });
-
         setMonthlyExpenseData(transformed);
       } catch (err) {
         console.error("Error fetching yearly expense data:", err);
@@ -78,19 +97,16 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [selectedYear, groupId]);
+  }, [selectedYear, groupId, currentYear]);
 
   // Memoize the formatter function to avoid recreating it on every render
   const tooltipFormatter = useMemo(() => {
     return (params: any) => {
       if (!params?.length) return "";
-
       const monthIndex = params[0].dataIndex;
       const data = monthlyExpenseData[monthIndex];
       if (!data) return "";
-
       const categoryHtml = Object.entries(data.categories || {})
         .map(
           ([cat, val]) =>
@@ -99,7 +115,6 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
           </div>`
         )
         .join("");
-
       const seriesHtml = params
         .map(
           (p: any) =>
@@ -109,7 +124,6 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
           </div>`
         )
         .join("");
-
       return `
       <strong>${data.month}</strong><br/>
       ${seriesHtml}
@@ -193,6 +207,8 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
     ],
   }), [tooltipFormatter, xAxisData, expensesData, creditsData, netBalanceData, isDarkMode, currency]);
 
+  const filteredYears = useMemo(() => years.filter((y) => y <= currentYear), [years]);
+
   return (
     <Card className="shadow-lg border-0 bg-white col-span-1 lg:col-span-3 dark:bg-gray-800">
       <CardHeader className="flex justify-between lg:flex-row flex-col">
@@ -202,7 +218,7 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
         >
-          {years.map((y) => (
+          {filteredYears.map((y) => (
             <option key={y} value={y}>
               {y}
             </option>
@@ -222,7 +238,6 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
                   />
                 ))}
               </div>
-
               {/* Chart bars/lines placeholder */}
               <div className="flex-1 flex items-end gap-2">
                 {[...Array(12)].map((_, i) => (
@@ -234,7 +249,6 @@ export const AreaYearlyExpenseChart: React.FC<AreaYearlyExpenseChart> = ({
                 ))}
               </div>
             </div>
-
             {/* X-axis */}
             <div className="mt-4 flex gap-2">
               {[...Array(12)].map((_, i) => (
