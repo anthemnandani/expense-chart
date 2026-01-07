@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -17,7 +17,6 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const { user, loading, signOut } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -99,8 +98,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const isActive = pathname === menu.href
 
     return (
-      <Button
-        variant={isActive ? "default" : "ghost"}
+      <Link
+        href={menu.href}
         className={cn(
           "w-full flex justify-between items-center px-3 py-2 rounded-md transition-colors hover:bg-blue-100 dark:hover:bg-gray-700",
           sidebarCollapsed && "justify-center",
@@ -108,7 +107,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
         onClick={() => {
           if (hasChildren) setOpenMenu(isOpen ? null : menu.title)
-          router.push(menu.href)
           setMobileMenuOpen(false)
         }}
         title={sidebarCollapsed ? menu.title : undefined} // Tooltip when collapsed
@@ -120,7 +118,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {hasChildren && !sidebarCollapsed && (
           <ArrowRight className={cn("h-4 w-4 transition-transform", isOpen && "rotate-90")} />
         )}
-      </Button>
+      </Link>
     )
   }
 

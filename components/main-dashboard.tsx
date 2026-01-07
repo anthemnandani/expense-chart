@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Users } from "lucide-react";
@@ -20,9 +20,7 @@ export default function MainDashboard() {
   useEffect(() => {
     if (!user?.token) return;
 
-    apiService.getEmployeeStats(user.token).then((res) => {
-      setEmployeeStats(res);
-    });
+    apiService.getEmployeeStats(user.token).then(setEmployeeStats);
   }, [user?.token]);
 
   /* ---------------- FETCH EXPENSE STATS ---------------- */
@@ -31,34 +29,33 @@ export default function MainDashboard() {
 
     const year = new Date().getFullYear();
 
-    fetch(`/api/stats?groupId=${groupId}&year=${year}`)
+    fetch(`/api/stats?groupId=${groupId}&year=${year}`, {
+      cache: "force-cache",
+    })
       .then((res) => res.json())
-      .then((data) => {
-        setExpenseStats(data);
-      })
-      .catch(() => {
-        setExpenseStats(null);
-      });
+      .then(setExpenseStats)
+      .catch(() => setExpenseStats(null));
   }, [groupId]);
 
-  /* ---------------- MEMOIZED EXPENSE VALUES ---------------- */
-  const expenseValues = useMemo(() => {
-    return {
+  /* ---------------- MEMOIZED VALUES ---------------- */
+  const expenseValues = useMemo(
+    () => ({
       debit: expenseStats?.curr?.totalDebit ?? 0,
       credit: expenseStats?.curr?.totalCredit ?? 0,
       net: Number(expenseStats?.netBalance ?? 0),
-    };
-  }, [expenseStats]);
+    }),
+    [expenseStats]
+  );
 
-  /* ---------------- MEMOIZED EMPLOYEE VALUES ---------------- */
-  const employeeValues = useMemo(() => {
-    return {
+  const employeeValues = useMemo(
+    () => ({
       checkedIn: employeeStats?.checkedInToday ?? 0,
       total: employeeStats?.activeEmployees ?? 0,
       late: employeeStats?.lateToday ?? 0,
       onLeave: employeeStats?.onLeaveToday ?? 0,
-    };
-  }, [employeeStats]);
+    }),
+    [employeeStats]
+  );
 
   return (
     <div className="min-h-screen px-6 py-10 space-y-10 animate-fade-in">
@@ -71,12 +68,17 @@ export default function MainDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ================= EXPENSES ================= */}
         <Link href="/expenses/dashboard">
-          <Card className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer transition-transform duration-300 hover:scale-[1.02]">
+          <Card
+            className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer
+                       transition-transform duration-200 hover:scale-[1.02] active:scale-95"
+          >
             <div className="relative w-full h-80">
               <Image
                 src="/images/ExpensesManagement.jpg"
                 alt="Expenses"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority={false}
                 className="object-cover"
               />
             </div>
@@ -107,11 +109,10 @@ export default function MainDashboard() {
                 <div>
                   <p className="opacity-80">Balance</p>
                   <p
-                    className={`font-semibold ${
-                      expenseValues.net >= 0
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }`}
+                    className={`font-semibold ${expenseValues.net >= 0
+                      ? "text-green-400"
+                      : "text-red-400"
+                      }`}
                   >
                     ₹{expenseValues.net.toLocaleString()}
                   </p>
@@ -127,12 +128,17 @@ export default function MainDashboard() {
 
         {/* ================= EMPLOYEES ================= */}
         <Link href="/employees/dashboard">
-          <Card className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer transition-transform duration-300 hover:scale-[1.02]">
+          <Card
+            className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer
+                       transition-transform duration-200 hover:scale-[1.02] active:scale-95"
+          >
             <div className="relative w-full h-80">
               <Image
                 src="/images/EmployeesManagement.jpg"
                 alt="Employees"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority={false}
                 className="object-cover"
               />
             </div>

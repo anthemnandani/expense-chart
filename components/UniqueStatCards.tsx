@@ -29,8 +29,8 @@ export default function UniqueStatCards({ selectedGlobalYear, currency }: { sele
   const groupId = user?.groupId
 
   const [metrics, setMetrics] = useState([
-    { key: "income", title: "Total Credits", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
-    { key: "expenses", title: "Total Debits", value: 0, final: 0, change: "+0%", color: "from-red-300 to-red-700" },
+    { key: "income", title: "Total Credit Amount", value: 0, final: 0, change: "+0%", color: "from-blue-300 to-blue-700" },
+    { key: "expenses", title: "Total Debit Amount", value: 0, final: 0, change: "+0%", color: "from-red-300 to-red-700" },
     { key: "savings", title: "Net Balances", value: 0, final: 0, change: "", color: "from-green-300 to-green-700" }, // ← NO CHANGE
     { key: "months", title: "Active Months", value: 0, final: 0, change: "+0%", color: "from-purple-300 to-purple-700" },
   ])

@@ -40,7 +40,13 @@ const getEventBadge = (events: EventItem[]) => {
       </div>
     );
   }
-  if (titles.some(t => t.includes("completed"))) {
+  if (
+    titles.some(
+      t =>
+        t.includes("completed") ||
+        t.includes("work anniversary")
+    )
+  ) {
     return (
       <div className="absolute bottom-0 right-0 text-black rounded-full p-[2px]">
         <svg
@@ -221,7 +227,7 @@ const YearlyModal = ({
   setCurrentYear: (year: number) => void;
   eventMap: Record<string, EventItem[]>;
   getEventBadge: (events: EventItem[]) => JSX.Element;
-    years: number[];
+  years: number[];
 }) => {
   // Helper to check if a year is available
   const isAvailableYear = (year: number) => years.includes(year);
