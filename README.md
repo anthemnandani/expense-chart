@@ -1,30 +1,137 @@
-# Yearly Expense Chart Data
+Anthem Dashboards
+Anthem Dashboards is a centralized internal dashboard system built for Anthem Infotech Pvt. Ltd. to manage and visualize Expense-related analytics and Employee management data through multiple interactive dashboards.
+🔗 Live URL: https://dashboards.workanthem.com
+🚀 Features Overview
+The application contains multiple dashboards, mainly divided into:
+💰 Expense Dashboards
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+Live expense tracking & analytics
+Credit vs Debit analysis
+Net balance overview
+Category-wise and date-wise expense reports
+Yearly, monthly, and daily insights
+Expense types and detailed expense listings
+Financial insights & visual charts
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/anthemnks-9497s-projects/v0-yearly-expense-chart-data)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/gyHZYLg7y1K)
+👥 Employee Dashboards
 
-## Overview
+Employee listing and management
+Department management
+Role management
+Employee-level dashboards
+Organization-related configurations
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+🧑‍💻 Tech Stack
+Frontend
 
-## Deployment
+Next.js (App Router)
+TypeScript
+Tailwind CSS
+Charting & data visualization libraries
+Server Components + API Routes (Next.js)
 
-Your project is live at:
+Backend
 
-**[https://vercel.com/anthemnks-9497s-projects/v0-yearly-expense-chart-data](https://vercel.com/anthemnks-9497s-projects/v0-yearly-expense-chart-data)**
+Expense APIs: Built inside Next.js API routes
+Employee APIs: Built using Node.js + Express
+Repository:
+👉 https://github.com/Anthem-InfoTech-Pvt-Ltd/managementapinodejs
 
-## Build your app
 
-Continue building your app on:
+Database
 
-**[https://v0.dev/chat/projects/gyHZYLg7y1K](https://v0.dev/chat/projects/gyHZYLg7y1K)**
+Microsoft SQL Server (SSMS)
+Both Expense and Employee systems use SSMS
+Databases are separate, but hosted on the same SQL Server
 
-## How It Works
+🗂️ Project Structure
+textapp
+├── (auth)
+│   └── signin
+│
+├── (dashboard)
+│   ├── employees
+│   │   ├── dashboard
+│   │   ├── departments
+│   │   ├── employees-list
+│   │   └── roles
+│   │
+│   ├── expenses
+│   │   ├── dashboard
+│   │   ├── detailed-map
+│   │   ├── expense-types
+│   │   └── expenses-list
+│   │
+│   └── settings
+│
+└── api
+    ├── auth
+    │   ├── google
+    │   │   └── callback
+    │   ├── signin
+    │   └── logout
+    │
+    ├── expenses
+    │   ├── add
+    │   └── send-report
+    │
+    ├── stats
+    ├── net-balance
+    ├── currency
+    ├── available-years
+    ├── daily-expenses
+    ├── monthly-credit-debit
+    ├── yearly-credit-debit
+    ├── yearly-expense
+    ├── yearly-expense-daywise
+    ├── yearly-category-expenses
+    ├── category-expenses
+    ├── expense-types
+    ├── treegraph
+    ├── financial-insights
+    └── user
+🔐 Authentication
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+Cookie-based authentication
+JWT (access_token) stored securely
+Google OAuth integration
+Server-side auth handling for faster dashboard loading
+
+⚡ Performance Optimizations
+
+Server-side rendering for dashboards
+Cookie-based user validation (avoids unnecessary API calls)
+Optimized API queries for analytics
+Global year selection across expense dashboards
+Reduced loading states for faster UX
+
+📈 Key Dashboards & APIs
+
+Expense Dashboard: Real-time financial data
+Employee Dashboard: Organization & role management
+Credit/Debit Charts
+Category Trends
+Net Balance Overview
+Tree Graph & Financial Insights
+
+🛠️ Setup Instructions (Local)
+text# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+Make sure:
+
+SQL Server is running
+Environment variables for DB & auth are properly set
+Employee API service is running separately (Node.js repo)
+
+📌 Notes
+
+Expense and Employee modules are logically separated
+Both systems use SSMS but different databases
+Designed for internal enterprise usage
+Scalable for adding more dashboards in future
+
+👨‍💼 Maintained By
+Anthem Infotech Pvt. Ltd.
